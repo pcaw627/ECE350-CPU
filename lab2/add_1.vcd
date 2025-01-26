@@ -1,0 +1,108 @@
+$date
+	Tue Jan 21 13:24:44 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	100ps
+$end
+$scope module add_1_tb $end
+$var wire 1 ! S $end
+$var wire 1 " Cout $end
+$var reg 1 # A $end
+$var reg 1 $ B $end
+$var reg 1 % Cin $end
+$scope module adder $end
+$var wire 1 # A $end
+$var wire 1 $ B $end
+$var wire 1 % Cin $end
+$var wire 1 " Cout $end
+$var wire 1 ! S $end
+$var wire 1 & w1 $end
+$var wire 1 ' w2 $end
+$var wire 1 ( w3 $end
+$var wire 1 ) w4 $end
+$var wire 1 * w5 $end
+$var wire 1 + w6 $end
+$var wire 1 , w7 $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+1,
+1+
+1*
+0)
+1(
+1'
+1&
+0%
+0$
+0#
+0"
+0!
+$end
+#100
+1!
+0+
+1)
+0'
+1#
+#200
+1'
+0(
+0#
+1$
+#300
+0!
+1+
+0)
+1(
+1"
+0&
+1'
+1#
+#400
+0"
+1!
+1&
+0,
+0#
+0$
+1%
+#500
+0!
+1,
+1"
+0*
+1+
+1)
+0'
+1#
+#600
+1'
+0(
+0#
+1$
+#700
+1!
+0,
+1*
+0)
+1(
+0&
+1'
+1#
+#800
+0"
+0!
+1&
+1,
+0#
+0$
+0%

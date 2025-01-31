@@ -1,0 +1,12 @@
+alu.v
+alu_tb.v
+badcla.v
+cla_32.v
+cla_32_tb.v
+cla_8.v
+cla_8_tb.v
+full_adder.v
+logic\and_1.v
+logic\and_1_tb.v
+logic\or_1.v
+logic\or_1_tb.v

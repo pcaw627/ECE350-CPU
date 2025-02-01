@@ -3,7 +3,7 @@ module sra_32_8b (
     output [31:0] out
 );
 
-    assign out[31:24] = in[7:0];
+    assign out[31:24] = {in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31]};
     assign out[23:0] = in[31:8];
 endmodule
 

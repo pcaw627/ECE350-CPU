@@ -18,4 +18,4 @@ sra_32_8b.v
 sra_32_tb.v
 sra_32_1b_tb.v
 sra_32_2b_tb.v
-../lab1/mux_2.v
+mux_2.v

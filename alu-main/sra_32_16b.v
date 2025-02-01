@@ -3,7 +3,8 @@ module sra_32_16b (
     output [31:0] out
 );
 
-    assign out[31:16] = in[15:0];
+    // assign out[31:16] = {in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31], in[31]};
+    assign out[31:16] = {16{in[31]}}; // replication, not the same as genvar
     assign out[15:0] = in[31:16];
 endmodule
 

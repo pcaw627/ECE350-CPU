@@ -1,3 +1,18 @@
-alu-main/*.v
-alu-main/*.csv
-alu-main/*.txt
+# Ignore all files
+*
+!alu-main/*
+# Include .v files
+!*.v
+# Include .csv files
+!*.csv
+# Include .txt files
+!*.txt
+# Include README files
+!*/README.md
+!alu-main/README.md
+!**/README*
+# Include .gitignore file
+!*.gitignore
+
+# Ignore .vcd files
+*.vcd

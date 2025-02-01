@@ -20,6 +20,6 @@ I implemented the above, along with the associated control signals for LT, EQ, G
 
 For my logic (SLL, SRA, bitwise AND and OR) I also used encapsulation in a similar way to how CLAs break up their operations into 4 8 bit blocks. 
 
-I took care not to use the prebuilt digital operators. 
+I took care not to use the prebuilt digital operators.  
 
 ## Bugs

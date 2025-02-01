@@ -20,3 +20,4 @@ lab1\mux_32_tb.v
 lab1\mux_2.v
 lab1\mux_4.v
 lab1\mux_8.v
+lab3\comp_32.v

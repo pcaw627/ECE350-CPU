@@ -48,7 +48,7 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
     not (isNotEqual, isEqualTo);
     comp_32 comparator(.EQ1(1'b1), .GT1(1'b0), .A(data_operandA), .B(data_operandB), .EQ0(isEqualTo), .GT0(isGreaterThan));
 
-    // overflow
+    // overflow - handled in ADD operator above.
 
     
 

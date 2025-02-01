@@ -1,0 +1,61 @@
+$date
+	Fri Jan 31 15:42:49 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	100ps
+$end
+$scope module and_32_tb $end
+$var wire 32 ! out [31:0] $end
+$var reg 32 " in1 [31:0] $end
+$var reg 32 # in2 [31:0] $end
+$scope module and_32_gate $end
+$var wire 32 $ in1 [31:0] $end
+$var wire 32 % in2 [31:0] $end
+$var wire 32 & out [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b10 &
+b10111111100110010 %
+b111 $
+b10111111100110010 #
+b111 "
+b10 !
+$end
+#200
+b100010 !
+b100010 &
+b101010010000010100110 #
+b101010010000010100110 %
+b1111100110011 "
+b1111100110011 $
+#400
+b100000 !
+b100000 &
+b1100010 #
+b1100010 %
+b11000111101110000010111001 "
+b11000111101110000010111001 $
+#600
+b11100010100000110 !
+b11100010100000110 &
+b11110011101111110 #
+b11110011101111110 %
+b11101010110000110 "
+b11101010110000110 $
+#800
+b1001010 !
+b1001010 &
+b1001110 #
+b1001110 %
+b1111011 "
+b1111011 $
+#1000

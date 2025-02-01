@@ -1,6 +1,5 @@
 alu.v
 alu_tb.v
-badcla.v
 cla_32.v
 cla_32_tb.v
 cla_8.v
@@ -10,3 +9,14 @@ logic\and_1.v
 logic\and_1_tb.v
 logic\or_1.v
 logic\or_1_tb.v
+logic\and_32.v
+logic\and_32_tb.v
+logic\or_32.v
+logic\or_32_tb.v
+logic\not_32.v
+logic\not_32_tb.v
+lab1\mux_32.v
+lab1\mux_32_tb.v
+lab1\mux_2.v
+lab1\mux_4.v
+lab1\mux_8.v

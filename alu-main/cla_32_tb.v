@@ -32,7 +32,7 @@ module cla_32_tb;
         A = 32'b11111111111111111111111111111111;
         B = 32'd17;
         #20;
-        $display("A:%d, B:%d, Cin:%b => S:%d, Cout:%b", A, B, Cin, Sum, Cout);
+        $display("A:%b, B:%b, Cin:%b => S:%b, Cout:%b", A, B, Cin, Sum, Cout);
         
         Cin = 1;
         A = 32'd3;
@@ -46,7 +46,7 @@ module cla_32_tb;
     // output waveform
     initial begin
         // output file name
-        $dumpfile("cla_32.vcd");
+        $dumpfile("cla_32_debug.vcd");
         $dumpvars(0, cla_32_tb);
     end
 

@@ -10,6 +10,7 @@ module cla_8 (
     wire [7:0] P, G;
     wire [7:0] C;
     wire [27:0] term; 
+    wire [6:0] gterm;
 
     // need generate fns
     and_1 g0_gate(.out(G[0]), .in1(A[0]), .in2(B[0]));
@@ -21,6 +22,15 @@ module cla_8 (
     and_1 g6_gate(.out(G[6]), .in1(A[6]), .in2(B[6]));
     and_1 g7_gate(.out(G[7]), .in1(A[7]), .in2(B[7]));
 
+    and (gterm[0], P[7], G[6]);
+    and (gterm[1], P[7], P[6], G[5]);
+    and (gterm[2], P[7], P[6], P[5], G[4]);
+    and (gterm[3], P[7], P[6], P[5], P[4], G[3]);
+    and (gterm[4], P[7], P[6], P[5], P[4], P[3], G[2]);
+    and (gterm[5], P[7], P[6], P[5], P[4], P[3], P[2], G[1]);
+    and (gterm[6], P[7], P[6], P[5], P[4], P[3], P[2], P[1], G[0]);
+    or (Gout, gterm[0], gterm[1], gterm[2], gterm[3], gterm[4], gterm[5], gterm[6]);
+
     // need propagation fns
     or_1 p0_gate(.out(P[0]), .in1(A[0]), .in2(B[0]));
     or_1 p1_gate(.out(P[1]), .in1(A[1]), .in2(B[1]));
@@ -30,6 +40,9 @@ module cla_8 (
     or_1 p5_gate(.out(P[5]), .in1(A[5]), .in2(B[5]));
     or_1 p6_gate(.out(P[6]), .in1(A[6]), .in2(B[6]));
     or_1 p7_gate(.out(P[7]), .in1(A[7]), .in2(B[7]));
+    
+    and (Pout, P[0], P[1], P[2], P[3], P[4], P[5], P[6], P[7]);
+
 
     //////// Carry terms (prop and gen components)
     // C0 = Cin
@@ -99,7 +112,7 @@ module cla_8 (
     wire [7:0] unused_carry;
     //////// Sum (using carry components])
     full_adder S_0(Sum[0], unused_carry[0], A[0], B[0], C[0]);
-    full_adder S_1(Sum[1], unused_carry[0], A[1], B[1], C[1]);
+    full_adder S_1(Sum[1], unused_carry[1], A[1], B[1], C[1]);
     full_adder S_2(Sum[2], unused_carry[2], A[2], B[2], C[2]);
     full_adder S_3(Sum[3], unused_carry[3], A[3], B[3], C[3]);
     full_adder S_4(Sum[4], unused_carry[4], A[4], B[4], C[4]);
@@ -107,20 +120,6 @@ module cla_8 (
     full_adder S_6(Sum[6], unused_carry[6], A[6], B[6], C[6]);
     full_adder S_7(Sum[7], unused_carry[7], A[7], B[7], C[7]);
 
-    // doesnt work
-    // wire [7:0] unused_carry;
-    // //////// Sum (using carry components])
-    // full_adder S_0(Sum[0], C[0], A[0], B[0], Cin);
-    // full_adder S_1(Sum[1], C[0], A[1], B[1], C[0]);
-    // full_adder S_2(Sum[2], C[2], A[2], B[2], C[1]);
-    // full_adder S_3(Sum[3], C[3], A[3], B[3], C[2]);
-    // full_adder S_4(Sum[4], C[4], A[4], B[4], C[3]);
-    // full_adder S_5(Sum[5], C[5], A[5], B[5], C[4]);
-    // full_adder S_6(Sum[6], C[6], A[6], B[6], C[5]);
-    // full_adder S_7(Sum[7], C[7], A[7], B[7], C[6]);
-
-    assign Pout = P[7];
-    assign Gout = G[7];
 
 endmodule
 

@@ -38,6 +38,12 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
     // BITWISE OR
     or_32 or_op(.in1(data_operandA), .in2(data_operandB), .out(or_result));
 
+    // LOGICAL SHIFT LEFT
+    sll_32 sll_op(.in1(data_operandA), .shamt(ctrl_shiftamt), .out(sll_result));
+
+    // ARITHMETIC SHIFT RIGHT
+    sra_32 sra_op(.in1(data_operandA), .shamt(ctrl_shiftamt), .out(sra_result));
+
     
     ///////// CONTROL SIGNALS OUT
     

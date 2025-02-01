@@ -10,12 +10,12 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
 
 
     //////// OPCODE MUX
-    wire [31:0] add_result = 32'd0;
-    wire [31:0] sub_result = 32'd0;
-    wire [31:0] and_result = 32'd0;
-    wire [31:0] or_result = 32'd0;
-    wire [31:0] sll_result = 32'd0;
-    wire [31:0] sra_result = 32'd0;
+    wire [31:0] add_result;
+    wire [31:0] sub_result;
+    wire [31:0] and_result;
+    wire [31:0] or_result;
+    wire [31:0] sll_result;
+    wire [31:0] sra_result;
     mux_32 opmux(.out(data_result), .select(ctrl_ALUopcode), .in0(add_result), .in1(sub_result), .in2(and_result), .in3(or_result), .in4(sll_result), .in5(sra_result), 
     .in6(32'd0), .in7(32'd0), .in8(32'd0), .in9(32'd0), .in10(32'd0), .in11(32'd0), .in12(32'd0), .in13(32'd0), .in14(32'd0), .in15(32'd0), .in16(32'd0), .in17(32'd0),
     .in18(32'd0), .in19(32'd0), .in20(32'd0), .in21(32'd0), .in22(32'd0), .in23(32'd0), .in24(32'd0), .in25(32'd0), .in26(32'd0), .in27(32'd0), .in28(32'd0),

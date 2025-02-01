@@ -1,0 +1,49 @@
+$date
+	Fri Jan 31 20:41:16 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	100ps
+$end
+$scope module sll_32_2b_tb $end
+$var wire 32 ! out [31:0] $end
+$var reg 32 " in [31:0] $end
+$scope module sll_32_gate $end
+$var wire 32 # in [31:0] $end
+$var wire 32 $ out [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b11100 $
+b111 #
+b111 "
+b11100 !
+$end
+#200
+b111110011001100 !
+b111110011001100 $
+b1111100110011 "
+b1111100110011 #
+#400
+b1100011110111000001011100100 !
+b1100011110111000001011100100 $
+b11000111101110000010111001 "
+b11000111101110000010111001 #
+#600
+b1110101011000011000 !
+b1110101011000011000 $
+b11101010110000110 "
+b11101010110000110 #
+#800
+b111101100 !
+b111101100 $
+b1111011 "
+b1111011 #
+#1000

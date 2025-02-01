@@ -4,7 +4,8 @@ module sra_32_1b (
 );
 
     // 1100101 -> 1110010
-    assign out[31] = in[0];
+    // out is padded to left (msb) with the original msb of the in
+    assign out[31] = in[31];
     assign out[30:0] = in[31:1];
 endmodule
 

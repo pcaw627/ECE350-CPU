@@ -62,27 +62,22 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
     
     // isequal and greaterthan
     wire isGreaterThan;
-    wire lt_temp;
-    wire lt_temp2;
+    wire geq;
+    wire lt_for_same_sign;
 
-    or (lt_temp, isGreaterThan, isEqualTo);
-    not (lt_temp2, lt_temp);
+    or (geq, isGreaterThan, isEqualTo);
+    not (lt_for_same_sign, geq);
 
     wire same_sign;
     xnor (same_sign, data_operandA[31], data_operandB[31]);
+    
 
-
-    comp_mux_2 ltmux(.select(same_sign), .in0(data_operandA[31]), .in1(lt_temp2), .out(isLessThan));
+    comp_mux_2 ltmux(.select(same_sign), .in0(data_operandA[31]), .in1(lt_for_same_sign), .out(isLessThan));
 
 
     wire isEqualTo;
     not (isNotEqual, isEqualTo);
     comp_32 comparator(.EQ1(1'b1), .GT1(1'b0), .A(data_operandA), .B(data_operandB), .EQ0(isEqualTo), .GT0(isGreaterThan));
-
-    // overflow - redo
-
-    
-
 
 endmodule
     

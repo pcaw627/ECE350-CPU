@@ -11,51 +11,40 @@ module comp_2(EQ1, GT1, A, B, EQ0, GT0);
 
     assign select = {A[1], A[0], B[1]};
     // h(a1 a0 b1 b0) = B0' * f(A1, A0, B1, B0=0) + B0 * f(A1, A0, B1, B0=1)
-    wire zero;
-    assign zero = 1'b0;
-    wire one;
-    assign one = !zero;
+    wire notB;
+    not (notB, B[0]);
+
+    wire notEQ1;
+    not (notEQ1, EQ1);
+
+    wire notGT1;
+    not (notGT1, GT1);
     
     
-    comp_mux_8 eqmux(.select(select), .out(eqmux_out), .in0(!B[0]), .in1(zero), .in2(B[0]), .in3(zero), .in4(zero), .in5(!B[0]), .in6(zero), .in7(B[0]));
-    and eq_out(EQ0, EQ1, !GT1, eqmux_out);
-
-
-    // eq_1 = EQ1 & !GT1 & !A1 & !A0 & !B1 & !B0
-    // eq_2 = EQ1 & !GT1 & !A1 & A0 & !B1 & B0
-    // eq_3 = EQ1 & !GT1 & A1 & !A0 & B1 & !B0
-    // eq_4 = EQ1 & !GT1 & A1 & A0 & B1 & B0
-
-    // EQ0 = eq_1 | eq_2 | eq_3 | eq_4  = (EQ1 & !GT1) & [(!A1 & !A0 & !B1 & !B0) | (!A1 & A0 & !B1 & B0) | (A1 & !A0 & B1 & !B0) | (A1 & A0 & B1 & B0)]
-    // EQ0 = (EQ1 & !GT1) & [eqmux_out]
-
-    // A1A0B1 : logic output
-    // 000 : !B0
-    // 010 : B0
-    // 101 : !B0
-    // 111 : B0
-    // the rest tied to 0.
-
-    // gt_1 = !EQ1 & GT1
-    // gt_2 = EQ1 & !GT1 & !A1 & A0 & !B1 & !B0
-    // gt_3 = EQ1 & !GT1 & A1 & !B1
-    // gt_4 = EQ1 & !GT1 & A1 & A0 & B1 & !B0
-
-    // h(a1 a0 b1 b0) = B0' * f(A1, A0, B1, B0=0) + B0 * f(A1, A0, B1, B0=1)
-    // A1A0B1: logic output
-    // 010: !B0
-    // 111: !B0
-    // 1x0: 1
-    //default : 0
-
+    comp_mux_8 eqmux(.select(select), .out(eqmux_out), .in0(notB), .in1(1'b0), .in2(B[0]), .in3(1'b0), .in4(1'b0), .in5(notB), .in6(1'b0), .in7(B[0]));
+    and eq_out(EQ0, EQ1, notGT1, eqmux_out);
+    // eqmux is 1 when current block inputs are equal (regardless of passed in values)
     // 1 by default: 0 if we have (!G1 & !A1 & B1)
 
     // 
     wire gt_mux_out;
 
-    comp_mux_8 gt_mux(.select(select), .out(gt_mux_out), .in0(zero), .in1(zero), .in2(!B[0]), .in3(zero), .in4(one), .in5(zero), .in6(one), .in7(!B[0]));
+    comp_mux_8 gt_mux(.select(select), .out(gt_mux_out), .in0(1'b0), .in1(1'b0), .in2(notB), .in3(1'b0), .in4(1'b1), .in5(1'b0), .in6(1'b1), .in7(notB));
+    // wire gtmuxout;
+    // and(gtmuxout, notEQ1, GT1);
 
-    or mux_out(GT0, gt_mux_out, !EQ1 & GT1);
+
+    wire temp3;
+    and (temp3, gt_mux_out, EQ1, notGT1);
+
+    wire temp4;
+    and (temp4, notEQ1, GT1);
+
+    or (GT0, temp4, temp3);
+
+
+
+    // gtmuxout is 1 when A for current block is greater than B for current block (regardless of passed in values).
 
 
 

@@ -6,11 +6,6 @@ module comp_32(EQ1, GT1, A, B, EQ0, GT0);
     input [31:0] A, B;
     output EQ0, GT0;
 
-    wire zero;
-    assign zero = 1'b0;
-    wire one;
-    assign one = !zero;
-
     wire C3_gt0, C2_gt0, C1_gt0, C0_gt0;
     wire C3_eq0, C2_eq0, C1_eq0, C0_eq0;
 

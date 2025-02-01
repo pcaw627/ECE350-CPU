@@ -25,5 +25,6 @@ module comp_32(EQ1, GT1, A, B, EQ0, GT0);
     // assign highest MSB GT1 to 0 ("don't know if they're gt yet, keep searching lower")
 
     // iverilog -o comp_32 -s comp_32_tb .\comp_32.v .\comp_8.v .\comp_2.v .\mux_8.v .\mux_2.v .\mux_4.v .\comp_32_tb.v
+    // iverilog -o comp_32 -s comp_32_tb .\comp_32.v .\comp_8.v .\comp_2.v .\comp_mux_8.v .\comp_mux_2.v .\comp_mux_4.v .\comp_32_tb.v
 
 endmodule

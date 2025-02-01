@@ -23,14 +23,27 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
 
 
     ///////// OPERATIONS
+    wire add_ovf;
+    wire sub_ovf;
+    wire [31:0] inv_B;
+    wire [31:0] cla_B_in;
+
+    not_32 subinv(.out(inv_B), .in(data_operandB));
+    mux_2 submux(.select(ctrl_ALUopcode[0]), .in0(data_operandB), .in1(inv_B), .out(cla_B_in));
+    // mux_2 (.)
+    assign sub_result = add_result;
+
 
     // ADD
-    cla_32 add_op(.A(data_operandA), .B(data_operandB), .Cin(1'b0), .Sum(add_result), .Cout(overflow));
+    cla_32 addsub(.A(data_operandA), .B(cla_B_in), .Cin(ctrl_ALUopcode[0]), .Sum(add_result), .Cout(), .signed_ovf(overflow)); 
+    // cla_32 add_op(.A(data_operandA), .B(data_operandB), .Cin(1'b0), .Sum(add_result), .Cout(add_ovf));  
+    // you may need two overflows if you have separate cla for add and sub
+    // x is double driven or propogated z
     
     // SUB
     wire [31:0] NOT_operandA;
     not_32 complement(.in(data_operandA), .out(NOT_operandA));
-    cla_32 sub_op(.A(NOT_operandA), .B(data_operandB), .Cin(1'b1), .Sum(sub_result), .Cout(overflow));
+    // cla_32 sub_op(.A(NOT_operandA), .B(data_operandB), .Cin(1'b1), .Sum(sub_result), .Cout(sub_ovf));
 
     // BITWISE AND
     and_32 and_op(.in1(data_operandA), .in2(data_operandB), .out(and_result));
@@ -39,22 +52,34 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
     or_32 or_op(.in1(data_operandA), .in2(data_operandB), .out(or_result));
 
     // LOGICAL SHIFT LEFT
-    sll_32 sll_op(.in1(data_operandA), .shamt(ctrl_shiftamt), .out(sll_result));
+    sll_32 sll_op(.in(data_operandA), .shamt(ctrl_shiftamt), .out(sll_result));
 
     // ARITHMETIC SHIFT RIGHT
-    sra_32 sra_op(.in1(data_operandA), .shamt(ctrl_shiftamt), .out(sra_result));
+    sra_32 sra_op(.in(data_operandA), .shamt(ctrl_shiftamt), .out(sra_result));
 
     
     ///////// CONTROL SIGNALS OUT
     
-    // not equal and c
+    // isequal and greaterthan
     wire isGreaterThan;
-    not (isLessThan, isGreaterThan);
+    wire lt_temp;
+    wire lt_temp2;
+
+    or (lt_temp, isGreaterThan, isEqualTo);
+    not (lt_temp2, lt_temp);
+
+    wire same_sign;
+    xnor (same_sign, data_operandA[31], data_operandB[31]);
+
+
+    comp_mux_2 ltmux(.select(same_sign), .in0(data_operandA[31]), .in1(lt_temp2), .out(isLessThan));
+
+
     wire isEqualTo;
     not (isNotEqual, isEqualTo);
     comp_32 comparator(.EQ1(1'b1), .GT1(1'b0), .A(data_operandA), .B(data_operandB), .EQ0(isEqualTo), .GT0(isGreaterThan));
 
-    // overflow - handled in ADD operator above.
+    // overflow - redo
 
     
 

@@ -1,5 +1,5 @@
 
-module mux_2(out, select, in0, in1);
+module comp_mux_2(out, select, in0, in1);
     input select;
     input in0, in1;
     output out;

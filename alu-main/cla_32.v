@@ -3,7 +3,8 @@ module cla_32 (
     input [31:0] B,
     input Cin,
     output [31:0] Sum,
-    output Cout
+    output Cout,
+    output signed_ovf
 );
     // block level vars
     wire [3:0] P, G;
@@ -46,9 +47,10 @@ module cla_32 (
         .B(B[31:24]),
         .Cin(C[2]),
         .Sum(Sum[31:24]),
-        .Cout(), // don't ripple
+        .Cout(Cout), // don't ripple
         .Pout(P[3]),
-        .Gout(G[3])
+        .Gout(G[3]),
+        .signed_ovf(signed_ovf)
     );
 
     

@@ -17,7 +17,7 @@ module comp_2(EQ1, GT1, A, B, EQ0, GT0);
     assign one = !zero;
     
     
-    mux_8 eqmux(.select(select), .out(eqmux_out), .in0(!B[0]), .in1(zero), .in2(B[0]), .in3(zero), .in4(zero), .in5(!B[0]), .in6(zero), .in7(B[0]));
+    comp_mux_8 eqmux(.select(select), .out(eqmux_out), .in0(!B[0]), .in1(zero), .in2(B[0]), .in3(zero), .in4(zero), .in5(!B[0]), .in6(zero), .in7(B[0]));
     and eq_out(EQ0, EQ1, !GT1, eqmux_out);
 
 
@@ -53,7 +53,7 @@ module comp_2(EQ1, GT1, A, B, EQ0, GT0);
     // 
     wire gt_mux_out;
 
-    mux_8 gt_mux(.select(select), .out(gt_mux_out), .in0(zero), .in1(zero), .in2(!B[0]), .in3(zero), .in4(one), .in5(zero), .in6(one), .in7(!B[0]));
+    comp_mux_8 gt_mux(.select(select), .out(gt_mux_out), .in0(zero), .in1(zero), .in2(!B[0]), .in3(zero), .in4(one), .in5(zero), .in6(one), .in7(!B[0]));
 
     or mux_out(GT0, gt_mux_out, !EQ1 & GT1);
 

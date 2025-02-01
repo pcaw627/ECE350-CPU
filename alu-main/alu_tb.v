@@ -145,4 +145,12 @@ module alu_tb;
 		#100;
 		$finish;
 	end
+
+	
+    // output waveform
+    // initial begin
+    //     // output file name
+    //     $dumpfile("alu.vcd");
+    //     $dumpvars(0, alu_tb);
+    // end
 endmodule

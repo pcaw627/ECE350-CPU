@@ -5,8 +5,13 @@ module cla_8 (
     output [7:0] Sum,
     output Cout,
     output Pout, // Propagate output for higher-level CLA
-    output Gout  // Generate output for higher-level CLA
+    output Gout,  // Generate output for higher-level CLA
+    output signed_ovf
 );
+    // signed overflow:
+    xor (signed_ovf, unused_carry[7], C[7]);
+
+
     wire [7:0] P, G;
     wire [7:0] C;
     wire [27:0] term; 
@@ -29,7 +34,7 @@ module cla_8 (
     and (gterm[4], P[7], P[6], P[5], P[4], P[3], G[2]);
     and (gterm[5], P[7], P[6], P[5], P[4], P[3], P[2], G[1]);
     and (gterm[6], P[7], P[6], P[5], P[4], P[3], P[2], P[1], G[0]);
-    or (Gout, gterm[0], gterm[1], gterm[2], gterm[3], gterm[4], gterm[5], gterm[6]);
+    or (Gout, G[7], gterm[0], gterm[1], gterm[2], gterm[3], gterm[4], gterm[5], gterm[6]);
 
     // need propagation fns
     or_1 p0_gate(.out(P[0]), .in1(A[0]), .in2(B[0]));

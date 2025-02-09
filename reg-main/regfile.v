@@ -5,13 +5,11 @@ module regfile (
 	data_readRegA, data_readRegB
 );
 
-	input clock, ctrl_writeEnable, ctrl_reset;
-	input [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB;
-	input [31:0] data_writeReg;
+	input clock, ctrl_writeEnable, ctrl_reset; 
 
-	output [31:0] data_readRegA, data_readRegB;
-
-	// add your code here
+	input [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB; // will control which regs are read and written
+	input [31:0] data_writeReg; // will control what data is written into reg
+	output [31:0] data_readRegA, data_readRegB; // will store the data read from regs
 
 	// https://people.duke.edu/~tkb13/courses/ece250-2022su/slides/06-sequential-logic.pdf
 	// note p45-p60
@@ -39,9 +37,13 @@ module regfile (
 	wire [31:0] Aregreadout;
 	wire [31:0] Bregreadout;
 
+	// make r0 output 0 no matter what 	
+	mux_2 mux_regAread_0(.select(ctrl_readRegA_onehotdecoded[0]), .out(data_readRegA), .in0(32'bz), .in1(32'b0));
+	mux_2 mux_regBread_0(.select(ctrl_readRegB_onehotdecoded[0]), .out(data_readRegB), .in0(32'bz), .in1(32'b0));
+
 	genvar i;
 	generate
-		for (i=0; i<32; i=i+1) begin : registers
+		for (i=1; i<32; i=i+1) begin : registers
 			// question: will ctrl_reset be required to reset all registers, or just the one selected by reg_enable?
 			// remember to make r0 always 0
 

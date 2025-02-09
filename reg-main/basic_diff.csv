@@ -1,3 +1,1 @@
 Test Number, WriteEnable, Reset, WriteReg, WriteData, ReadRegA, ReadRegB,DataRegA, DataRegB, ExpReadDataA, ExpReadDataB
-1,1,0, 0,          1, 0, 0,          1,          1,          0,          0
-33,0,0, 0,         -1, 0,16,          1,      65536,          0,      65536

@@ -18,7 +18,7 @@ module regfile (
    generate
         for (i=0 i<32; i=i+1) begin loop1;
             // module dffe_ref (q, d, clk, en, clr);
-            register r(.q(q[i]), .d(d[i]), .clk(clk), .en(en), .clr(clr));
+            register_32 r(.q(q[i]), .d(d[i]), .clk(clk), .en(en), .clr(clr));
         end
    endgenerate
    

@@ -1,4 +1,4 @@
-module decoder_32_tri (
+module decode_32_tri (
     input [4:0] select,      // 5-bit input to select one of 32 outputs
     output [31:0] out    // 32-bit output (one-hot 1 and the rest Z)
 );
@@ -14,3 +14,7 @@ module decoder_32_tri (
     endgenerate
 
 endmodule
+
+
+// iverilog -o reg-main/decode_32_tri -c reg-main/decode_32_tri_FileList.txt -Wimplicit
+// vvp .\reg-main\decode_32_tri

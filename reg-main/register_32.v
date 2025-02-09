@@ -15,8 +15,3 @@ module register_32 (
 
    endgenerate
 endmodule
-
-// register_32_FileList.txt
-
-// iverilog -o reg-main/register_32 -c reg-main/register_32_FileList.txt -Wimplicit
-// vvp .\reg-main\register_32

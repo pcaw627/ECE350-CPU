@@ -1,6 +1,6 @@
-reg-main\regfile.v
-reg-main\regfile_tb.v
-reg-main\register_32.v
-reg-main\dffe_ref.v
-reg-main\decode_32_bi.v
-alu-main\mux_2.v
+..\reg-main\regfile.v
+..\reg-main\regfile_tb.v
+..\reg-main\register_32.v
+..\reg-main\dffe_ref.v
+..\reg-main\decode_32_bi.v
+..\alu-main\mux_2.v

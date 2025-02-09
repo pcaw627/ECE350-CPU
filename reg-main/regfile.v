@@ -33,21 +33,24 @@ module regfile (
 
 
 	// now we can create the registers themselves. We want to hardcode r0 to 32'b0. this line will create 32 buses, each 32 bits long, one for each register. 
-	wire [31:0] Areg_d_array [0:31];
-    wire [31:0] Areg_q_array [0:31];
-	wire [31:0] Breg_d_array [0:31];
-    wire [31:0] Breg_q_array [0:31];
+	// wire [31:0] Areg_d_array [0:31];
+	// wire [31:0] Breg_d_array [0:31];
+    wire [31:0] reg_q_array [0:31];
 	wire [31:0] Aregreadout;
+	wire [31:0] Bregreadout;
 
 	genvar i;
 	generate
-		for (i=0; i<32; i=i+1) begin
-			// we will have to replace ctrl_writeEnable and possible the reset signal as well.
-			// question: will ctrl_reset be required to reset all registers, or just the one selected by ctrl_writeReg_onehotdecoded?
-			register_32 regA(.q(Areg_q_array[i]), .d(Areg_d_array[i]), .clk(clock), .en(ctrl_writeEnable), .clr(ctrl_reset));
-			register_32 regB(.q(Breg_q_array[i]), .d(Breg_d_array[i]), .clk(clock), .en(ctrl_writeEnable), .clr(ctrl_reset));
+		for (i=0; i<32; i=i+1) begin : registers
+			// question: will ctrl_reset be required to reset all registers, or just the one selected by reg_enable?
+			// remember to make r0 always 0
 
-			mux_2 mux_regAread(.select(ctrl_readRegA_onehotdecoded[i]), .out(Aregreadout), .in0(32'b0), .in1(Areg_q_array[i]));
+			wire reg_enable;
+			and(reg_enable, ctrl_writeEnable, ctrl_writeReg_onehotdecoded[i]);
+			register_32 reg_i(.q(reg_q_array[i]), .d(data_writeReg), .clk(clock), .en(reg_enable), .clr(ctrl_reset));
+			
+			mux_2 mux_regAread(.select(ctrl_readRegA_onehotdecoded[i]), .out(data_readRegA), .in0(32'bz), .in1(reg_q_array[i]));
+			mux_2 mux_regBread(.select(ctrl_readRegB_onehotdecoded[i]), .out(data_readRegB), .in0(32'bz), .in1(reg_q_array[i]));
 		end
 	endgenerate
    
@@ -58,4 +61,7 @@ endmodule
 // regfile_FileList.txt
 
 // iverilog -o reg-main/regfile -c reg-main/regfile_FileList.txt -Wimplicit
-// vvp .\reg-main\regfile
+// vvp .\reg-main\regfile +test=basic
+
+// iverilog -o .\regfile -c .\regfile_FileList.txt -Wimplicit
+// vvp .\regfile +test=basic

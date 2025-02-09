@@ -117,6 +117,14 @@ module regfile_tb;
 		$finish;
 	end
 
+
+    // output waveform
+    initial begin
+        // output file name
+        $dumpfile("regfile.vcd");
+        $dumpvars(0, regfile_tb);
+    end
+
     always 
     	#5 clock = !clock;
 

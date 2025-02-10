@@ -1,0 +1,39 @@
+
+choice of booth (2bits at a time), mbooth (3 bits at a time), wallace tree (a lot of bits at a time)
+
+question is whether to go with booth (which i feel might be a pain) or wallace (which i feel is scary as hell but has some pros)
+
+booth:
++ basic (4 cases)
++ good documentation thru boards + bletsch's lecture notes
++ meh factor
+
+mbooth:
++ faster than booth esp for alternating bits
++ a little more work to do each of 8 cases
+
++ both booths have sim tools built by bletsch on git, could be handy for debugging
+
+wallace:
++ a pain
++ is scary
++ faster than booth (maybe dadda tree is another option but lets say wallace for now)
++ wow factor
++ adrenaline rush
++ bragging rights
+- actually might be a liability, risk tanking first milestone and i dont want to do that just for the meme
+- as mentioned in lecture might have like over 32^2 = 1024 gates, space concern?
+    + but with the tree like structure i feel like we could just spam submodules to simplify things a bit 
+    + would problaly need psums
+    + logn reduction steps, each const time
+    + 2704 LUTs for 32bit wallace multiplier
+    + 134,600 LUTs on our artix7 fpga board so honestly that's really not too bad spacewise
++ as for the M1 deadline, we can optimize the mult module by autoreturning 0 if all bits of either input are 0 (mux it)
+
+https://www.ijcaonline.org/research/volume124/number13/keshaveni-2015-ijca-905742.pdf  // build off this one i think
+https://kalaharijournals.com/resources/26_JUNE21.pdf
+https://scholarworks.bridgeport.edu/server/api/core/bitstreams/5eeaa145-f704-4183-8e2f-3b8e6c94ef2e/content
+https://gitlab.oit.duke.edu/tkb13/multdiv-simulator
+https://en.wikipedia.org/wiki/Wallace_tree
+https://www.ijert.org/research/design-and-implementation-of-32-bit-wallace-multiplier-using-compressors-and-various-adders-IJERTV11IS050369.pdf
+[6] Jagadeshwar Rao M, Sanjay Dubey, Asia Pacific conference 2012, A high speed and area efficient booth encoded Wallace tree multiplier  for fast arithmetic circuits.  

@@ -1,14 +1,14 @@
-module full_adder(out1, out2, in1, in2, in3);
-    input in1, in2, in3;
-    output out1, out2;
+module full_adder(sum, cout, a, b, cin);
+    input a, b, cin;
+    output sum, cout;
     wire w1, w2, w3;
 
     // syntax: gate instance_name(output, input_1, input_2...)
-    xor Sresult(out1, in1, in2, in3);
-    and A_and_B(w1, in1, in2);
-    and A_and_C(w2, in1, in3);
-    and B_and_C(w3, in2, in3);
-    or Cout(out2, w1, w2, w3);
+    xor Sresult(sum, a, b, cin);
+    and A_and_B(w1, a, b);
+    and A_and_C(w2, a, cin);
+    and B_and_C(w3, b, cin);
+    or Cout(cout, w1, w2, w3);
 
 endmodule
 

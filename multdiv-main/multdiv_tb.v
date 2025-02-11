@@ -160,6 +160,14 @@ module multdiv_tb;
 		#100;
 		$finish;
 	end
+	
+
+    // output waveform
+    initial begin
+        // output file name
+        $dumpfile("multdiv.vcd");
+        $dumpvars(0, multdiv_tb);
+    end
 
     always 
     	#20 clock = !clock;

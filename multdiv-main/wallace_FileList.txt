@@ -1,0 +1,7 @@
+wallace_32.v
+wallace_tb.v
+../alu-main/mux_2.v
+../alu-main/or_64.v
+../alu-main/and_64.v
+../alu-main/full_adder.v
+../alu-main/half_adder.v

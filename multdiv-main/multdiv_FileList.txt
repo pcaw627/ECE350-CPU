@@ -1,3 +1,6 @@
 multdiv.v
 multdiv_tb.v
+wallace_32.v
 ../alu-main/mux_2.v
+../alu-main/full_adder.v
+../alu-main/half_adder.v

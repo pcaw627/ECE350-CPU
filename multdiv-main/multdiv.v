@@ -22,14 +22,23 @@ module multdiv(
     // not (autozero, notautozero);
 
     // we will discard the hi part of data_result
-    wire [31:0] mult_lo;
-    assign mult_lo = 32'b1; // remove this once wallace is more implemented. 
-    mux_2 autozero_mux(.select(autozero), .in0(mult_lo), .in1(32'b0), .out(data_result));
-    assign data_resultRDY = autozero;
+    // wire [31:0] mult_lo;
+    // // assign mult_lo = 32'b1; // remove this once wallace is more implemented. 
+    // mux_2 autozero_mux(.select(autozero), .in0(mult_lo), .in1(32'b0), .out(data_result));
+    assign data_resultRDY = 1'b1;// autozero;
     assign data_exception = 1'b0;
+
+    wire [31:0] mult_result_lo;
+    wire [31:0] mult_result_hi;
+    wallace_32 wtree(.a(data_operandA), .b(data_operandB), .product(), .product_hi(mult_result_hi), .product_lo(mult_result_lo));
+
+    assign data_result = mult_result_lo;
+
+
 
 endmodule
 
 
 // iverilog -o multdiv -c multdiv_FileList.txt -s multdiv_tb -Wimplicit; // vvp multdiv +test=multbasic
 // gtkwave multbasic.vcd
+// iverilog -o multdiv -c multdiv_FileList.txt -s multdiv_tb -Wimplicit; vvp .\multdiv +test=multbasic

@@ -1,7 +1,9 @@
 
 !alu-main/*
 !reg-main/*
-!multdiv-main/*
+multdiv-main/*
+multdiv-main/multdiv
+# !multdiv-main/*.v
 # Include .v files
 !*.v
 # Include .csv files

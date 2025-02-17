@@ -12,10 +12,11 @@ module multdiv_tb;
     // module outputs
     wire ready, except;
     wire signed [31:0] result;
+	// wire signed [31:0] multhi;
 
     // Instantiate multdiv
     multdiv tester(operandA, operandB, ctrl_Mult, ctrl_Div, clock,
-        result, except, ready);
+        result, except, ready);//, multhi);
 
 	// Initialize our strings
 	reg[511:0] testName, outDir;
@@ -115,6 +116,7 @@ module multdiv_tb;
                         exp_result, exp_except);
 
                 end else begin
+					
                     // Write the actual module outputs to the actual file
                     $fdisplay(actFile, "%d,%d,%d,%d",
                         operandA, operandB, 
@@ -133,9 +135,11 @@ module multdiv_tb;
                             operandA, operandB, 
                             result, except,
                             exp_result, exp_except);
-                        $display("Test %3d: FAILED", tests);
+                        // $display("Test %3d: FAILED: A:%b, B:%b, multhi:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, multhi, result, except, exp_result, exp_except);
+						$display("Test %3d: FAILED: A:%d, B:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, result, except, exp_result, exp_except);
                     end else begin
-                        $display("Test %3d: PASSED", tests);
+                        // $display("Test %3d: PASSED: A:%b, B:%b, multhi:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, multhi, result, except, exp_result, exp_except);
+                        $display("Test %3d: PASSED: A:%d, B:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, result, except, exp_result, exp_except);
                     end
                 end
 
@@ -166,7 +170,7 @@ module multdiv_tb;
     initial begin
         // output file name
         $dumpfile("multdiv.vcd");
-        $dumpvars(0, multdiv_tb);
+        $dumpvars(1, multdiv_tb);
     end
 
     always 

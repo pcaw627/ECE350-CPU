@@ -5,3 +5,6 @@ wallace_tb.v
 ../alu-main/and_64.v
 ../alu-main/full_adder.v
 ../alu-main/half_adder.v
+or_reduce_15.v
+or_reduce_32.v
+and_reduce_32.v

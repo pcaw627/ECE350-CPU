@@ -2,12 +2,12 @@ module multdiv(
 	data_operandA, data_operandB, 
 	ctrl_MULT, ctrl_DIV, 
 	clock, 
-	data_result, data_exception, data_resultRDY);
+	data_result, data_exception, data_resultRDY);//, multhi);
 
     input [31:0] data_operandA, data_operandB;
     input ctrl_MULT, ctrl_DIV, clock;
 
-    output [31:0] data_result;
+    output [31:0] data_result, multhi;
     output data_exception, data_resultRDY;
 
     // first let's check for zero inputs and mux for nonzero inputs.
@@ -26,13 +26,16 @@ module multdiv(
     // // assign mult_lo = 32'b1; // remove this once wallace is more implemented. 
     // mux_2 autozero_mux(.select(autozero), .in0(mult_lo), .in1(32'b0), .out(data_result));
     assign data_resultRDY = 1'b1;// autozero;
-    assign data_exception = 1'b0;
+    // assign data_exception = 1'b0;
 
     wire [31:0] mult_result_lo;
     wire [31:0] mult_result_hi;
-    wallace_32 wtree(.a(data_operandA), .b(data_operandB), .product(), .product_hi(mult_result_hi), .product_lo(mult_result_lo));
+    wire mult_ovf;
+    wallace_32 wtree(.a(data_operandA), .b(data_operandB), .product(), .product_hi(multhi), .product_lo(mult_result_lo), .ovf(mult_ovf));
 
     assign data_result = mult_result_lo;
+    assign data_exception = mult_ovf;
+    // overflow_detect ovfdetect(.ovf(data_exception), .a(data_operandA), .b(data_operandB), .product_hi(mult_result_hi), .product_lo(mult_result_lo));
 
 
 

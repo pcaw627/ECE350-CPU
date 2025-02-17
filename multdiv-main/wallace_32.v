@@ -1,11 +1,10 @@
-
-
 module wallace_32(
     input [31:0] a,
     input [31:0] b,
     output [63:0] product,
     output [31:0] product_hi,
-    output [31:0] product_lo
+    output [31:0] product_lo,
+    output ovf
 );  
 
     // braindump
@@ -28,27 +27,45 @@ module wallace_32(
     // https://www.ijert.org/research/design-and-implementation-of-32-bit-wallace-multiplier-using-compressors-and-various-adders-IJERTV11IS050369.pdf
     // [6] Jagadeshwar Rao M, Sanjay Dubey, Asia Pacific conference 2012, A high speed and area efficient booth encoded Wallace tree multiplier  for fast arithmetic circuits.  
 
+    // OVERFLOW EXCEPTION:
+    /*
+        Figured it out. First, I extended a and b to 64 bits each (and took partial products up to 64 as well, as
+         the bits weren't propagating as I expected them to. That got me to like 29/34, and even better I was able to see the pattern 
+         in the remaining test cases. 
+
+        Second, at least with the 34 test cases I have, the common trend exclusive to overflow test cases is that either:
+        a) the signs of multhi (taken as a 32bit signed) and the sign of result differ (counting 0 as "positive").
+            so if XOR(MSB_multhi, MSB_multlo)
+        b) the magnitude of multhi (as a 32bit signed) is NOT 0 or -1.
+            so if NOR( AND(all bits in multhi), NOR(all bits in multhi))
+    */
+    
+    wire [63:0] a_64;
+    assign a_64 = {{(32){a[31]}}, a};
+    wire [63:0] b_64;
+    assign b_64 = {{(32){b[31]}}, b};
+    
+    
     // 1: gen partial products
-    wire [31:0] pp[31:0];  
+    wire [63:0] pp[63:0];
     
     genvar i, j;
     generate
-        for(i = 0; i < 32; i = i + 1) begin : gen_pp_i
-            for(j = 0; j < 32; j = j + 1) begin : gen_pp_j
-                and g1(pp[i][j], a[j], b[i]);
+        for(i = 0; i < 64; i = i + 1) begin : gen_pp_i
+            for(j = 0; j < 64; j = j + 1) begin : gen_pp_j
+                and g1(pp[i][j], a_64[j], b_64[i]);
             end
         end
     endgenerate
 
     // 2: Sum partial products, row by row
-    wire [63:0] row_sums[31:0];
-    wire [63:0] row_carries[31:0];
+    wire [63:0] row_sums[63:0];
+    wire [63:0] row_carries[63:0];
     
-    // init first row (one block for sums (0-31 assigned from pp, the rest zero) then another for carries (all zero))
+    // init first row (one block for sums (0-63 assigned from pp) then another for carries (all zero))
     generate
-        for(i = 0; i < 32; i = i + 1) begin : init_first_row_sums
+        for(i = 0; i < 64; i = i + 1) begin : init_first_row_sums
             assign row_sums[0][i] = pp[0][i];
-            assign row_sums[0][i+32] = 1'b0;
         end
     endgenerate
 
@@ -58,12 +75,12 @@ module wallace_32(
         end
     endgenerate
 
-    // 3: add each subsequent row
+    // 3: add each subsequent row (reduction step). this is like 64^2 = 4096 gates (including the first rows above). 
     generate
-        for(i = 1; i < 32; i = i + 1) begin : add_rows
+        for(i = 1; i < 64; i = i + 1) begin : add_rows
             wire [63:0] extended_pp;
             // extend and shift partial product
-            assign extended_pp = {{(32-i){1'b0}}, pp[i], {i{1'b0}}};
+            assign extended_pp = {{(64-i){1'b0}}, pp[i], {i{1'b0}}};
             
             // add to previous sum
             // wire [63:0] temp_sum, temp_carry;
@@ -87,15 +104,15 @@ module wallace_32(
     // final stage- Add last sum and carries
     wire [63:0] final_carry;
 
-    assign product[0] = row_sums[31][0];
-    assign final_carry[0] = row_carries[31][0];
+    assign product[0] = row_sums[63][0];
+    assign final_carry[0] = row_carries[63][0];
     
-    // thisll maybe be slow? maybe add with cla?
+    // thisll maybe be slow? maybe add with cla? - not slow, they're all in parallel
     generate
         for(i = 1; i < 64; i = i + 1) begin : final_addition
             full_adder fa_final(
-                .a(row_sums[31][i]),
-                .b(row_carries[31][i-1]),
+                .a(row_sums[63][i]),
+                .b(row_carries[63][i-1]),
                 .cin(final_carry[i-1]),
                 .sum(product[i]),
                 .cout(final_carry[i])
@@ -109,6 +126,27 @@ module wallace_32(
     assign product_hi = product[63:32];
     assign product_lo = product[31:0];
 
+
+    // new overflow logic 
+    // a) the signs of multhi (taken as a 32bit signed) and the sign of result differ (counting 0 as "positive").
+            // so if XOR(MSB_multhi, MSB_multlo)
+    // b) the magnitude of multhi (as a 32bit signed) is NOT 0 or -1.
+            // so if NOR( AND(all bits in multhi), NOR(all bits in multhi))
+
+    wire signdiffer;
+    xor signdiff(signdiffer, product_hi[31], product_lo[31]); // (a)
+
+    wire allones, allzeros, notallzeros, invalidmagnitude;
+    and_reduce_32 ones_and(.result(allones), .data(product_hi));
+    or_reduce_32 zeros_or(.result(notallzeros), .data(product_hi));
+    not(allzeros, notallzeros);
+    
+    nor(invalidmagnitude, allzeros, allones);
+
+    // assign ovf = signdiffer;
+    // assign ovf = invalidmagnitude;
+    or (ovf, invalidmagnitude, signdiffer);
+    
 endmodule
 
 // iverilog -o wallace -s wallace_tb -c .\wallace_FileList.txt -Wimplicit; vvp ./wallace

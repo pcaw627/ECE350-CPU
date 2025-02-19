@@ -10,7 +10,7 @@ module nr_div(
 
     // first big note that this only works for UNSIGNED integers and we will have to take care of the signs manually
 
-    // internal registers
+    // reg wires
     wire [31:0] Q_next, Q_current;   // dividend/quotient register
     wire [31:0] M_next, M_current;   // divisor register
     wire [31:0] A_next, A_current;   // accumulator register
@@ -26,9 +26,16 @@ module nr_div(
     assign dividend_sign = data_operandA[31];
     assign divisor_sign = data_operandB[31];
 
+    
+    wire [31:0] A_2scomp;
+    wire [31:0] B_2scomp;
+    cla_32 Acomplement(.Sum(A_2scomp), .Cout(), .A(~data_operandA), .B(32'd1), .Cin(1'b0), .signed_ovf());
+    cla_32 Bcomplement(.Sum(B_2scomp), .Cout(), .A(~data_operandB), .B(32'd1), .Cin(1'b0), .signed_ovf());
+
     wire [31:0] abs_dividend, abs_divisor;
-    assign abs_dividend = dividend_sign ? (~data_operandA + 1) : data_operandA;
-    assign abs_divisor = divisor_sign ? (~data_operandB + 1) : data_operandB;
+
+    assign abs_dividend = dividend_sign ? A_2scomp : data_operandA;
+    assign abs_divisor = divisor_sign ? B_2scomp : data_operandB;
     
     // registers
     register_32 Q_reg(
@@ -84,10 +91,16 @@ module nr_div(
     assign operation_complete = (N_current == 6'd0);
     assign data_resultRDY = operation_complete | divisor_is_zero;
 
-    // counter mux
+    // counter mux (either start at 33 or decrement current value)
     wire [5:0] counter_start, counter_running;
     assign counter_start = 6'd33;
-    assign counter_running = N_current - 1;
+    wire [7:0] N_current_padded;
+    wire [7:0] counter_full_padded;
+    assign N_current_padded = {2'b00, N_current}; 
+
+    cla_8 Ndecrement(.Sum(counter_full_padded), .Cout(), .A(N_current_padded), .B(8'hFF), .Cin(1'b0), .signed_ovf());
+    assign counter_running = counter_full_padded[5:0];
+
     assign N_next = start_operation ? counter_start : 
                    operation_in_progress ? counter_running : 
                    6'd0;
@@ -113,40 +126,29 @@ module nr_div(
     assign shifted_A = {add_sub_result[30:0], Q_current[31]};
     assign shifted_Q = {Q_current[30:0], ~add_sub_result[31]};
 
-    // register next state muxes. 
-    wire [31:0] A_start, A_running, A_hold;
-    wire [31:0] Q_start, Q_running, Q_hold;
-    
-    assign A_start = 32'b0;
-    assign A_running = shifted_A;
-    assign A_hold = A_current;
 
-    assign Q_start = abs_dividend;
-    assign Q_running = shifted_Q;
-    assign Q_hold = Q_current;
-
+    // finite state machine (https://people.ee.duke.edu/~jab/ece350/Protected/Lecture%209.pdf p15)
+    // M (divisor, denominator) register - load on start, hold otherwise
     assign M_next = start_operation ? abs_divisor : M_current;
 
-    wire A_sel_start, A_sel_running;
-    assign A_sel_start = start_operation;
-    assign A_sel_running = operation_in_progress;
+    // A (accumulator) register - clear on start, update during operation, hold otherwise
+    assign A_next = start_operation ? 32'b0 :
+                   operation_in_progress ? shifted_A :
+                   A_current;
 
-    assign A_next = A_sel_start ? A_start :
-                   A_sel_running ? A_running :
-                   A_hold;
+    // Q (quotient) register - load dividend on start, update during operation, hold otherwise
+    assign Q_next = start_operation ? abs_dividend :
+                   operation_in_progress ? shifted_Q :
+                   Q_current;
 
-    wire Q_sel_start, Q_sel_running;
-    assign Q_sel_start = start_operation;
-    assign Q_sel_running = operation_in_progress;
 
-    assign Q_next = Q_sel_start ? Q_start :
-                   Q_sel_running ? Q_running :
-                   Q_hold;
+    // final result with sign correction    
+    wire [31:0] us_result_2scomp;
+    cla_32 result_complement(.Sum(us_result_2scomp), .Cout(), .A(~unsigned_result), .B(32'd1), .Cin(1'b0), .signed_ovf());
 
-    // final result with sign correction
     wire [31:0] unsigned_result, signed_result;
     assign unsigned_result = Q_current;
-    assign signed_result = sign_current ? (~unsigned_result + 1) : unsigned_result;
+    assign signed_result = sign_current ? us_result_2scomp : unsigned_result;
     
     // handle division by zero
     assign data_result = divisor_is_zero ? 32'b0 : signed_result;

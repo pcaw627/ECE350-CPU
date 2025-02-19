@@ -7,3 +7,4 @@ wallace_32.v
 or_reduce_15.v
 or_reduce_32.v
 and_reduce_32.v
+div2.v

@@ -136,10 +136,10 @@ module multdiv_tb;
                             result, except,
                             exp_result, exp_except);
                         // $display("Test %3d: FAILED: A:%b, B:%b, multhi:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, multhi, result, except, exp_result, exp_except);
-						$display("Test %3d: FAILED: A:%d, B:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, result, except, exp_result, exp_except);
+						$display("Test %3d: FAILED: A:%d, B:%d, result:%b, overflow:%d, expected_result:%b, expected_overflow:%d", tests, operandA, operandB, result, except, exp_result, exp_except);
                     end else begin
                         // $display("Test %3d: PASSED: A:%b, B:%b, multhi:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, multhi, result, except, exp_result, exp_except);
-                        $display("Test %3d: PASSED: A:%d, B:%d, result:%d, overflow:%d, expected_result:%d, expected_overflow:%d", tests, operandA, operandB, result, except, exp_result, exp_except);
+                        $display("Test %3d: PASSED: A:%d, B:%d, result:%b, overflow:%d, expected_result:%b, expected_overflow:%d", tests, operandA, operandB, result, except, exp_result, exp_except);
                     end
                 end
 

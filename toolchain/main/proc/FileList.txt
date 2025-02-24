@@ -1,0 +1,5 @@
+.\processor.v
+.\RAM.v
+.\ROM.v
+.\Wrapper.v
+..\..\test_files\Wrapper_tb.v

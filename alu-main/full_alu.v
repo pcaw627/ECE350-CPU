@@ -1,4 +1,4 @@
-module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_result, isNotEqual, isLessThan, overflow);
+module full_alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_result, isNotEqual, isLessThan, overflow);
         
     input [31:0] data_operandA, data_operandB;
     input [4:0] ctrl_ALUopcode, ctrl_shiftamt;
@@ -16,8 +16,10 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
     wire [31:0] or_result;
     wire [31:0] sll_result;
     wire [31:0] sra_result;
+    wire [31:0] mult_result;
+    wire [31:0] div_result;
     mux_32 opmux(.out(data_result), .select(ctrl_ALUopcode), .in0(add_result), .in1(sub_result), .in2(and_result), .in3(or_result), .in4(sll_result), .in5(sra_result), 
-    .in6(mul), .in7(div), .in8(32'd0), .in9(32'd0), .in10(32'd0), .in11(32'd0), .in12(32'd0), .in13(32'd0), .in14(32'd0), .in15(32'd0), .in16(32'd0), .in17(32'd0),
+    .in6(mult_result), .in7(div_result), .in8(32'd0), .in9(32'd0), .in10(32'd0), .in11(32'd0), .in12(32'd0), .in13(32'd0), .in14(32'd0), .in15(32'd0), .in16(32'd0), .in17(32'd0),
     .in18(32'd0), .in19(32'd0), .in20(32'd0), .in21(32'd0), .in22(32'd0), .in23(32'd0), .in24(32'd0), .in25(32'd0), .in26(32'd0), .in27(32'd0), .in28(32'd0),
     .in29(32'd0), .in30(32'd0), .in31(32'd0));
 
@@ -56,6 +58,23 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
 
     // ARITHMETIC SHIFT RIGHT
     sra_32 sra_op(.in(data_operandA), .shamt(ctrl_shiftamt), .out(sra_result));
+
+
+    // actually keep these guys separate from ALU... disconnect ALU output.
+    // in main processor, maintain multdiv as its own module as it will take several clock cycles (and we need ALU to be a 1 cycle pony)
+    
+    wire mult_result = 32'bz;
+    wire div_result = 32'bz;
+    // // MULTDIV
+    // multdiv multiplier(.data_operandA(data_operandA), .data_operandB(data_operandB), .ctrl_MULT(1'b1), .ctrl_DIV(1'b0), 
+    //     .clock(clock), .data_result(mult_result), .data_exception(), .data_resultRDY());
+
+    // // DIV 
+    // multdiv divider(.data_operandA(data_operandA), .data_operandB(data_operandB), .ctrl_MULT(1'b0), .ctrl_DIV(1'b1), 
+    //     .clock(clock), .data_result(div_result), .data_exception(), .data_resultRDY());
+
+
+
     
     ///////// CONTROL SIGNALS OUT
     

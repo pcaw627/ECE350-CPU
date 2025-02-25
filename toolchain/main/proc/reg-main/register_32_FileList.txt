@@ -1,0 +1,3 @@
+reg-main\register_32.v
+reg-main\register_32_tb.v
+reg-main\dffe_ref.v

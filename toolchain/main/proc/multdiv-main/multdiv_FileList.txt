@@ -1,0 +1,10 @@
+multdiv.v
+multdiv_tb.v
+wallace_32.v
+../alu-main/mux_2.v
+../alu-main/full_adder.v
+../alu-main/half_adder.v
+or_reduce_15.v
+or_reduce_32.v
+and_reduce_32.v
+div2.v

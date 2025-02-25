@@ -1,0 +1,67 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Tue Feb 25 01:31:26 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\test_files\output_files\positive_no_bypass.vcd"
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\template.gtkw"
+[timestart] 125780
+[size] 1536 889
+[pos] -35 -35
+*-13.760311 145410 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[treeopen] Wrapper_tb.CPU.
+[sst_width] 197
+[signals_width] 497
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@22
+Wrapper_tb.CPU.ALUop[4:0]
+Wrapper_tb.CPU.PC_current[31:0]
+Wrapper_tb.CPU.PC_next[31:0]
+Wrapper_tb.CPU.address_dmem[31:0]
+Wrapper_tb.CPU.address_imem[31:0]
+@28
+Wrapper_tb.CPU.clock
+Wrapper_tb.CPU.ctrl_insn_is_immediate
+@22
+Wrapper_tb.CPU.ctrl_readRegA[4:0]
+Wrapper_tb.CPU.ctrl_readRegB[4:0]
+@28
+Wrapper_tb.CPU.ctrl_writeEnable
+@22
+Wrapper_tb.CPU.ctrl_writeReg[4:0]
+Wrapper_tb.CPU.data[31:0]
+@420
+Wrapper_tb.CPU.data_readRegA[31:0]
+Wrapper_tb.CPU.data_readRegB[31:0]
+Wrapper_tb.CPU.data_writeReg[31:0]
+Wrapper_tb.CPU.dx_A[31:0]
+Wrapper_tb.CPU.dx_B[31:0]
+Wrapper_tb.CPU.dx_PC[31:0]
+Wrapper_tb.CPU.dx_insn[31:0]
+Wrapper_tb.CPU.fd_PC[31:0]
+@28
+Wrapper_tb.CPU.fd_insn[31:0]
+@420
+Wrapper_tb.CPU.immediate[31:0]
+Wrapper_tb.CPU.opcode[4:0]
+Wrapper_tb.CPU.q_dmem[31:0]
+@28
+Wrapper_tb.CPU.q_imem[31:0]
+@420
+Wrapper_tb.CPU.reset
+[color] 7
+Wrapper_tb.CPU.main_alu_A[31:0]
+[color] 7
+Wrapper_tb.CPU.main_alu_B[31:0]
+[color] 7
+Wrapper_tb.CPU.rd[4:0]
+[color] 7
+Wrapper_tb.CPU.rs[4:0]
+[color] 7
+Wrapper_tb.CPU.rt[4:0]
+Wrapper_tb.CPU.shamt[4:0]
+Wrapper_tb.CPU.target[31:0]
+Wrapper_tb.CPU.wren
+[pattern_trace] 1
+[pattern_trace] 0

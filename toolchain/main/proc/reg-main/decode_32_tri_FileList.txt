@@ -1,0 +1,2 @@
+reg-main\decode_32_tri.v
+reg-main\decode_32_tri_tb.v

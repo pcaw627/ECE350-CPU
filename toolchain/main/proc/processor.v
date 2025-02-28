@@ -72,7 +72,7 @@ module processor(
     wire [31:0] PC_next;
     alu PC_increment (.data_operandA(32'd1), .data_operandB(PC_current), .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), .data_result(PC_next), .isNotEqual(), .isLessThan(), .overflow());
     // register_32 PC (.q(), .d(), .clk(), .en(), .clr());
-    register_32 PC (.q(PC_current), .d(PC_next), .clk(~clock), .en(1'b1), .clr(reset));
+    register_32 PC (.q(PC_current), .d(PC_next), .clk(clock), .en(1'b1), .clr(reset));
     assign address_imem = PC_current;
     // assign PC_next = PC_plus_1;
 
@@ -119,14 +119,16 @@ module processor(
     register_32 DX_insn_reg (.q(dx_insn), .d(fd_insn), .clk(~clock), .en(1'b1), .clr(reset));
     register_32 DX_A_reg (.q(dx_A), .d(data_readRegA), .clk(~clock), .en(1'b1), .clr(reset));
     register_32 DX_B_reg (.q(dx_B), .d(data_readRegB), .clk(~clock), .en(1'b1), .clr(reset));
-    dffe_ref DX_ctrl_RWE_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
-    register_5 DX_ctrl_Rdst_reg (.q(dx_rd), .d(rd), .clk(~clock), .en(1'b1), .clr(reset));
-    dffe_ref DX_ctrl_ALUinB_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
-    register_5 DX_ctrl_ALUop_reg (.q(dx_ALUop), .d(ALUop), .clk(~clock), .en(1'b1), .clr(reset));
-    dffe_ref DX_ctrl_DMwe_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
-    dffe_ref DX_ctrl_Rwd_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
-    dffe_ref DX_ctrl_JP_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
-    dffe_ref DX_ctrl_BR_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
+
+    register_5  DX_ctrl_Rdst_reg (.q(dx_rd), .d(rd), .clk(~clock), .en(1'b1), .clr(reset));
+    register_5  DX_ctrl_ALUop_reg (.q(dx_ALUop), .d(ALUop), .clk(~clock), .en(1'b1), .clr(reset));
+    
+    dffe_ref    DX_ctrl_RWE_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
+    dffe_ref    DX_ctrl_Rwd_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
+    dffe_ref    DX_ctrl_ALUinB_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
+    dffe_ref    DX_ctrl_DMwe_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
+    dffe_ref    DX_ctrl_JP_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
+    dffe_ref    DX_ctrl_BR_reg (.q(), .d(), .clk(~clock), .en(1'b1), .clr(reset));
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,7 +159,7 @@ module processor(
     mux_2 regB_out_mux (.out(main_alu_B), .select(ctrl_insn_is_immediate), .in0(dx_B), .in1(immediate));
 
     alu main_alu(.data_operandA(main_alu_A), .data_operandB(main_alu_B), .ctrl_ALUopcode(ALUop), 
-        .ctrl_shiftamt(shamt), .data_result(data_writeReg), .isNotEqual(), .isLessThan(), .overflow());
+        .ctrl_shiftamt(shamt), .data_result(alu_result), .isNotEqual(), .isLessThan(), .overflow());
 
 
 

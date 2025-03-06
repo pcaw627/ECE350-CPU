@@ -1,22 +1,3 @@
-/**
- * READ THIS DESCRIPTION!
- *
- * This is your processor module that will contain the bulk of your code submission. You are to implement
- * a 5-stage pipelined processor in this module, accounting for hazards and implementing bypasses as
- * necessary.
- *
- * Ultimately, your processor will be tested by a master skeleton, so the
- * testbench can see which controls signal you active when. Therefore, there needs to be a way to
- * "inject" imem, dmem, and regfile interfaces from some external controller module. The skeleton
- * file, Wrapper.v, acts as a small wrapper around your processor for this purpose. Refer to Wrapper.v
- * for more details.
- *
- * As a result, this module will NOT contain the RegFile nor the memory modules. Study the inputs 
- * very carefully - the RegFile-related I/Os are merely signals to be sent to the RegFile instantiated
- * in your Wrapper module. This is the same for your memory elements. 
- *
- *
- */
 module processor(
     // Control signals
     clock,                          // I: The master clock
@@ -61,35 +42,60 @@ module processor(
 	output [31:0] data_writeReg;
 	input [31:0] data_readRegA, data_readRegB;
 
-    // https://people.duke.edu/~tkb13/courses/ece250-2022fa/slides/08-datapath-and-control.pdf
-    // https://people.duke.edu/~tkb13/courses/ece250-2022fa/slides/12-pipelining.pdf
+    // ~~~~~~~~~ WIRES ~~~~~~~~~~~~~~~~~~~~
+    // fd
+    wire [31:0] PC_current, PC_next;
+    wire [4:0] fd_opcode, fd_rd, fd_rs, fd_rt, fd_shamt, fd_ALUop;
+    wire [31:0] fd_ir, fd_PC, fd_immediate, fd_target;
 
-	
-    // ~~~~~~~~~ FETCH: Program Counter ~~~~~~~~~
+    //dx
+    wire [4:0] dx_opcode, dx_rd, dx_rs, dx_rt, dx_shamt, dx_ALUop;
+    wire [31:0] dx_immediate, dx_target;
 
-    // alu(.data_operandA(), .data_operandB(), .ctrl_ALUopcode(), .ctrl_shiftamt(), .data_result(), .isNotEqual(), .isLessThan(), .overflow())
-    wire [31:0] PC_current;
-    wire [31:0] PC_next;
+    // execute ALU
+    wire [31:0] main_alu_A, main_alu_B, alu_result;
+    wire [4:0] dx_ALUop_final;
+    
+    //xm
+    wire [4:0] xm_opcode, xm_rd, xm_rs, xm_rt;
+    
+    //mw
+    wire [4:0] mw_opcode, mw_rd, mw_rs, mw_rt, mw_shamt, mw_ALUop;
+    wire [31:0] mw_immediate, mw_target;
+
+    // Control signals for lw/sw
+    wire dx_is_lw, dx_is_sw;
+    wire xm_is_lw, xm_is_sw;
+    wire mw_is_lw;
+
+    // ~~~~~~~~~ FETCH: program counter ~~~~~~~~~
+
+    // detect direct jump instruction (opcode 00001)
+    wire is_jump;
+    and(is_jump, ~q_imem[31], ~q_imem[30], ~q_imem[29], ~q_imem[28], q_imem[27]);
+
+    // detect jr instruction (opcode 00100) in decode stage
+    wire fd_is_jr;
+    and(fd_is_jr, ~fd_opcode[4], ~fd_opcode[3], fd_opcode[2], ~fd_opcode[1], ~fd_opcode[0]);
+
+    // for direct jump instruction, the target address is in the target field
+    wire [31:0] jump_target;
+    assign jump_target = {5'd0, q_imem[26:0]};
+
+    // for jr instruction, get the jump target from RegA (fd_rd register value)
+    wire [31:0] jr_target;
+    assign jr_target = data_readRegA;
+
+    // select between pc+1, direct jump target, and jr target
+    wire [31:0] next_pc;
+    assign next_pc = is_jump ? jump_target : (fd_is_jr ? jr_target : PC_next);
+
+    // alu for pc+1 calculation
     alu PC_increment (.data_operandA(32'd1), .data_operandB(PC_current), .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), .data_result(PC_next), .isNotEqual(), .isLessThan(), .overflow());
-    // register_32 PC (.q(), .d(), .clk(), .en(), .clr());
-    register_32 PC (.q(PC_current), .d(PC_next), .clk(clock), .en(1'b1), .clr(reset));
+    
+    // pc register
+    register_32 PC (.q(PC_current), .d(next_pc), .clk(clock), .en(1'b1), .clr(reset));
     assign address_imem = PC_current;
-    // assign PC_next = PC_plus_1;
-
-    
-    wire [31:0] fd_ir, fd_PC;
-
-
-    
-    wire [4:0] fd_opcode;
-    wire [4:0] fd_rd;
-    wire [4:0] fd_rs;
-    wire [4:0] fd_rt;
-    wire [4:0] fd_shamt;
-    wire [4:0] fd_ALUop;
-
-    wire [31:0] fd_immediate;
-    wire [31:0] fd_target;
     
     // r type
     assign fd_opcode = fd_ir[31:27];
@@ -105,22 +111,10 @@ module processor(
     // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
     assign fd_target = {5'd0, fd_ir[26:0]};
 
-
-
     register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(1'b1), .clr(reset));
     register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(1'b1), .clr(reset));
 
-    // ~~~~~~~~~ DECODE: Instruction (from external module) ~~~~~~~~~
-
-    wire [4:0] dx_opcode;
-    wire [4:0] dx_rd;
-    wire [4:0] dx_rs;
-    wire [4:0] dx_rt;
-    wire [4:0] dx_shamt;
-    wire [4:0] dx_ALUop;
-
-    wire [31:0] dx_immediate;
-    wire [31:0] dx_target;
+    // ~~~~~~~~~ DECODE: instruction ~~~~~~~~~
     
     // r type
     assign dx_opcode = dx_ir[31:27];
@@ -136,12 +130,40 @@ module processor(
     // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
     assign dx_target = {5'd0, dx_ir[26:0]};
 
-    // j2 type: opcode and rd are the same, the rest unused
+    // detect memory instructions and jr in fetch/decode stage
+    wire fd_is_sw, fd_is_lw;
+    and(fd_is_sw, ~fd_opcode[4], ~fd_opcode[3], fd_opcode[2], fd_opcode[1], fd_opcode[0]); // sw: 00111
+    and(fd_is_lw, ~fd_opcode[4], fd_opcode[3], ~fd_opcode[2], ~fd_opcode[1], ~fd_opcode[0]); // lw: 01000
+    
+    // for jr $rd, we need to read the value from $rd to use as jump target
+    // for all other instructions, we need to read rs
+    assign ctrl_readRegA = fd_is_jr ? fd_rd : fd_rs;
+    
+    // for r-type: read rt
+    // for sw: read rd (value to store)
+    assign ctrl_readRegB = fd_is_sw ? fd_rd : fd_rt;
 
+    // lw/sw control signals in DX stage
+    // lw has opcode 01000
+    wire dx_opcode_bit4, dx_opcode_bit3, dx_opcode_bit2, dx_opcode_bit1, dx_opcode_bit0;
+    assign dx_opcode_bit4 = dx_opcode[4];
+    assign dx_opcode_bit3 = dx_opcode[3];
+    assign dx_opcode_bit2 = dx_opcode[2];
+    assign dx_opcode_bit1 = dx_opcode[1];
+    assign dx_opcode_bit0 = dx_opcode[0];
+    
+    // lw: 01000
+    wire dx_opcode_is_lw_temp;
+    and and_lw_op(dx_opcode_is_lw_temp, ~dx_opcode_bit4, dx_opcode_bit3, ~dx_opcode_bit2, ~dx_opcode_bit1, ~dx_opcode_bit0);
+    assign dx_is_lw = dx_opcode_is_lw_temp;
+    
+    // sw: 00111
+    wire dx_opcode_is_sw_temp;
+    and and_sw_op(dx_opcode_is_sw_temp, ~dx_opcode_bit4, ~dx_opcode_bit3, dx_opcode_bit2, dx_opcode_bit1, dx_opcode_bit0);
+    assign dx_is_sw = dx_opcode_is_sw_temp;
     
     // ~~~~~~~~~ DECODE/EXECUTE PIPELINE REGS ~~~~~~~~~
     wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
-    // wire [4:0] dx_ALUop, dx_rd;
     
     // PC reg
     register_32 DX_PC (
@@ -176,55 +198,56 @@ module processor(
         .clr(reset)
     );
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-
     // ~~~~~~~~~ EXECUTE: main ALU + regfile ~~~~~~~~~
-    // also make sure regfile is updated on rising edge (clock high)
-    assign ctrl_writeEnable = 1'b1;//clock;
-
-    // on input side of regfile, lets specify s1, s2, d:
-    // s1 is always rs
-    assign ctrl_readRegA = fd_rs;
-    // s2 is always rt
-    assign ctrl_readRegB = fd_rt;
-
-    // now on output side of regfile, we have alu. 
-    wire [31:0] main_alu_A;
-    wire [31:0] main_alu_B;
-    wire [31:0] alu_result;
-    wire [4:0] dx_ALUop_final;
-
+    
+    // now on output side of regfile, we have alu.
     assign main_alu_A = dx_A;
-    wire dx_ctrl_insn_is_addimmediate;  // if immediate, take main_alu_B to be imm, otherwise default back to rt
-
-    // d is rt for immediate instructions (addi -> dx_opcode 00101), but rd by default
+    
+    // for immediate instructions (addi, lw, sw) use immediate as operand B
+    wire dx_use_immediate;
+    wire dx_ctrl_insn_is_addimmediate;  // addi -> dx_opcode 00101
+    
     and(dx_ctrl_insn_is_addimmediate, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]); // is dx opcode 00101 (addi)?
     
-    mux_2 regB_out_mux (.out(main_alu_B), .select(dx_ctrl_insn_is_addimmediate), .in0(dx_B), .in1(dx_immediate));
-    // main_alu_B = dx_ctrl_insn_is_addimmediate ? dx_immediate : dx_B;
+    // use immediate for addi, lw, sw
+    or or_use_imm(dx_use_immediate, dx_ctrl_insn_is_addimmediate, dx_is_lw, dx_is_sw);
+    
+    assign main_alu_B = dx_use_immediate ? dx_immediate : dx_B;
 
-    // also mux ALUop if its an immediate (addi has no aluOP as its lower bits are all immediate.)
-    // mux_2 addi_aluop_mux (.out(dx_ALUop_final), .select(dx_ctrl_insn_is_addimmediate), .in0(dx_ALUop), .in1(5'b00000));
-    assign dx_ALUop_final = dx_ctrl_insn_is_addimmediate ? 5'b00000 : dx_ALUop;
-
-    // mux_2 regdestmux (.in0(rd), .in1(rt), .select(ctrl_insn_is_immediate), .out(ctrl_writeReg));
-    // assign ctrl_writeReg = dx_ctrl_insn_is_addimmediate ? dx_rt : dx_rd;
-
+    // also mux ALUop if its an immediate (addi, lw, sw all use add operation for address calculation)
+    assign dx_ALUop_final = dx_use_immediate ? 5'b00000 : dx_ALUop;
 
     alu main_alu(.data_operandA(main_alu_A), .data_operandB(main_alu_B), .ctrl_ALUopcode(dx_ALUop_final), 
         .ctrl_shiftamt(dx_shamt), .data_result(alu_result), .isNotEqual(), .isLessThan(), .overflow());
 
-
-
-
-    
     // ~~~~~~~~~ EXECUTION/MEMORY PIPELINE REGS ~~~~~~~~~
     wire [31:0] xm_o;       // ALU output
     wire [31:0] xm_B;       // reg B value (for memory writes)
     wire [31:0] xm_ir;      // instruction
-    wire [31:0] xm_d;       // mem data
-    wire [4:0]  xm_rd;      // dest reg
+    
+    // Extract opcode and registers from xm instruction
+    assign xm_opcode = xm_ir[31:27];
+    assign xm_rd = xm_ir[26:22];
+    assign xm_rs = xm_ir[21:17];
+    assign xm_rt = xm_ir[16:12];
+    
+    // Control signals for lw/sw in XM stage
+    wire xm_opcode_bit4, xm_opcode_bit3, xm_opcode_bit2, xm_opcode_bit1, xm_opcode_bit0;
+    assign xm_opcode_bit4 = xm_opcode[4];
+    assign xm_opcode_bit3 = xm_opcode[3];
+    assign xm_opcode_bit2 = xm_opcode[2];
+    assign xm_opcode_bit1 = xm_opcode[1];
+    assign xm_opcode_bit0 = xm_opcode[0];
+    
+    // lw: 01000
+    wire xm_opcode_is_lw_temp;
+    and and_xm_lw_op(xm_opcode_is_lw_temp, ~xm_opcode_bit4, xm_opcode_bit3, ~xm_opcode_bit2, ~xm_opcode_bit1, ~xm_opcode_bit0);
+    assign xm_is_lw = xm_opcode_is_lw_temp;
+    
+    // sw: 00111
+    wire xm_opcode_is_sw_temp;
+    and and_xm_sw_op(xm_opcode_is_sw_temp, ~xm_opcode_bit4, ~xm_opcode_bit3, xm_opcode_bit2, xm_opcode_bit1, xm_opcode_bit0);
+    assign xm_is_sw = xm_opcode_is_sw_temp;
 
     // ALU output register
     register_32 XM_O (
@@ -238,7 +261,7 @@ module processor(
     // reg B value (for memory store operations)
     register_32 XM_B (
         .q(xm_B),
-        .d(dx_B),     // could be hazardous maybe
+        .d(dx_B),     // contains register value to store for sw
         .clk(~clock),
         .en(1'b1),
         .clr(reset)
@@ -253,30 +276,22 @@ module processor(
         .clr(reset)
     );
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
+    // ~~~~~~~~~ MEMORY STAGE ~~~~~~~~~
+    
+    // for lw/sw, address_dmem needs to be ALU result (rs + immediate)
+    assign address_dmem = xm_o;
+    
+    // data to write to memory (for sw) comes from the B register (which holds rd data for sw)
+    assign data = xm_B;
+    
+    // write enable for memory is high only for sw instruction
+    assign wren = xm_is_sw;
     
     // ~~~~~~~~~ MEMORY/WRITEBACK PIPELINE REGS ~~~~~~~~~
     
     wire [31:0] mw_o;       // ALU result (for arithmetic ops)
-    wire [31:0] mw_d;       // Data memory value (for lw/sw ops)
+    wire [31:0] mw_d;       // Data memory value (for lw ops)
     wire [31:0] mw_ir;      // Instruction
-
-
-
-    wire [4:0] mw_opcode;
-    wire [4:0] mw_rd;
-    wire [4:0] mw_rs;
-    wire [4:0] mw_rt;
-    wire [4:0] mw_shamt;
-    wire [4:0] mw_ALUop;
-
-    wire [31:0] mw_immediate;
-    wire [31:0] mw_target;
-
-
     
     // r type
     assign mw_opcode = mw_ir[31:27];
@@ -289,11 +304,29 @@ module processor(
     // i type: opcode, rd, rs are the same, the rest is immediate
     assign mw_immediate = {{15{mw_ir[16]}}, mw_ir[16:0]};  // we sign extend here
 
-    // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
-    assign mw_target = {5'd0, mw_ir[26:0]};
-
-
+    // j1 type: opcode is the same, the rest is target
+    assign mw_target = {5'd0, mw_ir[26:0]};    
     
+    // control signals for lw in MW stage
+    wire mw_opcode_bit4, mw_opcode_bit3, mw_opcode_bit2, mw_opcode_bit1, mw_opcode_bit0;
+    assign mw_opcode_bit4 = mw_opcode[4];
+    assign mw_opcode_bit3 = mw_opcode[3];
+    assign mw_opcode_bit2 = mw_opcode[2];
+    assign mw_opcode_bit1 = mw_opcode[1];
+    assign mw_opcode_bit0 = mw_opcode[0];
+    
+    // lw: 01000
+    wire mw_opcode_is_lw_temp;
+    and and_mw_lw_op(mw_opcode_is_lw_temp, ~mw_opcode_bit4, mw_opcode_bit3, ~mw_opcode_bit2, ~mw_opcode_bit1, ~mw_opcode_bit0);
+    assign mw_is_lw = mw_opcode_is_lw_temp;
+    
+    // jr: 00100
+    wire mw_is_jr;
+    and(mw_is_jr, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], ~mw_opcode[1], ~mw_opcode[0]);
+    
+    // sw: 00111
+    wire mw_is_sw;
+    and(mw_is_sw, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], mw_opcode[1], mw_opcode[0]); // sw: 00111
 
     // ALU output reg
     register_32 MW_O (
@@ -304,10 +337,10 @@ module processor(
         .clr(reset)
     );
 
-    // data reg
+    // data reg - holds data from memory for lw
     register_32 MW_D (
         .q(mw_d),
-        .d(xm_d),  // wire xm_d to data memory out
+        .d(q_dmem),  // wire memory output to MW_D register
         .clk(~clock),
         .en(1'b1),
         .clr(reset)
@@ -322,26 +355,20 @@ module processor(
         .clr(reset)
     );
 
- 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~ WRITEBACK STAGE ~~~~~~~~~
     
-    // d is rt for immediate instructions (addi -> mw_opcode 00101), but rd by default
-    wire mw_ctrl_insn_is_immediate;
-    and(mw_ctrl_insn_is_immediate, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], ~mw_opcode[1], mw_opcode[0]);
-
-    // mux_2 regdestmux (.in0(rd), .in1(rt), .select(ctrl_insn_is_immediate), .out(ctrl_writeReg));
-    // assign ctrl_writeReg = mw_ctrl_insn_is_immediate ? mw_rs : mw_rd;
-
-
-    // Connect MW stage outputs to register file inputs
-    assign ctrl_writeEnable = 1'b1;//mw_regwrite;
+    // for most instructions, regwrite data comes from ALU
+    // for lw, it comes from memory data
+    wire [31:0] regwrite_data;
+    assign regwrite_data = mw_is_lw ? mw_d : mw_o;
+    
+    // disable register write for sw and jr instructions
+    wire reg_write_enable;
+    assign reg_write_enable = ~(mw_is_sw || mw_is_jr);
+    assign ctrl_writeEnable = reg_write_enable;
+    
+    // destination register selection
     assign ctrl_writeReg = mw_rd;
-    assign data_writeReg = mw_o; // or mw_d, later on when we do loadword ops
+    assign data_writeReg = regwrite_data;
 
 endmodule
-
-// update file list
-// cd "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc"; Get-ChildItem -Recurse -Name -Filter *.v | Out-File -FilePath FileList.txt -Encoding Ascii; cd ../..
-
-// python .\autotester.py
-// gtkwave .\test_files\output_files\positive_no_bypass.vcd -o .\test_files\output_files\template.gtkw

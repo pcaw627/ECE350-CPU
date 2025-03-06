@@ -19,6 +19,8 @@ multdiv-main/multdiv
 
 # Ignore .vcd files
 *.vcd
+**/*.vcd
+**/*.mem
 *.html
 *.pyc
 *.vvp

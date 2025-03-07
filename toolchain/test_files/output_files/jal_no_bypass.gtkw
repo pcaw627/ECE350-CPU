@@ -1,0 +1,37 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Fri Mar 07 01:27:35 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\test_files\output_files\jal_no_bypass.vcd"
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\jal_no_bypass.gtkw"
+[timestart] 348100
+[size] 1536 889
+[pos] -217 -217
+*-16.561913 400500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[treeopen] Wrapper_tb.CPU.
+[sst_width] 197
+[signals_width] 198
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@28
+Wrapper_tb.CPU.clock
+Wrapper_tb.CPU.need_to_jump
+@22
+Wrapper_tb.CPU.mw_target[31:0]
+@28
+Wrapper_tb.CPU.is_jal
+Wrapper_tb.CPU.fd_is_jal
+Wrapper_tb.CPU.dx_opcode_is_jal_temp
+Wrapper_tb.CPU.dx_is_jal
+Wrapper_tb.CPU.xm_is_jal
+@29
+Wrapper_tb.CPU.xm_opcode_is_jal_temp
+@28
+Wrapper_tb.CPU.mw_is_jal
+@420
+Wrapper_tb.CPU.PC_current[31:0]
+Wrapper_tb.CPU.PC_next[31:0]
+Wrapper_tb.CPU.PC_plus_1[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

@@ -1,48 +1,48 @@
 module processor(
-    // Control signals
-    clock,                          // I: The master clock
-    reset,                          // I: A reset signal
+    // control signals
+    clock,                          // i: the master clock
+    reset,                          // i: a reset signal
 
-    // Imem
-    address_imem,                   // O: The address of the data to get from imem
-    q_imem,                         // I: The data from imem
+    // imem
+    address_imem,                   // o: the address of the data to get from imem
+    q_imem,                         // i: the data from imem
 
-    // Dmem
-    address_dmem,                   // O: The address of the data to get or put from/to dmem
-    data,                           // O: The data to write to dmem
-    wren,                           // O: Write enable for dmem
-    q_dmem,                         // I: The data from dmem
+    // dmem
+    address_dmem,                   // o: the address of the data to get or put from/to dmem
+    data,                           // o: the data to write to dmem
+    wren,                           // o: write enable for dmem
+    q_dmem,                         // i: the data from dmem
 
-    // Regfile
-    ctrl_writeEnable,               // O: Write enable for RegFile
-    ctrl_writeReg,                  // O: Register to write to in RegFile
-    ctrl_readRegA,                  // O: Register to read from port A of RegFile
-    ctrl_readRegB,                  // O: Register to read from port B of RegFile
-    data_writeReg,                  // O: Data to write to for RegFile
-    data_readRegA,                  // I: Data from port A of RegFile
-    data_readRegB                   // I: Data from port B of RegFile
+    // regfile
+    ctrl_writeEnable,               // o: write enable for regfile
+    ctrl_writeReg,                  // o: register to write to in regfile
+    ctrl_readRegA,                  // o: register to read from port a of regfile
+    ctrl_readRegB,                  // o: register to read from port b of regfile
+    data_writeReg,                  // o: data to write to for regfile
+    data_readRegA,                  // i: data from port a of regfile
+    data_readRegB                   // i: data from port b of regfile
 	 
 	);
 
-	// Control signals
+	// control signals
 	input clock, reset;
 	
-	// Imem
+	// imem
     output [31:0] address_imem;
 	input [31:0] q_imem;
 
-	// Dmem
+	// dmem
 	output [31:0] address_dmem, data;
 	output wren;
 	input [31:0] q_dmem;
 
-	// Regfile
+	// regfile
 	output ctrl_writeEnable;
 	output [4:0] ctrl_writeReg, ctrl_readRegA, ctrl_readRegB;
 	output [31:0] data_writeReg;
 	input [31:0] data_readRegA, data_readRegB;
 
-    // ~~~~~~~~~ WIRES ~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~ wires ~~~~~~~~~~~~~~~~~~~~
     // fd
     wire [31:0] PC_current, PC_next;
     wire [4:0] fd_opcode, fd_rd, fd_rs, fd_rt, fd_shamt, fd_ALUop;
@@ -63,37 +63,58 @@ module processor(
     wire [4:0] mw_opcode, mw_rd, mw_rs, mw_rt, mw_shamt, mw_ALUop;
     wire [31:0] mw_immediate, mw_target;
 
-    // Control signals for lw/sw
+    // control signals for lw/sw
     wire dx_is_lw, dx_is_sw;
     wire xm_is_lw, xm_is_sw;
     wire mw_is_lw;
 
-    // ~~~~~~~~~ FETCH: program counter ~~~~~~~~~
+    // ~~~~~~~~~ fetch: program counter ~~~~~~~~~
 
-    // detect direct jump instruction (opcode 00001)
+    // detect different jump/branch instructions
     wire is_jump;
     and(is_jump, ~q_imem[31], ~q_imem[30], ~q_imem[29], ~q_imem[28], q_imem[27]);
 
-    // detect jr instruction (opcode 00100) in decode stage
+    wire is_jal;
+    and(is_jal, ~q_imem[31], ~q_imem[30], ~q_imem[29], q_imem[28], q_imem[27]);
+
+    wire is_bne;
+    and(is_bne, ~q_imem[31], ~q_imem[30], ~q_imem[29], q_imem[28], ~q_imem[27]);
+
+    // detect jr instruction at fd stage
     wire fd_is_jr;
     and(fd_is_jr, ~fd_opcode[4], ~fd_opcode[3], fd_opcode[2], ~fd_opcode[1], ~fd_opcode[0]);
 
-    // for direct jump instruction, the target address is in the target field
+    // for direct jump instructions, target is in the instruction
     wire [31:0] jump_target;
     assign jump_target = {5'd0, q_imem[26:0]};
 
-    // for jr instruction, get the jump target from RegA (fd_rd register value)
+    // for jr instruction, target is in register
     wire [31:0] jr_target;
     assign jr_target = data_readRegA;
 
-    // select between pc+1, direct jump target, and jr target
-    wire [31:0] next_pc;
-    assign next_pc = is_jump ? jump_target : (fd_is_jr ? jr_target : PC_next);
-
-    // alu for pc+1 calculation
-    alu PC_increment (.data_operandA(32'd1), .data_operandB(PC_current), .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), .data_result(PC_next), .isNotEqual(), .isLessThan(), .overflow());
+    // for branch instructions, need to check condition in execute stage
+    wire [31:0] dx_branch_target;
     
-    // pc register
+    // branch comparison results
+    wire alu_isNotEqual, alu_isLessThan, alu_overflow;
+    
+    // branch condition signals
+    wire dx_is_bne, dx_is_blt;
+    wire dx_take_branch;
+    
+    // PC control logic
+    wire [31:0] next_pc;
+    assign next_pc = is_jump || is_jal ? jump_target : 
+                     fd_is_jr ? jr_target : 
+                     dx_take_branch ? dx_branch_target : 
+                     PC_next;
+
+    // PC+1 value for normal execution
+    wire [31:0] PC_plus_1;
+    alu PC_increment (.data_operandA(32'd1), .data_operandB(PC_current), .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), .data_result(PC_plus_1), .isNotEqual(), .isLessThan(), .overflow());
+    assign PC_next = PC_plus_1;
+    
+    // PC register
     register_32 PC (.q(PC_current), .d(next_pc), .clk(clock), .en(1'b1), .clr(reset));
     assign address_imem = PC_current;
     
@@ -111,10 +132,11 @@ module processor(
     // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
     assign fd_target = {5'd0, fd_ir[26:0]};
 
+    // create pipeline registers for fetch/decode stage
     register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(1'b1), .clr(reset));
     register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(1'b1), .clr(reset));
 
-    // ~~~~~~~~~ DECODE: instruction ~~~~~~~~~
+    // ~~~~~~~~~ decode: instruction ~~~~~~~~~
     
     // r type
     assign dx_opcode = dx_ir[31:27];
@@ -130,39 +152,26 @@ module processor(
     // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
     assign dx_target = {5'd0, dx_ir[26:0]};
 
-    // detect memory instructions and jr in fetch/decode stage
-    wire fd_is_sw, fd_is_lw;
+    // detect memory instructions and branch/jump instructions in fetch/decode stage
+    wire fd_is_sw, fd_is_lw, fd_is_bne, fd_is_blt;
     and(fd_is_sw, ~fd_opcode[4], ~fd_opcode[3], fd_opcode[2], fd_opcode[1], fd_opcode[0]); // sw: 00111
     and(fd_is_lw, ~fd_opcode[4], fd_opcode[3], ~fd_opcode[2], ~fd_opcode[1], ~fd_opcode[0]); // lw: 01000
+    and(fd_is_bne, ~fd_opcode[4], ~fd_opcode[3], ~fd_opcode[2], fd_opcode[1], ~fd_opcode[0]); // bne: 00010
+    and(fd_is_blt, ~fd_opcode[4], ~fd_opcode[3], fd_opcode[2], fd_opcode[1], ~fd_opcode[0]); // blt: 00110
     
-    // for jr $rd, we need to read the value from $rd to use as jump target
-    // for all other instructions, we need to read rs
+    // combined branch signal
+    wire fd_is_branch;
+    or(fd_is_branch, fd_is_bne, fd_is_blt);
+    
+    // register reads based on instruction type
+    // branches: $rs in A, $rd in B
+    // jr: $rd in A (target)
+    // sw: $rd in B (data to store), $rs in A (address base)
+    // other instructions: $rs in A, $rt in B
     assign ctrl_readRegA = fd_is_jr ? fd_rd : fd_rs;
-    
-    // for r-type: read rt
-    // for sw: read rd (value to store)
-    assign ctrl_readRegB = fd_is_sw ? fd_rd : fd_rt;
+    assign ctrl_readRegB = fd_is_sw ? fd_rd : (fd_is_branch ? fd_rd : fd_rt);
 
-    // lw/sw control signals in DX stage
-    // lw has opcode 01000
-    wire dx_opcode_bit4, dx_opcode_bit3, dx_opcode_bit2, dx_opcode_bit1, dx_opcode_bit0;
-    assign dx_opcode_bit4 = dx_opcode[4];
-    assign dx_opcode_bit3 = dx_opcode[3];
-    assign dx_opcode_bit2 = dx_opcode[2];
-    assign dx_opcode_bit1 = dx_opcode[1];
-    assign dx_opcode_bit0 = dx_opcode[0];
-    
-    // lw: 01000
-    wire dx_opcode_is_lw_temp;
-    and and_lw_op(dx_opcode_is_lw_temp, ~dx_opcode_bit4, dx_opcode_bit3, ~dx_opcode_bit2, ~dx_opcode_bit1, ~dx_opcode_bit0);
-    assign dx_is_lw = dx_opcode_is_lw_temp;
-    
-    // sw: 00111
-    wire dx_opcode_is_sw_temp;
-    and and_sw_op(dx_opcode_is_sw_temp, ~dx_opcode_bit4, ~dx_opcode_bit3, dx_opcode_bit2, dx_opcode_bit1, dx_opcode_bit0);
-    assign dx_is_sw = dx_opcode_is_sw_temp;
-    
-    // ~~~~~~~~~ DECODE/EXECUTE PIPELINE REGS ~~~~~~~~~
+    // ~~~~~~~~~ decode/execute pipeline regs ~~~~~~~~~
     wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
     
     // PC reg
@@ -173,6 +182,7 @@ module processor(
         .en(1'b1),
         .clr(reset)
     );
+    
     // Instruction reg
     register_32 DX_IR (
         .q(dx_ir),
@@ -181,7 +191,8 @@ module processor(
         .en(1'b1),
         .clr(reset)
     );
-    // A reg
+    
+    // A reg ($rs value or $rd for jr)
     register_32 DX_A_reg (
         .q(dx_A),
         .d(data_readRegA),
@@ -189,7 +200,8 @@ module processor(
         .en(1'b1),
         .clr(reset)
     );
-    // B reg
+    
+    // B reg ($rt or $rd value depending on instruction)
     register_32 DX_B_reg (
         .q(dx_B),
         .d(data_readRegB),
@@ -198,32 +210,97 @@ module processor(
         .clr(reset)
     );
 
-    // ~~~~~~~~~ EXECUTE: main ALU + regfile ~~~~~~~~~
+    // ~~~~~~~~~ execute: main ALU + regfile ~~~~~~~~~
     
-    // now on output side of regfile, we have alu.
-    assign main_alu_A = dx_A;
+    // Detect branch instructions in execute stage
+    and(dx_is_bne, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], dx_opcode[1], ~dx_opcode[0]); // bne: 00010
+    and(dx_is_blt, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], dx_opcode[1], ~dx_opcode[0]); // blt: 00110
     
-    // for immediate instructions (addi, lw, sw) use immediate as operand B
-    wire dx_use_immediate;
+    // detect other instruction types in execute stage
+    and(dx_is_lw, ~dx_opcode[4], dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]); // lw: 01000
+    and(dx_is_sw, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], dx_opcode[1], dx_opcode[0]); // sw: 00111
+    
+    wire dx_is_jr;
+    and(dx_is_jr, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]); // jr: 00100
+    
+    // branch comparison logic
+    // bne: branch if $rd != $rs (B != A)
+    // blt: branch if $rd < $rs (B < A)
+    wire bne_result, blt_result;
+    
+    // for comparison, we need an ALU or comparator 
+    // if B - A == 0, then B == A
+    // if B - A < 0, then B < A
+    wire [31:0] branch_comp_result;
+    wire branch_comp_isNotEqual, branch_comp_isLessThan, branch_comp_overflow;
+    
+    // branch comparison ALU
+    alu branch_comp_alu(
+        .data_operandA(dx_B),  // $rd
+        .data_operandB(dx_A),  // $rs
+        .ctrl_ALUopcode(5'b00001), // subtract B - A
+        .ctrl_shiftamt(5'b00000),
+        .data_result(branch_comp_result),
+        .isNotEqual(branch_comp_isNotEqual),    // $rd != $rs
+        .isLessThan(branch_comp_isLessThan),    // $rd < $rs
+        .overflow(branch_comp_overflow)
+    );
+    
+    // branch conditions
+    assign bne_result = branch_comp_isNotEqual;
+    assign blt_result = branch_comp_isLessThan;
+    
+    // Determine if branch should be taken
+    wire bne_take, blt_take;
+    and(bne_take, dx_is_bne, bne_result);
+    and(blt_take, dx_is_blt, blt_result);
+    or(dx_take_branch, bne_take, blt_take);
+    
+    // Calculate branch target: PC+1+immediate
+    // PC+1 is already in dx_PC by pipeline timing
+    alu branch_target_alu(
+        .data_operandA(dx_PC),
+        .data_operandB(dx_immediate),
+        .ctrl_ALUopcode(5'b00000), // add
+        .ctrl_shiftamt(5'b00000),
+        .data_result(dx_branch_target),
+        .isNotEqual(),
+        .isLessThan(),
+        .overflow()
+    );
+    
+    // For arithmetic/memory operations
     wire dx_ctrl_insn_is_addimmediate;  // addi -> dx_opcode 00101
+    and(dx_ctrl_insn_is_addimmediate, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]);
     
-    and(dx_ctrl_insn_is_addimmediate, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]); // is dx opcode 00101 (addi)?
+    // Use immediate for addi, lw, sw
+    wire dx_use_immediate;
+    or(dx_use_immediate, dx_ctrl_insn_is_addimmediate, dx_is_lw, dx_is_sw);
     
-    // use immediate for addi, lw, sw
-    or or_use_imm(dx_use_immediate, dx_ctrl_insn_is_addimmediate, dx_is_lw, dx_is_sw);
-    
+    // Select ALU inputs
+    assign main_alu_A = dx_A;  // $rs
     assign main_alu_B = dx_use_immediate ? dx_immediate : dx_B;
-
-    // also mux ALUop if its an immediate (addi, lw, sw all use add operation for address calculation)
+    
+    // Select ALUop
     assign dx_ALUop_final = dx_use_immediate ? 5'b00000 : dx_ALUop;
+    
+    // Main ALU for arithmetic and memory address calculation
+    alu main_alu(
+        .data_operandA(main_alu_A),
+        .data_operandB(main_alu_B),
+        .ctrl_ALUopcode(dx_ALUop_final),
+        .ctrl_shiftamt(dx_shamt),
+        .data_result(alu_result),
+        .isNotEqual(alu_isNotEqual),
+        .isLessThan(alu_isLessThan),
+        .overflow(alu_overflow)
+    );
 
-    alu main_alu(.data_operandA(main_alu_A), .data_operandB(main_alu_B), .ctrl_ALUopcode(dx_ALUop_final), 
-        .ctrl_shiftamt(dx_shamt), .data_result(alu_result), .isNotEqual(), .isLessThan(), .overflow());
-
-    // ~~~~~~~~~ EXECUTION/MEMORY PIPELINE REGS ~~~~~~~~~
+    // ~~~~~~~~~ execution/memory pipeline regs ~~~~~~~~~
     wire [31:0] xm_o;       // ALU output
     wire [31:0] xm_B;       // reg B value (for memory writes)
     wire [31:0] xm_ir;      // instruction
+    wire [31:0] xm_PC;      // PC value for jal
     
     // Extract opcode and registers from xm instruction
     assign xm_opcode = xm_ir[31:27];
@@ -231,24 +308,10 @@ module processor(
     assign xm_rs = xm_ir[21:17];
     assign xm_rt = xm_ir[16:12];
     
-    // Control signals for lw/sw in XM stage
-    wire xm_opcode_bit4, xm_opcode_bit3, xm_opcode_bit2, xm_opcode_bit1, xm_opcode_bit0;
-    assign xm_opcode_bit4 = xm_opcode[4];
-    assign xm_opcode_bit3 = xm_opcode[3];
-    assign xm_opcode_bit2 = xm_opcode[2];
-    assign xm_opcode_bit1 = xm_opcode[1];
-    assign xm_opcode_bit0 = xm_opcode[0];
+    // Detect instruction types in memory stage
+    and(xm_is_lw, ~xm_opcode[4], xm_opcode[3], ~xm_opcode[2], ~xm_opcode[1], ~xm_opcode[0]); // lw: 01000
+    and(xm_is_sw, ~xm_opcode[4], ~xm_opcode[3], xm_opcode[2], xm_opcode[1], xm_opcode[0]); // sw: 00111
     
-    // lw: 01000
-    wire xm_opcode_is_lw_temp;
-    and and_xm_lw_op(xm_opcode_is_lw_temp, ~xm_opcode_bit4, xm_opcode_bit3, ~xm_opcode_bit2, ~xm_opcode_bit1, ~xm_opcode_bit0);
-    assign xm_is_lw = xm_opcode_is_lw_temp;
-    
-    // sw: 00111
-    wire xm_opcode_is_sw_temp;
-    and and_xm_sw_op(xm_opcode_is_sw_temp, ~xm_opcode_bit4, ~xm_opcode_bit3, xm_opcode_bit2, xm_opcode_bit1, xm_opcode_bit0);
-    assign xm_is_sw = xm_opcode_is_sw_temp;
-
     // ALU output register
     register_32 XM_O (
         .q(xm_o),
@@ -258,7 +321,16 @@ module processor(
         .clr(reset)
     );
 
-    // reg B value (for memory store operations)
+    // PC register for jal
+    register_32 XM_PC (
+        .q(xm_PC),
+        .d(dx_PC),
+        .clk(~clock),
+        .en(1'b1),
+        .clr(reset)
+    );
+
+    // B register (for memory store operations)
     register_32 XM_B (
         .q(xm_B),
         .d(dx_B),     // contains register value to store for sw
@@ -267,7 +339,7 @@ module processor(
         .clr(reset)
     );
 
-    // Instruction reg
+    // Instruction register
     register_32 XM_IR (
         .q(xm_ir),
         .d(dx_ir),
@@ -276,24 +348,25 @@ module processor(
         .clr(reset)
     );
 
-    // ~~~~~~~~~ MEMORY STAGE ~~~~~~~~~
+    // ~~~~~~~~~ memory stage ~~~~~~~~~
     
-    // for lw/sw, address_dmem needs to be ALU result (rs + immediate)
+    // For lw/sw, address_dmem needs to be ALU result (rs + immediate)
     assign address_dmem = xm_o;
     
-    // data to write to memory (for sw) comes from the B register (which holds rd data for sw)
+    // Data to write to memory (for sw) comes from the B register
     assign data = xm_B;
     
-    // write enable for memory is high only for sw instruction
+    // Write enable for memory is high only for sw instruction
     assign wren = xm_is_sw;
     
-    // ~~~~~~~~~ MEMORY/WRITEBACK PIPELINE REGS ~~~~~~~~~
+    // ~~~~~~~~~ memory/writeback pipeline regs ~~~~~~~~~
     
     wire [31:0] mw_o;       // ALU result (for arithmetic ops)
     wire [31:0] mw_d;       // Data memory value (for lw ops)
     wire [31:0] mw_ir;      // Instruction
+    wire [31:0] mw_PC;      // PC value for jal
     
-    // r type
+    // Extract opcode and registers from mw instruction
     assign mw_opcode = mw_ir[31:27];
     assign mw_rd = mw_ir[26:22];
     assign mw_rs = mw_ir[21:17];
@@ -307,28 +380,21 @@ module processor(
     // j1 type: opcode is the same, the rest is target
     assign mw_target = {5'd0, mw_ir[26:0]};    
     
-    // control signals for lw in MW stage
-    wire mw_opcode_bit4, mw_opcode_bit3, mw_opcode_bit2, mw_opcode_bit1, mw_opcode_bit0;
-    assign mw_opcode_bit4 = mw_opcode[4];
-    assign mw_opcode_bit3 = mw_opcode[3];
-    assign mw_opcode_bit2 = mw_opcode[2];
-    assign mw_opcode_bit1 = mw_opcode[1];
-    assign mw_opcode_bit0 = mw_opcode[0];
+    // detect instruction types in writeback stage
+    and(mw_is_lw, ~mw_opcode[4], mw_opcode[3], ~mw_opcode[2], ~mw_opcode[1], ~mw_opcode[0]); // lw: 01000
     
-    // lw: 01000
-    wire mw_opcode_is_lw_temp;
-    and and_mw_lw_op(mw_opcode_is_lw_temp, ~mw_opcode_bit4, mw_opcode_bit3, ~mw_opcode_bit2, ~mw_opcode_bit1, ~mw_opcode_bit0);
-    assign mw_is_lw = mw_opcode_is_lw_temp;
-    
-    // jr: 00100
-    wire mw_is_jr;
-    and(mw_is_jr, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], ~mw_opcode[1], ~mw_opcode[0]);
-    
-    // sw: 00111
-    wire mw_is_sw;
+    wire mw_is_sw, mw_is_jr, mw_is_bne, mw_is_blt, mw_is_jal;
     and(mw_is_sw, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], mw_opcode[1], mw_opcode[0]); // sw: 00111
+    and(mw_is_jr, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], ~mw_opcode[1], ~mw_opcode[0]); // jr: 00100
+    and(mw_is_bne, ~mw_opcode[4], ~mw_opcode[3], ~mw_opcode[2], mw_opcode[1], ~mw_opcode[0]); // bne: 00010
+    and(mw_is_blt, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], mw_opcode[1], ~mw_opcode[0]); // blt: 00110
+    and(mw_is_jal, ~mw_opcode[4], ~mw_opcode[3], ~mw_opcode[2], mw_opcode[1], mw_opcode[0]); // jal: 00011
+    
+    // combined branch signal
+    wire mw_is_branch;
+    or(mw_is_branch, mw_is_bne, mw_is_blt);
 
-    // ALU output reg
+    // ALU output register
     register_32 MW_O (
         .q(mw_o),
         .d(xm_o),
@@ -337,7 +403,16 @@ module processor(
         .clr(reset)
     );
 
-    // data reg - holds data from memory for lw
+    // PC register for jal return address
+    register_32 MW_PC (
+        .q(mw_PC),
+        .d(xm_PC),
+        .clk(~clock),
+        .en(1'b1),
+        .clr(reset)
+    );
+
+    // data register - holds data from memory for lw
     register_32 MW_D (
         .q(mw_d),
         .d(q_dmem),  // wire memory output to MW_D register
@@ -346,7 +421,7 @@ module processor(
         .clr(reset)
     );
 
-    // insn reg
+    // Instruction register
     register_32 MW_IR (
         .q(mw_ir),
         .d(xm_ir),
@@ -355,20 +430,27 @@ module processor(
         .clr(reset)
     );
 
-    // ~~~~~~~~~ WRITEBACK STAGE ~~~~~~~~~
+    // ~~~~~~~~~ writeback stage ~~~~~~~~~
     
-    // for most instructions, regwrite data comes from ALU
-    // for lw, it comes from memory data
+    // select data to write to register file
+    // lw: memory data
+    // jal: PC+1 (return address)
+    // other instructions: ALU result
     wire [31:0] regwrite_data;
-    assign regwrite_data = mw_is_lw ? mw_d : mw_o;
+    assign regwrite_data = mw_is_jal ? mw_PC : (mw_is_lw ? mw_d : mw_o);
     
-    // disable register write for sw and jr instructions
+    // Disable register write for sw, jr, and branch instructions
     wire reg_write_enable;
-    assign reg_write_enable = ~(mw_is_sw || mw_is_jr);
+    assign reg_write_enable = mw_is_jal || (~mw_is_sw && ~mw_is_jr && ~mw_is_branch);
     assign ctrl_writeEnable = reg_write_enable;
     
-    // destination register selection
-    assign ctrl_writeReg = mw_rd;
+    // select destination register
+    // jal: $r31
+    // other instructions: $rd
+    wire [4:0] dest_reg;
+    assign dest_reg = mw_is_jal ? 5'd31 : mw_rd;
+    assign ctrl_writeReg = dest_reg;
+    
     assign data_writeReg = regwrite_data;
 
 endmodule

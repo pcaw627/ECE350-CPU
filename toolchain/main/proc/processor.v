@@ -118,7 +118,7 @@ module processor(
     assign PC_next = PC_plus_1;
     
     // PC register
-    register_32 PC (.q(PC_current), .d(next_pc), .clk(clock), .en(1'b1), .clr(reset));
+    register_32 PC (.q(PC_current), .d(next_pc), .clk(~clock), .en(~stall), .clr(reset));
     assign address_imem = PC_current;
     
     // r type
@@ -136,8 +136,8 @@ module processor(
     assign fd_target = {5'd0, fd_ir[26:0]};
 
     // create pipeline registers for fetch/decode stage
-    register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(stall), .clr(reset));
-    register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(stall), .clr(reset));
+    register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ decode: instruction ~~~~~~~~~
     
@@ -178,16 +178,16 @@ module processor(
     wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
     
     // PC reg
-    register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(stall), .clr(reset));
+    register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(~stall), .clr(reset));
     
     // Instruction reg
-    register_32 DX_IR (.q(dx_ir), .d(fd_ir), .clk(~clock), .en(stall), .clr(reset));
+    register_32 DX_IR (.q(dx_ir), .d(fd_ir), .clk(~clock), .en(~stall), .clr(reset));
     
     // A reg ($rs value or $rd for jr)
-    register_32 DX_A_reg (.q(dx_A), .d(data_readRegA), .clk(~clock), .en(stall), .clr(reset));
+    register_32 DX_A_reg (.q(dx_A), .d(data_readRegA), .clk(~clock), .en(~stall), .clr(reset));
     
     // B reg ($rt or $rd value depending on instruction)
-    register_32 DX_B_reg (.q(dx_B), .d(data_readRegB), .clk(~clock), .en(stall), .clr(reset));
+    register_32 DX_B_reg (.q(dx_B), .d(data_readRegB), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ execute: main ALU + regfile ~~~~~~~~~
     
@@ -236,17 +236,10 @@ module processor(
     or(dx_take_branch, bne_take, blt_take);
     
     // Calculate branch target: PC+1+immediate
-    // PC+1 is already in dx_PC by pipeline timing
-    alu branch_target_alu(
-        .data_operandA(dx_PC),
-        .data_operandB(dx_immediate),
-        .ctrl_ALUopcode(5'b00000), // add
-        .ctrl_shiftamt(5'b00000),
-        .data_result(dx_branch_target),
-        .isNotEqual(),
-        .isLessThan(),
-        .overflow()
-    );
+    // PC+1 is already in dx_PC by pipeline timing (but we handle differently after doing multdiv.. so we add here)
+    wire [31:0] branch_target;
+    wire [31:0] branch_N;
+    cla_32 branch_adder (.A(dx_PC), .B(dx_immediate), .Cin(1'b1), .Sum(dx_branch_target), .Cout(), .signed_ovf());
     
     // For arithmetic/memory operations
     wire dx_ctrl_insn_is_addimmediate;  // addi -> dx_opcode 00101
@@ -327,7 +320,9 @@ module processor(
     wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : alu_result;
 
     // wire stall; 
-    nand (stall, dx_is_MULTDIV, ~multdiv_resultRDY);
+    // wire prestall;
+    and (stall, dx_is_MULTDIV, ~multdiv_resultRDY);
+    // or (stall, prestall, ctrl_DIV);
 
 
 
@@ -348,17 +343,17 @@ module processor(
     and(xm_is_sw, ~xm_opcode[4], ~xm_opcode[3], xm_opcode[2], xm_opcode[1], xm_opcode[0]); // sw: 00111
     
     // ALU output register
-    register_32 XM_O (.q(xm_o), .d(dx_out), .clk(~clock), .en(stall), .clr(reset));
+    register_32 XM_O (.q(xm_o), .d(dx_out), .clk(~clock), .en(~stall), .clr(reset));
 
     // PC register for jal
-    register_32 XM_PC (.q(xm_PC), .d(dx_PC), .clk(~clock), .en(stall), .clr(reset));
+    register_32 XM_PC (.q(xm_PC), .d(dx_PC), .clk(~clock), .en(~stall), .clr(reset));
 
     // B register (for memory store operations)
     register_32 XM_B (.q(xm_B), .d(dx_B), // contains register value to store for sw
-        .clk(~clock), .en(stall), .clr(reset));
+        .clk(~clock), .en(~stall), .clr(reset));
 
     // Instruction register
-    register_32 XM_IR (.q(xm_ir), .d(dx_ir), .clk(~clock), .en(stall), .clr(reset));
+    register_32 XM_IR (.q(xm_ir), .d(dx_ir), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ memory stage ~~~~~~~~~
     
@@ -407,17 +402,17 @@ module processor(
     or(mw_is_branch, mw_is_bne, mw_is_blt);
 
     // ALU output register
-    register_32 MW_O (.q(mw_o), .d(xm_o), .clk(~clock), .en(stall), .clr(reset));
+    register_32 MW_O (.q(mw_o), .d(xm_o), .clk(~clock), .en(1'b1), .clr(reset));
 
     // PC register for jal return address
-    register_32 MW_PC (.q(mw_PC), .d(xm_PC), .clk(~clock), .en(stall), .clr(reset));
+    register_32 MW_PC (.q(mw_PC), .d(xm_PC), .clk(~clock), .en(1'b1), .clr(reset));
 
     // data register - holds data from memory for lw
     register_32 MW_D (.q(mw_d), .d(q_dmem),  // wire memory output to MW_D register
-        .clk(~clock), .en(stall), .clr(reset));
+        .clk(~clock), .en(1'b1), .clr(reset));
 
     // Instruction register
-    register_32 MW_IR (.q(mw_ir), .d(xm_ir), .clk(~clock), .en(stall), .clr(reset));
+    register_32 MW_IR (.q(mw_ir), .d(xm_ir), .clk(~clock), .en(1'b1), .clr(reset));
 
     // ~~~~~~~~~ writeback stage ~~~~~~~~~
     
@@ -426,7 +421,9 @@ module processor(
     // jal: PC+1 (return address)
     // other instructions: ALU result
     wire [31:0] regwrite_data;
-    assign regwrite_data = mw_is_jal ? mw_PC : (mw_is_lw ? mw_d : mw_o);
+    wire [31:0] jal_val;
+    cla_32 jal_adder (.A(mw_PC), .B(32'b1), .Cin(1'b0), .Sum(jal_val), .Cout(), .signed_ovf());
+    assign regwrite_data = mw_is_jal ? jal_val : (mw_is_lw ? mw_d : mw_o);
     
     // Disable register write for sw, jr, and branch instructions
     wire reg_write_enable;

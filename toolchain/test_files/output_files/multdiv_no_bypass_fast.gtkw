@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Sat Mar 22 00:50:08 2025
+[*] Sat Mar 22 23:19:17 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\multdiv_no_bypass_fast.vcd"
-[dumpfile_mtime] "Sat Mar 22 00:46:08 2025"
-[dumpfile_size] 3807971
+[dumpfile_mtime] "Sat Mar 22 23:18:57 2025"
+[dumpfile_size] 3693101
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\multdiv_no_bypass_fast.gtkw"
-[timestart] 925300
+[timestart] 262400
 [size] 1536 889
 [pos] -1 -1
-*-14.760311 990400 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-14.760311 344200 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] Wrapper_tb.
 [treeopen] Wrapper_tb.CPU.
 [treeopen] Wrapper_tb.CPU.md.
@@ -27,9 +27,6 @@ Wrapper_tb.CPU.dx_B[31:0]
 Wrapper_tb.CPU.dx_PC[31:0]
 Wrapper_tb.CPU.fd_PC[31:0]
 Wrapper_tb.CPU.q_dmem[31:0]
-@22
-Wrapper_tb.CPU.q_imem[31:0]
-@420
 Wrapper_tb.CPU.reset
 [color] 7
 Wrapper_tb.CPU.main_alu_A[31:0]
@@ -53,9 +50,7 @@ Wrapper_tb.CPU.md.clock
 Wrapper_tb.CPU.md.ctrl_MULT
 Wrapper_tb.CPU.dx_is_MULT
 Wrapper_tb.CPU.multdiv_start_valid
-@29
 Wrapper_tb.CPU.dx_is_MULTDIV
-@28
 Wrapper_tb.CPU.md.mult_ready
 [color] 2
 Wrapper_tb.CPU.md.ctrl_DIV
@@ -65,10 +60,19 @@ Wrapper_tb.CPU.md.data_resultRDY
 Wrapper_tb.CPU.md.divider.divisor_is_zero
 Wrapper_tb.CPU.md.divider.operation_complete
 @22
-+{MW_IR_q} Wrapper_tb.CPU.MW_IR.q[31:0]
-+{XM_IR_q} Wrapper_tb.CPU.XM_IR.q[31:0]
+Wrapper_tb.CPU.q_imem[31:0]
+@23
++{FD_IR_q} Wrapper_tb.CPU.FD_IR_reg.q[31:0]
+@22
 +{DX_IR_q} Wrapper_tb.CPU.DX_IR.q[31:0]
++{XM_IR_q} Wrapper_tb.CPU.XM_IR.q[31:0]
++{MW_IR_q} Wrapper_tb.CPU.MW_IR.q[31:0]
 @28
+[color] 1
 Wrapper_tb.CPU.stall
+Wrapper_tb.CPU.multdiv_start_valid
+Wrapper_tb.CPU.multdiv_counter_clear
+@24
+Wrapper_tb.CPU.multdiv_counter[5:0]
 [pattern_trace] 1
 [pattern_trace] 0

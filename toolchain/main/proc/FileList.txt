@@ -61,6 +61,11 @@
 .\alu-main\sra_32_4b.v
 .\alu-main\sra_32_8b.v
 .\alu-main\sra_32_tb.v
+.\FFT\AGU.v
+.\FFT\BFU.v
+.\FFT\FFT.v
+.\FFT\FFT_mem.v
+.\FFT\FFT_RAM.v
 .\multdiv-main\and_reduce_32.v
 .\multdiv-main\multdiv.v
 .\multdiv-main\multdiv_tb.v

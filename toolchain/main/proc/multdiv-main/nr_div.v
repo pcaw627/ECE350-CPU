@@ -91,7 +91,7 @@ module nr_div(
     
     assign start_operation = ctrl_DIV & ~operation_in_progress & ~divisor_is_zero;
     assign operation_in_progress = |N_current;
-    assign operation_complete = (N_current == 6'd0);
+    and(operation_complete, ~N_current[5], ~N_current[4], ~N_current[3], ~N_current[2], ~N_current[1], ~N_current[0]);
     assign data_resultRDY = operation_complete | divisor_is_zero;
 
     // counter mux (either start at 33 or decrement current value)

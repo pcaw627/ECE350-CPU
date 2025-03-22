@@ -68,6 +68,9 @@ module processor(
     wire xm_is_lw, xm_is_sw;
     wire mw_is_lw;
 
+    // control signals for multdiv and stall
+    wire stall;
+
     // ~~~~~~~~~ fetch: program counter ~~~~~~~~~
 
     // detect different jump/branch instructions
@@ -133,8 +136,8 @@ module processor(
     assign fd_target = {5'd0, fd_ir[26:0]};
 
     // create pipeline registers for fetch/decode stage
-    register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(1'b1), .clr(reset));
-    register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(1'b1), .clr(reset));
+    register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(stall), .clr(reset));
+    register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(stall), .clr(reset));
 
     // ~~~~~~~~~ decode: instruction ~~~~~~~~~
     
@@ -175,40 +178,16 @@ module processor(
     wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
     
     // PC reg
-    register_32 DX_PC (
-        .q(dx_PC),
-        .d(fd_PC),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(stall), .clr(reset));
     
     // Instruction reg
-    register_32 DX_IR (
-        .q(dx_ir),
-        .d(fd_ir),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 DX_IR (.q(dx_ir), .d(fd_ir), .clk(~clock), .en(stall), .clr(reset));
     
     // A reg ($rs value or $rd for jr)
-    register_32 DX_A_reg (
-        .q(dx_A),
-        .d(data_readRegA),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 DX_A_reg (.q(dx_A), .d(data_readRegA), .clk(~clock), .en(stall), .clr(reset));
     
     // B reg ($rt or $rd value depending on instruction)
-    register_32 DX_B_reg (
-        .q(dx_B),
-        .d(data_readRegB),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 DX_B_reg (.q(dx_B), .d(data_readRegB), .clk(~clock), .en(stall), .clr(reset));
 
     // ~~~~~~~~~ execute: main ALU + regfile ~~~~~~~~~
     
@@ -296,6 +275,62 @@ module processor(
         .overflow(alu_overflow)
     );
 
+
+
+    // ~~~~~~~~~ multdiv ~~~~~~~~~~~~~~~~~~
+    
+    wire ctrl_MULT;
+    wire ctrl_DIV;
+    wire [31:0] multdiv_result;
+    wire multdiv_exception;
+    wire multdiv_resultRDY;
+    
+    wire dx_is_MULT, dx_is_DIV, dx_is_MULTDIV, dx_is_rtype;
+    and (dx_is_rtype, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]);
+    and (dx_is_MULT, dx_is_rtype, ~dx_ALUop_final[4], ~dx_ALUop_final[3], dx_ALUop_final[2], 
+        dx_ALUop_final[1], ~dx_ALUop_final[0]);
+    and (dx_is_DIV, dx_is_rtype, ~dx_ALUop_final[4], ~dx_ALUop_final[3], dx_ALUop_final[2], 
+    dx_ALUop_final[1], dx_ALUop_final[0]);
+    or (dx_is_MULTDIV, dx_is_MULT, dx_is_DIV);
+
+    // mult is instant but for div it's pretty much guaranteed to be 32 (33?) cycles
+    wire [5:0] multdiv_counter;
+    wire md_counter_is_zero = (multdiv_counter == 6'd0);
+    wire multdiv_start_valid;
+
+    and (multdiv_start_valid, dx_is_MULTDIV, md_counter_is_zero);
+    and(ctrl_MULT, dx_is_MULT, multdiv_start_valid);
+    and(ctrl_DIV, dx_is_DIV, multdiv_start_valid);
+    
+    wire multdiv_counter_clear;
+    or (multdiv_counter_clear, ~dx_is_MULTDIV, multdiv_resultRDY);
+    counter_6 multdiv_count(
+        .count(multdiv_counter), 
+        .clk(~clock),
+        .clr(multdiv_counter_clear),
+        .en(1'b1)
+    );
+    
+    multdiv md(
+        .data_operandA(dx_A),
+        .data_operandB(dx_B),
+        .ctrl_MULT(ctrl_MULT),
+        .ctrl_DIV(ctrl_DIV),
+        .clock(clock),
+        .data_result(multdiv_result),
+        .data_exception(multdiv_exception),
+        .data_resultRDY(multdiv_resultRDY)
+    );
+
+
+    // xm will need result from multdiv if we did that operation, use mux from op
+    wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : alu_result;
+
+    // wire stall; 
+    nand (stall, dx_is_MULTDIV, ~multdiv_resultRDY);
+
+
+
     // ~~~~~~~~~ execution/memory pipeline regs ~~~~~~~~~
     wire [31:0] xm_o;       // ALU output
     wire [31:0] xm_B;       // reg B value (for memory writes)
@@ -313,40 +348,17 @@ module processor(
     and(xm_is_sw, ~xm_opcode[4], ~xm_opcode[3], xm_opcode[2], xm_opcode[1], xm_opcode[0]); // sw: 00111
     
     // ALU output register
-    register_32 XM_O (
-        .q(xm_o),
-        .d(alu_result),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 XM_O (.q(xm_o), .d(dx_out), .clk(~clock), .en(stall), .clr(reset));
 
     // PC register for jal
-    register_32 XM_PC (
-        .q(xm_PC),
-        .d(dx_PC),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 XM_PC (.q(xm_PC), .d(dx_PC), .clk(~clock), .en(stall), .clr(reset));
 
     // B register (for memory store operations)
-    register_32 XM_B (
-        .q(xm_B),
-        .d(dx_B),     // contains register value to store for sw
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 XM_B (.q(xm_B), .d(dx_B), // contains register value to store for sw
+        .clk(~clock), .en(stall), .clr(reset));
 
     // Instruction register
-    register_32 XM_IR (
-        .q(xm_ir),
-        .d(dx_ir),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 XM_IR (.q(xm_ir), .d(dx_ir), .clk(~clock), .en(stall), .clr(reset));
 
     // ~~~~~~~~~ memory stage ~~~~~~~~~
     
@@ -395,40 +407,17 @@ module processor(
     or(mw_is_branch, mw_is_bne, mw_is_blt);
 
     // ALU output register
-    register_32 MW_O (
-        .q(mw_o),
-        .d(xm_o),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 MW_O (.q(mw_o), .d(xm_o), .clk(~clock), .en(stall), .clr(reset));
 
     // PC register for jal return address
-    register_32 MW_PC (
-        .q(mw_PC),
-        .d(xm_PC),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 MW_PC (.q(mw_PC), .d(xm_PC), .clk(~clock), .en(stall), .clr(reset));
 
     // data register - holds data from memory for lw
-    register_32 MW_D (
-        .q(mw_d),
-        .d(q_dmem),  // wire memory output to MW_D register
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 MW_D (.q(mw_d), .d(q_dmem),  // wire memory output to MW_D register
+        .clk(~clock), .en(stall), .clr(reset));
 
     // Instruction register
-    register_32 MW_IR (
-        .q(mw_ir),
-        .d(xm_ir),
-        .clk(~clock),
-        .en(1'b1),
-        .clr(reset)
-    );
+    register_32 MW_IR (.q(mw_ir), .d(xm_ir), .clk(~clock), .en(stall), .clr(reset));
 
     // ~~~~~~~~~ writeback stage ~~~~~~~~~
     

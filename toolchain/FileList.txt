@@ -91,4 +91,5 @@ main\proc\reg-main\regfile_tb.v
 main\proc\reg-main\register_32.v
 main\proc\reg-main\register_32_tb.v
 main\proc\reg-main\register_6.v
+main\proc\reg-main\counter_6.v
 test_files\Wrapper_tb.v

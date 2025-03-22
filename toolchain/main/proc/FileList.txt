@@ -69,6 +69,7 @@
 .\multdiv-main\or_reduce_32.v
 .\multdiv-main\wallace_32.v
 .\multdiv-main\wallace_tb.v
+.\reg-main\counter_6.v
 .\reg-main\decode_32_bi.v
 .\reg-main\decode_32_bi_tb.v
 .\reg-main\decode_32_tri.v

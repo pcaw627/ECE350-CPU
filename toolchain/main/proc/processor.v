@@ -102,8 +102,7 @@ module processor(
     wire alu_isNotEqual, alu_isLessThan, alu_overflow;
     
     // branch condition signals
-    wire dx_is_bne, dx_is_blt;
-    wire dx_take_branch;
+    wire dx_is_bne, dx_is_blt, dx_take_branch, bex_taken;
     
     // PC control logic
     wire [31:0] next_pc;
@@ -136,8 +135,10 @@ module processor(
     // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
     assign fd_target = {5'd0, fd_ir[26:0]};
 
-    register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(~stall), .clr(reset));
-    register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(~stall), .clr(reset));
+    wire control_flow_taken, control_branch_or_jump, control_branch_taken;
+
+    register_32 FD_PC_reg (.q(fd_PC), .d(control_branch_or_jump ? 32'd0 : PC_current), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 FD_IR_reg (.q(fd_ir), .d(control_branch_or_jump ? 32'd0 : q_imem), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ decode: instruction ~~~~~~~~~
     
@@ -185,15 +186,11 @@ module processor(
 
     // bex branch logic
     wire bex_condition = (data_readRegA != 32'd0); // for bex: if $rstatus != 0
-    wire bex_taken;
     and(bex_taken, fd_is_bex, bex_condition);
 
     wire [31:0] bex_target; // (similar to j target)
     assign bex_target = {5'd0, fd_ir[26:0]};
 
-    wire pipeline_flush;
-    or(pipeline_flush, fd_is_jr, bex_taken, dx_take_branch, is_jump, is_jal);
-    
 
     // ~~~~~~~~~ decode/execute pipeline regs ~~~~~~~~~
     wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
@@ -202,13 +199,13 @@ module processor(
     register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(~stall), .clr(reset));
     
     // Instruction reg
-    register_32 DX_IR (.q(dx_ir), .d(fd_ir), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 DX_IR (.q(dx_ir), .d(control_branch_or_jump ? 32'd0 : fd_ir), .clk(~clock), .en(~stall), .clr(reset));
     
     // A reg ($rs value or $rd for jr)
-    register_32 DX_A_reg (.q(dx_A), .d(data_readRegA), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 DX_A_reg (.q(dx_A), .d(control_branch_or_jump ? 32'd0 : data_readRegA), .clk(~clock), .en(~stall), .clr(reset));
     
     // B reg ($rt or $rd value depending on instruction)
-    register_32 DX_B_reg (.q(dx_B), .d(data_readRegB), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 DX_B_reg (.q(dx_B), .d(control_branch_or_jump ? 32'd0 : data_readRegB), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ execute: main ALU + regfile ~~~~~~~~~
     
@@ -245,6 +242,10 @@ module processor(
         .isLessThan(branch_comp_isLessThan),    // $rd < $rs
         .overflow(branch_comp_overflow)
     );
+
+    assign control_branch_taken = (dx_is_bne && branch_comp_isNotEqual) || (dx_is_blt && branch_comp_isLessThan);
+    or(control_flow_taken, is_jump, is_jal, fd_is_jr, bex_taken, control_branch_taken);
+    assign control_branch_or_jump = control_branch_taken || is_jump || bex_taken;
     
     // branch conditions
     assign bne_result = branch_comp_isNotEqual;
@@ -386,21 +387,21 @@ module processor(
     and(xm_is_sw, ~xm_opcode[4], ~xm_opcode[3], xm_opcode[2], xm_opcode[1], xm_opcode[0]); // sw: 00111
     
     // ALU output register
-    register_32 XM_O (.q(xm_o), .d(dx_out), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 XM_O (.q(xm_o), .d(control_branch_or_jump ? 32'd0 : dx_out), .clk(~clock), .en(~stall), .clr(reset));
 
     // PC register for jal
     register_32 XM_PC (.q(xm_PC), .d(dx_PC), .clk(~clock), .en(~stall), .clr(reset));
 
     // B register (for memory store operations)
-    register_32 XM_B (.q(xm_B), .d(dx_B), // contains register value to store for sw
+    register_32 XM_B (.q(xm_B), .d(control_branch_or_jump ? 32'd0 : dx_B), // contains register value to store for sw
         .clk(~clock), .en(~stall), .clr(reset));
 
     // Instruction register
-    register_32 XM_IR (.q(xm_ir), .d(dx_ir), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 XM_IR (.q(xm_ir), .d(control_branch_or_jump ? 32'd0 : dx_ir), .clk(~clock), .en(~stall), .clr(reset));
 
     // Exception Code Register 
     wire [31:0] xm_exception_code;
-    register_32 XM_EXCEPTION (.q(xm_exception_code), .d(dx_exception_code), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 XM_EXCEPTION (.q(xm_exception_code), .d(control_branch_or_jump ? 32'd0 : dx_exception_code), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ memory stage ~~~~~~~~~
     
@@ -450,21 +451,21 @@ module processor(
     or(mw_is_branch, mw_is_bne, mw_is_blt);
 
     // ALU output register
-    register_32 MW_O (.q(mw_o), .d(xm_o), .clk(~clock), .en(1'b1), .clr(reset));
+    register_32 MW_O (.q(mw_o), .d(control_branch_or_jump ? 32'd0 : xm_o), .clk(~clock), .en(1'b1), .clr(reset));
 
     // PC register for jal return address
     register_32 MW_PC (.q(mw_PC), .d(xm_PC), .clk(~clock), .en(1'b1), .clr(reset));
 
     // data register - holds data from memory for lw
-    register_32 MW_D (.q(mw_d), .d(q_dmem),  // wire memory output to MW_D register
+    register_32 MW_D (.q(mw_d), .d(control_branch_or_jump ? 32'd0 : q_dmem),  // wire memory output to MW_D register
         .clk(~clock), .en(1'b1), .clr(reset));
 
     // Instruction register
-    register_32 MW_IR (.q(mw_ir), .d(xm_ir), .clk(~clock), .en(1'b1), .clr(reset));
+    register_32 MW_IR (.q(mw_ir), .d(control_branch_or_jump ? 32'd0 : xm_ir), .clk(~clock), .en(1'b1), .clr(reset));
 
     // Exception Code Register 
     wire [31:0] mw_exception_code;
-    register_32 MW_EXCEPTION (.q(mw_exception_code), .d(xm_exception_code), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 MW_EXCEPTION (.q(mw_exception_code), .d(control_branch_or_jump ? 32'd0 : xm_exception_code), .clk(~clock), .en(~stall), .clr(reset));
     wire mw_exception_code_flag = (mw_exception_code == 32'b0) ? 1'b0 : 1'b1; // any nonzero exception code is exception raised! this carries into writeback stage
 
     // ~~~~~~~~~ writeback stage ~~~~~~~~~

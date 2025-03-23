@@ -108,9 +108,10 @@ module processor(
     // PC control logic
     wire [31:0] next_pc;
     assign next_pc = is_jump || is_jal ? jump_target : 
-                     fd_is_jr ? jr_target : 
-                     dx_take_branch ? dx_branch_target : 
-                     PC_next;
+                    fd_is_jr ? jr_target : 
+                    bex_taken ? bex_target :
+                    dx_take_branch ? dx_branch_target : 
+                    PC_next;
 
     // PC+1 value for normal execution
     wire [31:0] PC_plus_1;
@@ -135,7 +136,6 @@ module processor(
     // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
     assign fd_target = {5'd0, fd_ir[26:0]};
 
-    // create pipeline registers for fetch/decode stage
     register_32 FD_PC_reg (.q(fd_PC), .d(PC_current), .clk(~clock), .en(~stall), .clr(reset));
     register_32 FD_IR_reg (.q(fd_ir), .d(q_imem), .clk(~clock), .en(~stall), .clr(reset));
 
@@ -171,8 +171,29 @@ module processor(
     // jr: $rd in A (target)
     // sw: $rd in B (data to store), $rs in A (address base)
     // other instructions: $rs in A, $rt in B
-    assign ctrl_readRegA = fd_is_jr ? fd_rd : fd_rs;
+    // assign ctrl_readRegA = fd_is_jr ? fd_rd : fd_rs;
+    assign ctrl_readRegA = fd_is_bex ? 5'd30 : (fd_is_jr ? fd_rd : fd_rs);
     assign ctrl_readRegB = fd_is_sw ? fd_rd : (fd_is_branch ? fd_rd : fd_rt);
+
+    // ~~~~~~~~~~~~~~~~~~~~ BEX - SETX ~~~~~~~~~~~~~~~~~~~~~~
+    wire is_bex, fd_is_bex, fd_is_setx;
+    and(is_bex, q_imem[31], ~q_imem[30], q_imem[29], q_imem[28], ~q_imem[27]); // 10110
+    and(fd_is_bex, fd_opcode[4], ~fd_opcode[3], fd_opcode[2], fd_opcode[1], ~fd_opcode[0]); // 10110
+    and(fd_is_setx, fd_opcode[4], ~fd_opcode[3], fd_opcode[2], ~fd_opcode[1], fd_opcode[0]); // 10101
+
+    wire [31:0] rstatus_value; // for bex, we need to read $rstatus (r30)
+
+    // bex branch logic
+    wire bex_condition = (data_readRegA != 32'd0); // for bex: if $rstatus != 0
+    wire bex_taken;
+    and(bex_taken, fd_is_bex, bex_condition);
+
+    wire [31:0] bex_target; // (similar to j target)
+    assign bex_target = {5'd0, fd_ir[26:0]};
+
+    wire pipeline_flush;
+    or(pipeline_flush, fd_is_jr, bex_taken, dx_take_branch, is_jump, is_jal);
+    
 
     // ~~~~~~~~~ decode/execute pipeline regs ~~~~~~~~~
     wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
@@ -314,8 +335,17 @@ module processor(
     );
 
 
+    wire dx_is_setx;
+    and(dx_is_setx, dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]); // 10101
+
+    wire [31:0] setx_value;
+    assign setx_value = {5'd0, dx_ir[26:0]}; // Take the 27-bit target field
+
     // xm will need result from multdiv if we did that operation, use mux from op
-    wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : alu_result;
+    // wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : alu_result;
+    wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : 
+                     dx_is_setx ? setx_value :
+                     alu_result;
 
     // wire stall; 
     // wire prestall;
@@ -407,13 +437,14 @@ module processor(
     // detect instruction types in writeback stage
     and(mw_is_lw, ~mw_opcode[4], mw_opcode[3], ~mw_opcode[2], ~mw_opcode[1], ~mw_opcode[0]); // lw: 01000
     
-    wire mw_is_sw, mw_is_jr, mw_is_bne, mw_is_blt, mw_is_jal;
+    wire mw_is_sw, mw_is_jr, mw_is_bne, mw_is_blt, mw_is_jal, mw_is_setx;
     and(mw_is_sw, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], mw_opcode[1], mw_opcode[0]); // sw: 00111
     and(mw_is_jr, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], ~mw_opcode[1], ~mw_opcode[0]); // jr: 00100
     and(mw_is_bne, ~mw_opcode[4], ~mw_opcode[3], ~mw_opcode[2], mw_opcode[1], ~mw_opcode[0]); // bne: 00010
     and(mw_is_blt, ~mw_opcode[4], ~mw_opcode[3], mw_opcode[2], mw_opcode[1], ~mw_opcode[0]); // blt: 00110
     and(mw_is_jal, ~mw_opcode[4], ~mw_opcode[3], ~mw_opcode[2], mw_opcode[1], mw_opcode[0]); // jal: 00011
-    
+    and(mw_is_setx, mw_opcode[4], ~mw_opcode[3], mw_opcode[2], ~mw_opcode[1], mw_opcode[0]); // setx: 10101
+
     // combined branch signal
     wire mw_is_branch;
     or(mw_is_branch, mw_is_bne, mw_is_blt);
@@ -459,7 +490,10 @@ module processor(
     // jal: $r31
     // other instructions: $rd
     wire [4:0] dest_reg;
-    assign dest_reg = mw_exception_code_flag ? 5'd30 : (mw_is_jal ? 5'd31 : mw_rd);
+    // assign dest_reg = mw_exception_code_flag ? 5'd30 : (mw_is_jal ? 5'd31 : mw_rd);
+    assign dest_reg = mw_exception_code_flag ? 5'd30 : 
+                  mw_is_setx ? 5'd30 :
+                  (mw_is_jal ? 5'd31 : mw_rd);
     assign ctrl_writeReg = dest_reg;
     
     assign data_writeReg = regwrite_data;

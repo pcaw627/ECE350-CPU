@@ -242,12 +242,12 @@ module processor(
     cla_32 branch_adder (.A(dx_PC), .B(dx_immediate), .Cin(1'b1), .Sum(dx_branch_target), .Cout(), .signed_ovf());
     
     // For arithmetic/memory operations
-    wire dx_ctrl_insn_is_addimmediate;  // addi -> dx_opcode 00101
-    and(dx_ctrl_insn_is_addimmediate, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]);
+    wire dx_is_addimmediate;  // addi -> dx_opcode 00101
+    and(dx_is_addimmediate, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]);
     
     // Use immediate for addi, lw, sw
     wire dx_use_immediate;
-    or(dx_use_immediate, dx_ctrl_insn_is_addimmediate, dx_is_lw, dx_is_sw);
+    or(dx_use_immediate, dx_is_addimmediate, dx_is_lw, dx_is_sw);
     
     // Select ALU inputs
     assign main_alu_A = dx_A;  // $rs
@@ -267,8 +267,6 @@ module processor(
         .isLessThan(alu_isLessThan),
         .overflow(alu_overflow)
     );
-
-
 
     // ~~~~~~~~~ multdiv ~~~~~~~~~~~~~~~~~~
     
@@ -325,6 +323,21 @@ module processor(
     // or (stall, prestall, ctrl_DIV);
 
 
+    // ~~~~~~~~~~~ exception handling ~~~~~~~~~~~~~~~~~~~~~
+    wire dx_is_ADD, dx_is_SUB;
+    
+    
+    and(dx_is_ADD, dx_is_rtype, (dx_ALUop == 5'b00000));
+    and(dx_is_SUB, dx_is_rtype, (dx_ALUop == 5'b00001));
+
+    wire [31:0] dx_exception_code;
+    assign dx_exception_code = (dx_is_ADD & alu_overflow)  ? 32'd1 :
+                               (dx_is_addimmediate & alu_overflow) ? 32'd2 :
+                               (dx_is_SUB & alu_overflow)  ? 32'd3 :
+                               (dx_is_MULT & multdiv_exception) ? 32'd4 :
+                               (dx_is_DIV & multdiv_exception) ? 32'd5 : 32'd0;
+
+
 
     // ~~~~~~~~~ execution/memory pipeline regs ~~~~~~~~~
     wire [31:0] xm_o;       // ALU output
@@ -354,6 +367,10 @@ module processor(
 
     // Instruction register
     register_32 XM_IR (.q(xm_ir), .d(dx_ir), .clk(~clock), .en(~stall), .clr(reset));
+
+    // Exception Code Register 
+    wire [31:0] xm_exception_code;
+    register_32 XM_EXCEPTION (.q(xm_exception_code), .d(dx_exception_code), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ memory stage ~~~~~~~~~
     
@@ -414,6 +431,11 @@ module processor(
     // Instruction register
     register_32 MW_IR (.q(mw_ir), .d(xm_ir), .clk(~clock), .en(1'b1), .clr(reset));
 
+    // Exception Code Register 
+    wire [31:0] mw_exception_code;
+    register_32 MW_EXCEPTION (.q(mw_exception_code), .d(xm_exception_code), .clk(~clock), .en(~stall), .clr(reset));
+    wire mw_exception_code_flag = (mw_exception_code == 32'b0) ? 1'b0 : 1'b1; // any nonzero exception code is exception raised! this carries into writeback stage
+
     // ~~~~~~~~~ writeback stage ~~~~~~~~~
     
     // select data to write to register file
@@ -423,7 +445,10 @@ module processor(
     wire [31:0] regwrite_data;
     wire [31:0] jal_val;
     cla_32 jal_adder (.A(mw_PC), .B(32'b1), .Cin(1'b0), .Sum(jal_val), .Cout(), .signed_ovf());
-    assign regwrite_data = mw_is_jal ? jal_val : (mw_is_lw ? mw_d : mw_o);
+    assign regwrite_data = mw_exception_code_flag ? mw_exception_code : 
+                            (mw_is_jal ? jal_val : 
+                            (mw_is_lw ? mw_d : 
+                             mw_o));
     
     // Disable register write for sw, jr, and branch instructions
     wire reg_write_enable;
@@ -434,7 +459,7 @@ module processor(
     // jal: $r31
     // other instructions: $rd
     wire [4:0] dest_reg;
-    assign dest_reg = mw_is_jal ? 5'd31 : mw_rd;
+    assign dest_reg = mw_exception_code_flag ? 5'd30 : (mw_is_jal ? 5'd31 : mw_rd);
     assign ctrl_writeReg = dest_reg;
     
     assign data_writeReg = regwrite_data;

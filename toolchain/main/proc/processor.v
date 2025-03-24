@@ -183,24 +183,72 @@ module processor(
     assign bex_target = {5'd0, fd_ir[26:0]};
 
     // ~~~~~~~~~ decode/execute pipeline regs ~~~~~~~~~
-    wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
+    wire [31:0] dx_ir, dx_PC, dx_A, dx_B, bypassA_value, bypassB_value, dx_link;
     
+    // (reg A and B are modified to use bypass, all changes to bypass should be done through these vars)
     register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(~stall), .clr(reset)); // PC reg
     register_32 DX_IR (.q(dx_ir), .d(control_branch_or_jump ? 32'd0 : fd_ir), .clk(~clock), .en(~stall), .clr(reset)); // Instruction reg
     // A reg ($rs value or $rd for jr)
-    register_32 DX_A_reg (.q(dx_A), .d(control_branch_or_jump ? 32'd0 : data_readRegA), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 DX_A_reg (.q(dx_A), .d(control_branch_or_jump ? 32'd0 : bypassA_value), .clk(~clock), .en(~stall), .clr(reset));
     // B reg ($rt or $rd value depending on instruction)
-    register_32 DX_B_reg (.q(dx_B), .d(control_branch_or_jump ? 32'd0 : data_readRegB), .clk(~clock), .en(~stall), .clr(reset));
-    
+    register_32 DX_B_reg (.q(dx_B), .d(control_branch_or_jump ? 32'd0 : bypassB_value), .clk(~clock), .en(~stall), .clr(reset));
     // link reg (for flush-proof jal)
-    wire [31:0] dx_link;
     register_32 DX_link (.q(dx_link), .d(control_branch_or_jump ? 32'd0 : fd_PC), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ execute: main ALU + regfile ~~~~~~~~~
 
-    // bypass
-    wire [4:0] ex_rs = dx_ir[21:17];
-    wire [4:0] ex_rt = dx_ir[16:12];
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BYPASS BEGIN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Detect when we need to bypass from X->D
+    wire bypassX_to_A, bypassX_to_B; 
+
+    // check if insn in X stage will write to register file
+    wire dx_writes_reg;
+    wire dx_is_rtype, dx_is_addi, dx_is_memory_read;
+    and(dx_is_rtype, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]);
+    and(dx_is_addi, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]);
+    and(dx_is_memory_read, ~dx_opcode[4], dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]); // lw
+    or(dx_writes_reg, dx_is_rtype, dx_is_addi, dx_is_memory_read);
+
+    // bypass from X stage to A if dest of insn in execute matches rs of insn in D
+    // AND if the insn in X stage writes to a register AND rs isn't r0
+    wire fd_rs_not_zero, fd_rt_not_zero;
+    or(fd_rs_not_zero, fd_rs[4], fd_rs[3], fd_rs[2], fd_rs[1], fd_rs[0]);
+    or(fd_rt_not_zero, fd_rt[4], fd_rt[3], fd_rt[2], fd_rt[1], fd_rt[0]);
+
+    wire regA_match_dx;
+    assign regA_match_dx = (fd_rs == dx_rd) && fd_rs_not_zero;
+
+    wire regB_match_dx;
+    assign regB_match_dx = (fd_rt == dx_rd) && fd_rt_not_zero;
+
+    and(bypassX_to_A, dx_writes_reg, regA_match_dx);
+    and(bypassX_to_B, dx_writes_reg, regB_match_dx);
+
+    // detect when we need to bypass from M->D
+    wire bypassM_to_A, bypassM_to_B;
+
+    // check if insn in M will write to register file
+    wire xm_writes_reg, xm_is_rtype, xm_is_addi;
+    and(xm_is_rtype, ~xm_opcode[4], ~xm_opcode[3], ~xm_opcode[2], ~xm_opcode[1], ~xm_opcode[0]);
+    and(xm_is_addi, ~xm_opcode[4], ~xm_opcode[3], xm_opcode[2], ~xm_opcode[1], xm_opcode[0]);
+    or(xm_writes_reg, xm_is_rtype, xm_is_addi, xm_is_lw);
+
+    wire regA_match_xm, regB_match_xm;
+    assign regA_match_xm = (fd_rs == xm_rd) && fd_rs_not_zero;
+    assign regB_match_xm = (fd_rt == xm_rd) && fd_rt_not_zero;
+    and(bypassM_to_A, xm_writes_reg, regA_match_xm);
+    and(bypassM_to_B, xm_writes_reg, regB_match_xm);
+
+    // ========== BYPASS DATA SELECTION ==========
+
+    assign bypassA_value = bypassX_to_A ? alu_result : 
+                        bypassM_to_A ? xm_o : 
+                        data_readRegA;
+    assign bypassB_value = bypassX_to_B ? alu_result : 
+                        bypassM_to_B ? xm_o : 
+                        data_readRegB;
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BYPASS END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Detect branch instructions in execute stage
     and(dx_is_bne, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], dx_opcode[1], ~dx_opcode[0]); // bne: 00010
@@ -287,7 +335,7 @@ module processor(
     wire [31:0] multdiv_result;
     wire [5:0] multdiv_counter;
 
-    wire dx_is_MULT, dx_is_DIV, dx_is_MULTDIV, dx_is_rtype;
+    wire dx_is_MULT, dx_is_DIV, dx_is_MULTDIV;
     and (dx_is_rtype, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]);
     and (dx_is_MULT, dx_is_rtype, ~dx_ALUop_final[4], ~dx_ALUop_final[3], dx_ALUop_final[2], 
         dx_ALUop_final[1], ~dx_ALUop_final[0]);

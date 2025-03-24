@@ -26,7 +26,7 @@ module processor(
 
 	// control signals
 	input clock, reset;
-	
+
 	// imem
     output [31:0] address_imem;
 	input [31:0] q_imem;
@@ -74,35 +74,19 @@ module processor(
     // ~~~~~~~~~ fetch: program counter ~~~~~~~~~
 
     // detect different jump/branch instructions
-    wire is_jump;
+    wire is_jump, is_jal, is_bne, fd_is_jr;
+    wire [31:0] jump_target, jr_target;
     and(is_jump, ~q_imem[31], ~q_imem[30], ~q_imem[29], ~q_imem[28], q_imem[27]);
-
-    wire is_jal;
     and(is_jal, ~q_imem[31], ~q_imem[30], ~q_imem[29], q_imem[28], q_imem[27]);
-
-    wire is_bne;
     and(is_bne, ~q_imem[31], ~q_imem[30], ~q_imem[29], q_imem[28], ~q_imem[27]);
+    and(fd_is_jr, ~fd_opcode[4], ~fd_opcode[3], fd_opcode[2], ~fd_opcode[1], ~fd_opcode[0]);  // detect jr instruction at fd stage
 
-    // detect jr instruction at fd stage
-    wire fd_is_jr;
-    and(fd_is_jr, ~fd_opcode[4], ~fd_opcode[3], fd_opcode[2], ~fd_opcode[1], ~fd_opcode[0]);
+    assign jump_target = {5'd0, q_imem[26:0]}; // for direct jump instructions, target is in the instruction
+    assign jr_target = data_readRegA; // for jr instruction, target is in register
 
-    // for direct jump instructions, target is in the instruction
-    wire [31:0] jump_target;
-    assign jump_target = {5'd0, q_imem[26:0]};
-
-    // for jr instruction, target is in register
-    wire [31:0] jr_target;
-    assign jr_target = data_readRegA;
-
-    // for branch instructions, need to check condition in execute stage
-    wire [31:0] dx_branch_target;
-    
-    // branch comparison results
-    wire alu_isNotEqual, alu_isLessThan, alu_overflow;
-    
-    // branch condition signals
-    wire dx_is_bne, dx_is_blt, dx_take_branch, bex_taken;
+    wire [31:0] dx_branch_target; // for branch instructions, need to check condition in execute stage
+    wire alu_isNotEqual, alu_isLessThan, alu_overflow; // branch comparison results
+    wire dx_is_bne, dx_is_blt, dx_take_branch, bex_taken; // branch condition signals
     
     // PC control logic
     wire [31:0] next_pc;
@@ -112,13 +96,11 @@ module processor(
                     dx_take_branch ? dx_branch_target : 
                     PC_next;
 
-    // PC+1 value for normal execution
-    wire [31:0] PC_plus_1;
+    wire [31:0] PC_plus_1;  // PC+1 value for normal execution
     alu PC_increment (.data_operandA(32'd1), .data_operandB(PC_current), .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), .data_result(PC_plus_1), .isNotEqual(), .isLessThan(), .overflow());
     assign PC_next = PC_plus_1;
     
-    // PC register
-    register_32 PC (.q(PC_current), .d(next_pc), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 PC (.q(PC_current), .d(next_pc), .clk(~clock), .en(~stall), .clr(reset)); // PC register
     assign address_imem = PC_current;
     
     // r type
@@ -166,6 +148,15 @@ module processor(
     // combined branch signal
     wire fd_is_branch;
     or(fd_is_branch, fd_is_bne, fd_is_blt);
+
+    wire jal_fd_active;
+    dffe_ref jal_fd (.q(jal_fd_active), .d(is_jal), .clk(~clock), .en(~stall), .clr(reset));
+
+    wire [31:0] jal_fd_addr;
+    wire [31:0] jal_ret_addr;
+    register_32 jal_fd_reg (.q(jal_fd_addr), .d(is_jal ? jal_ret_addr : 32'd0), 
+                            .clk(~clock), .en(~stall), .clr(reset));
+
     
     // register reads based on instruction type
     // branches: $rs in A, $rd in B
@@ -191,23 +182,25 @@ module processor(
     wire [31:0] bex_target; // (similar to j target)
     assign bex_target = {5'd0, fd_ir[26:0]};
 
-
     // ~~~~~~~~~ decode/execute pipeline regs ~~~~~~~~~
     wire [31:0] dx_ir, dx_PC, dx_A, dx_B;
     
-    // PC reg
-    register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(~stall), .clr(reset));
-    
-    // Instruction reg
-    register_32 DX_IR (.q(dx_ir), .d(control_branch_or_jump ? 32'd0 : fd_ir), .clk(~clock), .en(~stall), .clr(reset));
-    
+    register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(~stall), .clr(reset)); // PC reg
+    register_32 DX_IR (.q(dx_ir), .d(control_branch_or_jump ? 32'd0 : fd_ir), .clk(~clock), .en(~stall), .clr(reset)); // Instruction reg
     // A reg ($rs value or $rd for jr)
     register_32 DX_A_reg (.q(dx_A), .d(control_branch_or_jump ? 32'd0 : data_readRegA), .clk(~clock), .en(~stall), .clr(reset));
-    
     // B reg ($rt or $rd value depending on instruction)
     register_32 DX_B_reg (.q(dx_B), .d(control_branch_or_jump ? 32'd0 : data_readRegB), .clk(~clock), .en(~stall), .clr(reset));
+    
+    // link reg (for flush-proof jal)
+    wire [31:0] dx_link;
+    register_32 DX_link (.q(dx_link), .d(control_branch_or_jump ? 32'd0 : fd_PC), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ execute: main ALU + regfile ~~~~~~~~~
+
+    // bypass
+    wire [4:0] ex_rs = dx_ir[21:17];
+    wire [4:0] ex_rt = dx_ir[16:12];
     
     // Detect branch instructions in execute stage
     and(dx_is_bne, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], dx_opcode[1], ~dx_opcode[0]); // bne: 00010
@@ -225,14 +218,11 @@ module processor(
     // blt: branch if $rd < $rs (B < A)
     wire bne_result, blt_result;
     
-    // for comparison, we need an ALU or comparator 
-    // if B - A == 0, then B == A
-    // if B - A < 0, then B < A
+    // for comparison, we need an ALU or comparator. if B - A == 0, then B == A. if B - A < 0, then B < A
     wire [31:0] branch_comp_result;
     wire branch_comp_isNotEqual, branch_comp_isLessThan, branch_comp_overflow;
     
-    // branch comparison ALU
-    alu branch_comp_alu(
+    alu branch_comp_alu(  // branch comparison ALU
         .data_operandA(dx_B),  // $rd
         .data_operandB(dx_A),  // $rs
         .ctrl_ALUopcode(5'b00001), // subtract B - A
@@ -243,24 +233,25 @@ module processor(
         .overflow(branch_comp_overflow)
     );
 
-    assign control_branch_taken = (dx_is_bne && branch_comp_isNotEqual) || (dx_is_blt && branch_comp_isLessThan);
-    or(control_flow_taken, is_jump, is_jal, fd_is_jr, bex_taken, control_branch_taken);
-    assign control_branch_or_jump = control_branch_taken || is_jump || bex_taken;
-    
+    assign control_branch_taken = (dx_is_bne && branch_comp_isNotEqual) || (dx_is_blt && branch_comp_isLessThan); //good?
+    or(control_flow_taken, is_jump, is_jal, fd_is_jr, bex_taken, control_branch_taken); // good?
+    assign control_branch_or_jump = control_branch_taken || is_jump || is_jal || fd_is_jr || bex_taken;
+    alu jal_pc_inc (.data_operandA(PC_current), .data_operandB(32'd1), 
+                    .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), 
+                    .data_result(jal_ret_addr), .isNotEqual(), .isLessThan(), .overflow());
+
     // branch conditions
     assign bne_result = branch_comp_isNotEqual;
     assign blt_result = branch_comp_isLessThan;
     
-    // Determine if branch should be taken
+    // determine if branch should be taken
     wire bne_take, blt_take;
     and(bne_take, dx_is_bne, bne_result);
     and(blt_take, dx_is_blt, blt_result);
     or(dx_take_branch, bne_take, blt_take);
     
-    // Calculate branch target: PC+1+immediate
-    // PC+1 is already in dx_PC by pipeline timing (but we handle differently after doing multdiv.. so we add here)
-    wire [31:0] branch_target;
-    wire [31:0] branch_N;
+    // calculate branch target: PC+1+immediate
+    wire [31:0] branch_target, branch_N;
     cla_32 branch_adder (.A(dx_PC), .B(dx_immediate), .Cin(1'b1), .Sum(dx_branch_target), .Cout(), .signed_ovf());
     
     // For arithmetic/memory operations
@@ -292,49 +283,33 @@ module processor(
 
     // ~~~~~~~~~ multdiv ~~~~~~~~~~~~~~~~~~
     
-    wire ctrl_MULT;
-    wire ctrl_DIV;
+    wire ctrl_MULT, ctrl_DIV, multdiv_exception, multdiv_resultRDY, multdiv_start_valid, multdiv_counter_clear;
     wire [31:0] multdiv_result;
-    wire multdiv_exception;
-    wire multdiv_resultRDY;
-    
+    wire [5:0] multdiv_counter;
+
     wire dx_is_MULT, dx_is_DIV, dx_is_MULTDIV, dx_is_rtype;
     and (dx_is_rtype, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]);
     and (dx_is_MULT, dx_is_rtype, ~dx_ALUop_final[4], ~dx_ALUop_final[3], dx_ALUop_final[2], 
         dx_ALUop_final[1], ~dx_ALUop_final[0]);
     and (dx_is_DIV, dx_is_rtype, ~dx_ALUop_final[4], ~dx_ALUop_final[3], dx_ALUop_final[2], 
-    dx_ALUop_final[1], dx_ALUop_final[0]);
+        dx_ALUop_final[1], dx_ALUop_final[0]);
     or (dx_is_MULTDIV, dx_is_MULT, dx_is_DIV);
 
     // mult is instant but for div it's pretty much guaranteed to be 32 (33?) cycles
-    wire [5:0] multdiv_counter;
     wire md_counter_is_zero = (multdiv_counter == 6'd0);
-    wire multdiv_start_valid;
 
     and (multdiv_start_valid, dx_is_MULTDIV, md_counter_is_zero);
     and(ctrl_MULT, dx_is_MULT, multdiv_start_valid);
     and(ctrl_DIV, dx_is_DIV, multdiv_start_valid);
     
-    wire multdiv_counter_clear;
     or (multdiv_counter_clear, ~dx_is_MULTDIV, multdiv_resultRDY);
-    counter_6 multdiv_count(
-        .count(multdiv_counter), 
-        .clk(~clock),
-        .clr(multdiv_counter_clear),
-        .en(1'b1)
-    );
+    counter_6 multdiv_count(.count(multdiv_counter), .clk(~clock), .clr(multdiv_counter_clear), .en(1'b1));
     
     multdiv md(
-        .data_operandA(dx_A),
-        .data_operandB(dx_B),
-        .ctrl_MULT(ctrl_MULT),
-        .ctrl_DIV(ctrl_DIV),
-        .clock(clock),
-        .data_result(multdiv_result),
-        .data_exception(multdiv_exception),
-        .data_resultRDY(multdiv_resultRDY)
+        .data_operandA(dx_A), .data_operandB(dx_B),
+        .ctrl_MULT(ctrl_MULT), .ctrl_DIV(ctrl_DIV),
+        .clock(clock), .data_result(multdiv_result), .data_exception(multdiv_exception), .data_resultRDY(multdiv_resultRDY)
     );
-
 
     wire dx_is_setx;
     and(dx_is_setx, dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]); // 10101
@@ -343,21 +318,23 @@ module processor(
     assign setx_value = {5'd0, dx_ir[26:0]}; // Take the 27-bit target field
 
     // xm will need result from multdiv if we did that operation, use mux from op
-    // wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : alu_result;
     wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : 
                      dx_is_setx ? setx_value :
                      alu_result;
 
-    // wire stall; 
-    // wire prestall;
     and (stall, dx_is_MULTDIV, ~multdiv_resultRDY);
     // or (stall, prestall, ctrl_DIV);
 
+    wire jal_ex_active;
+    dffe_ref jal_ex (.q(jal_ex_active), .d(jal_fd_active), .clk(~clock), .en(~stall), .clr(reset));
+
+    wire [31:0] jal_ex_addr;
+    register_32 jal_ex_reg (.q(jal_ex_addr), .d(jal_fd_addr), 
+                            .clk(~clock), .en(~stall), .clr(reset));
+
 
     // ~~~~~~~~~~~ exception handling ~~~~~~~~~~~~~~~~~~~~~
-    wire dx_is_ADD, dx_is_SUB;
-    
-    
+    wire dx_is_ADD, dx_is_SUB;    
     and(dx_is_ADD, dx_is_rtype, (dx_ALUop == 5'b00000));
     and(dx_is_SUB, dx_is_rtype, (dx_ALUop == 5'b00001));
 
@@ -368,21 +345,18 @@ module processor(
                                (dx_is_MULT & multdiv_exception) ? 32'd4 :
                                (dx_is_DIV & multdiv_exception) ? 32'd5 : 32'd0;
 
-
-
     // ~~~~~~~~~ execution/memory pipeline regs ~~~~~~~~~
     wire [31:0] xm_o;       // ALU output
     wire [31:0] xm_B;       // reg B value (for memory writes)
     wire [31:0] xm_ir;      // instruction
     wire [31:0] xm_PC;      // PC value for jal
     
-    // Extract opcode and registers from xm instruction
     assign xm_opcode = xm_ir[31:27];
     assign xm_rd = xm_ir[26:22];
     assign xm_rs = xm_ir[21:17];
     assign xm_rt = xm_ir[16:12];
     
-    // Detect instruction types in memory stage
+    // detect instruction types in memory stage
     and(xm_is_lw, ~xm_opcode[4], xm_opcode[3], ~xm_opcode[2], ~xm_opcode[1], ~xm_opcode[0]); // lw: 01000
     and(xm_is_sw, ~xm_opcode[4], ~xm_opcode[3], xm_opcode[2], xm_opcode[1], xm_opcode[0]); // sw: 00111
     
@@ -396,23 +370,32 @@ module processor(
     register_32 XM_B (.q(xm_B), .d(control_branch_or_jump ? 32'd0 : dx_B), // contains register value to store for sw
         .clk(~clock), .en(~stall), .clr(reset));
 
-    // Instruction register
     register_32 XM_IR (.q(xm_ir), .d(control_branch_or_jump ? 32'd0 : dx_ir), .clk(~clock), .en(~stall), .clr(reset));
 
-    // Exception Code Register 
     wire [31:0] xm_exception_code;
     register_32 XM_EXCEPTION (.q(xm_exception_code), .d(control_branch_or_jump ? 32'd0 : dx_exception_code), .clk(~clock), .en(~stall), .clr(reset));
+
+    // jal link reg
+    wire [31:0] xm_link;
+    register_32 XM_link (.q(xm_link), .d(dx_link), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ memory stage ~~~~~~~~~
     
     // For lw/sw, address_dmem needs to be ALU result (rs + immediate)
     assign address_dmem = xm_o;
     
-    // Data to write to memory (for sw) comes from the B register
+    // data to write to memory (for sw) comes from the B register
     assign data = xm_B;
     
-    // Write enable for memory is high only for sw instruction
+    // write enable for memory is high only for sw instruction
     assign wren = xm_is_sw;
+
+    wire jal_mem_active;
+    dffe_ref jal_mem (.q(jal_mem_active), .d(jal_ex_active), .clk(~clock), .en(~stall), .clr(reset));
+
+    wire [31:0] jal_mem_addr;
+    register_32 jal_mem_reg (.q(jal_mem_addr), .d(jal_ex_addr), 
+                            .clk(~clock), .en(~stall), .clr(reset));
     
     // ~~~~~~~~~ memory/writeback pipeline regs ~~~~~~~~~
     
@@ -428,6 +411,13 @@ module processor(
     assign mw_rt = mw_ir[16:12];
     assign mw_shamt = mw_ir[11:7];
     assign mw_ALUop = mw_ir[6:2];
+
+    wire jal_wb_active;
+    dffe_ref jal_wb (.q(jal_wb_active), .d(jal_mem_active), .clk(~clock), .en(1'b1), .clr(reset));
+
+    wire [31:0] jal_wb_addr;
+    register_32 jal_wb_reg (.q(jal_wb_addr), .d(jal_mem_addr), 
+                            .clk(~clock), .en(1'b1), .clr(reset));
 
     // i type: opcode, rd, rs are the same, the rest is immediate
     assign mw_immediate = {{15{mw_ir[16]}}, mw_ir[16:0]};  // we sign extend here
@@ -467,6 +457,10 @@ module processor(
     wire [31:0] mw_exception_code;
     register_32 MW_EXCEPTION (.q(mw_exception_code), .d(control_branch_or_jump ? 32'd0 : xm_exception_code), .clk(~clock), .en(~stall), .clr(reset));
     wire mw_exception_code_flag = (mw_exception_code == 32'b0) ? 1'b0 : 1'b1; // any nonzero exception code is exception raised! this carries into writeback stage
+    
+    // jal link reg
+    wire [31:0] mw_link;
+    register_32 MW_link (.q(mw_link), .d(xm_link), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ writeback stage ~~~~~~~~~
     
@@ -474,15 +468,37 @@ module processor(
     // lw: memory data
     // jal: PC+1 (return address)
     // other instructions: ALU result
-    wire [31:0] regwrite_data;
-    wire [31:0] jal_val;
-    cla_32 jal_adder (.A(mw_PC), .B(32'b1), .Cin(1'b0), .Sum(jal_val), .Cout(), .signed_ovf());
-    assign regwrite_data = mw_exception_code_flag ? mw_exception_code : 
-                            (mw_is_jal ? jal_val : 
-                            (mw_is_lw ? mw_d : 
-                             mw_o));
+    wire [31:0] regwrite_data, jal_val;
+    assign mw_is_jal = mw_ir[31:27] == 5'b00011;
+    // cla_32 jal_adder (.A(mw_link), .B(32'b1), .Cin(1'b0), .Sum(jal_val), .Cout(), .signed_ovf());
+    assign jal_val = jal_wb_addr;
+
     
-    // Disable register write for sw, jr, and branch instructions
+    assign regwrite_data = mw_exception_code_flag ? mw_exception_code : 
+                            (mw_is_lw ? mw_d : 
+                            mw_o);
+    
+    // normal register write enable logic (**excluding** JAL)
+    wire normal_write_enable;
+    assign normal_write_enable = ~mw_is_sw && ~mw_is_jr && ~mw_is_branch;
+
+    // combined write enable with JAL priority
+    assign ctrl_writeEnable = jal_wb_active || (normal_write_enable && ~jal_wb_active);
+
+    // normal destination register select
+    wire [4:0] normal_dest_reg;
+    assign normal_dest_reg = mw_exception_code_flag ? 5'd30 : 
+                            mw_is_setx ? 5'd30 :
+                            mw_rd;
+
+    // select destination register with JAL priority
+    assign ctrl_writeReg = jal_wb_active ? 5'd31 : normal_dest_reg;
+
+    // select write data with JAL priority
+    assign data_writeReg = jal_wb_active ? jal_val : regwrite_data;
+
+
+    // disable register write for sw, jr, and branch instructions
     wire reg_write_enable;
     assign reg_write_enable = mw_is_jal || (~mw_is_sw && ~mw_is_jr && ~mw_is_branch);
     assign ctrl_writeEnable = reg_write_enable;
@@ -495,8 +511,6 @@ module processor(
     assign dest_reg = mw_exception_code_flag ? 5'd30 : 
                   mw_is_setx ? 5'd30 :
                   (mw_is_jal ? 5'd31 : mw_rd);
-    assign ctrl_writeReg = dest_reg;
-    
-    assign data_writeReg = regwrite_data;
-
+    // assign ctrl_writeReg = dest_reg;
+    // assign data_writeReg = regwrite_data;
 endmodule

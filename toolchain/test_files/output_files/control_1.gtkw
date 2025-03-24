@@ -1,0 +1,31 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sun Mar 23 16:38:28 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\control_1.vcd"
+[dumpfile_mtime] "Sun Mar 23 08:31:47 2025"
+[dumpfile_size] 4029003
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\control_1.gtkw"
+[timestart] 2046300
+[size] 1536 889
+[pos] -1 -1
+*-15.501438 1720000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[treeopen] Wrapper_tb.RegisterFile.
+[treeopen] Wrapper_tb.RegisterFile.registers[31].
+[sst_width] 197
+[signals_width] 166
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@24
+Wrapper_tb.CPU.jump_target[31:0]
+Wrapper_tb.CPU.jal_val[31:0]
+Wrapper_tb.CPU.mw_target[31:0]
+[color] 1
+Wrapper_tb.CPU.mw_is_jal
+Wrapper_tb.CPU.PC_current[31:0]
++{reg31 ra} Wrapper_tb.RegisterFile.registers[31].mux_regAread.out[31:0]
+@25
+Wrapper_tb.CPU.jump_target[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

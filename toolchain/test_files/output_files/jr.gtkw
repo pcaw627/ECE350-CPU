@@ -1,0 +1,114 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Mon Mar 24 19:47:28 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\jr.vcd"
+[dumpfile_mtime] "Mon Mar 24 19:45:42 2025"
+[dumpfile_size] 3332864
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\jr.gtkw"
+[timestart] 396390
+[size] 1536 889
+[pos] -1 -1
+*-14.134583 408970 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[treeopen] Wrapper_tb.RegisterFile.
+[treeopen] Wrapper_tb.RegisterFile.registers[31].
+[sst_width] 238
+[signals_width] 238
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@24
+[color] 5
+Wrapper_tb.CPU.fd_is_jr
+[color] 2
+Wrapper_tb.CPU.dx_is_jr
+@28
+[color] 3
+Wrapper_tb.CPU.mw_is_jr
+@24
+Wrapper_tb.CPU.next_pc[31:0]
+Wrapper_tb.CPU.ctrl_readRegA[4:0]
+Wrapper_tb.CPU.ctrl_writeReg[4:0]
+@28
+Wrapper_tb.CPU.control_branch_or_jump
+@420
+[color] 7
+Wrapper_tb.CPU.data_readRegA[31:0]
+@24
+[color] 2
+Wrapper_tb.CPU.fd_rd[4:0]
+Wrapper_tb.CPU.dx_immediate[31:0]
+[color] 2
+Wrapper_tb.CPU.dx_rd[4:0]
+[color] 2
+Wrapper_tb.CPU.xm_rd[4:0]
+[color] 2
+Wrapper_tb.CPU.mw_rd[4:0]
+@28
+Wrapper_tb.CPU.clock
+@22
+[color] 6
+Wrapper_tb.RegisterFile.registers[31].mux_regAread.out[31:0]
+@28
+Wrapper_tb.CPU.fd_ir[31:0]
+Wrapper_tb.CPU.dx_ir[31:0]
+Wrapper_tb.CPU.xm_ir[31:0]
+Wrapper_tb.CPU.mw_ir[31:0]
+@22
+Wrapper_tb.CPU.alu_result[31:0]
+@28
+Wrapper_tb.CPU.jr_flush
+Wrapper_tb.CPU.mw_is_jr
+Wrapper_tb.CPU.clock
+@22
+Wrapper_tb.CPU.xm_o[31:0]
+[color] 1
+Wrapper_tb.CPU.mw_o[31:0]
+@25
+[color] 1
+Wrapper_tb.CPU.dx_rd[4:0]
+@28
+Wrapper_tb.CPU.mw_exception_code_flag
+Wrapper_tb.CPU.mw_is_lw
+@22
+[color] 1
+Wrapper_tb.CPU.regwrite_data[31:0]
+@24
+Wrapper_tb.CPU.mw_rd[4:0]
+@22
+Wrapper_tb.CPU.mw_d[31:0]
+@28
+Wrapper_tb.CPU.control_branch_or_jump
+Wrapper_tb.CPU.control_branch_taken
+@22
+Wrapper_tb.CPU.dx_branch_target[31:0]
+@28
+Wrapper_tb.CPU.dx_take_branch
+Wrapper_tb.CPU.fd_is_branch
+Wrapper_tb.CPU.mw_is_branch
+Wrapper_tb.CPU.control_flow_taken
+Wrapper_tb.CPU.branch_comp_overflow
+@22
+[color] 1
+Wrapper_tb.CPU.dx_out[31:0]
+@28
+Wrapper_tb.CPU.dx_is_jr
+Wrapper_tb.CPU.fd_is_jr
+Wrapper_tb.CPU.jr_bypass_from_M
+Wrapper_tb.CPU.jr_bypass_from_W
+Wrapper_tb.CPU.jr_bypass_from_X
+@22
+Wrapper_tb.CPU.jr_bypassed_target[31:0]
+@28
+Wrapper_tb.CPU.jr_needs_bypass
+@22
+Wrapper_tb.CPU.jr_target[31:0]
+@28
+Wrapper_tb.CPU.xm_is_jr
+@24
+Wrapper_tb.CPU.fd_rd[4:0]
+Wrapper_tb.CPU.fd_rd_not_zero
+Wrapper_tb.CPU.mw_rd[4:0]
+Wrapper_tb.CPU.xm_rd[4:0]
+[pattern_trace] 1
+[pattern_trace] 0

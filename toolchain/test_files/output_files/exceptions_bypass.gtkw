@@ -1,0 +1,32 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Mon Mar 24 21:48:46 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\test_files\output_files\exception_bypass.vcd"
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\exceptions_bypass.gtkw"
+[timestart] 0
+[size] 1536 889
+[pos] -191 -191
+*-16.485432 217900 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[sst_width] 197
+[signals_width] 254
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@24
+Wrapper_tb.CPU.bypassException_to_A
+Wrapper_tb.CPU.bypassException_to_B
+Wrapper_tb.CPU.bypassM_exception
+Wrapper_tb.CPU.bypassM_exception_B
+Wrapper_tb.CPU.bypassX_exception
+Wrapper_tb.CPU.bypassX_exception_B
+Wrapper_tb.CPU.dx_exception_code[31:0]
+Wrapper_tb.CPU.dx_exception_code_flag
+Wrapper_tb.CPU.exception_bypass_value[31:0]
+Wrapper_tb.CPU.multdiv_exception
+Wrapper_tb.CPU.mw_exception_code[31:0]
+Wrapper_tb.CPU.mw_exception_code_flag
+Wrapper_tb.CPU.xm_exception_code[31:0]
+Wrapper_tb.CPU.xm_exception_code_flag
+[pattern_trace] 1
+[pattern_trace] 0

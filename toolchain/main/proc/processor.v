@@ -211,8 +211,9 @@ module processor(
 
     // bypass from X stage to A if dest of insn in execute matches rs of insn in D
     // AND if the insn in X stage writes to a register AND rs isn't r0
-    wire fd_rs_not_zero, fd_rt_not_zero;
+    wire fd_rs_not_zero, fd_rd_not_zero, fd_rt_not_zero;
     or(fd_rs_not_zero, fd_rs[4], fd_rs[3], fd_rs[2], fd_rs[1], fd_rs[0]);
+    or(fd_rd_not_zero, fd_rd[4], fd_rd[3], fd_rd[2], fd_rd[1], fd_rd[0]);
     or(fd_rt_not_zero, fd_rt[4], fd_rt[3], fd_rt[2], fd_rt[1], fd_rt[0]);
 
     wire regA_match_dx;
@@ -245,10 +246,14 @@ module processor(
     assign bypassA_value = bypassX_to_A ? (dx_is_MULTDIV && multdiv_resultRDY ? multdiv_result : alu_result) : 
                         bypassM_to_A ? xm_o : 
                         data_readRegA;
-    assign bypassB_value = bypassX_to_B ? (dx_is_MULTDIV && multdiv_resultRDY ? multdiv_result : alu_result) : 
+    // assign bypassB_value = bypassX_to_B ? (dx_is_MULTDIV && multdiv_resultRDY ? multdiv_result : alu_result) : 
+    //                     bypassM_to_B ? xm_o : 
+    //                     data_readRegB;
+    
+    assign bypassB_value = fd_is_sw ? sw_bypassed_data :
+                        bypassX_to_B ? (dx_is_MULTDIV && multdiv_resultRDY ? multdiv_result : alu_result) : 
                         bypassM_to_B ? xm_o : 
                         data_readRegB;
-
 
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BYPASS END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -442,11 +447,30 @@ module processor(
     register_32 XM_link (.q(xm_link), .d(dx_link), .clk(~clock), .en(~stall), .clr(reset));
 
     // ~~~~~~~~~ memory stage ~~~~~~~~~
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MEM BYPASS
+    
+    wire sw_needs_bypass_B; // flag for when SW's data needs to be bypassed
+    wire sw_bypass_from_X, sw_bypass_from_M; // flags for source stage for SW bypass
+    wire [31:0] sw_bypassed_data; // actual bypassed data for SW
+
+    // check at fd_rd (source reg for SW's data) for matches with recent dest regs in pipeline (that means dx and xm)
+    assign sw_bypass_from_X = fd_is_sw && (fd_rd == dx_rd) && dx_writes_reg && fd_rd_not_zero;
+    assign sw_bypass_from_M = fd_is_sw && (fd_rd == xm_rd) && xm_writes_reg && fd_rd_not_zero;
+    or(sw_needs_bypass_B, sw_bypass_from_X, sw_bypass_from_M);
+
+    // select the bypassed data based on matching stage
+    assign sw_bypassed_data = sw_bypass_from_X ? alu_result : 
+                            sw_bypass_from_M ? xm_o : 
+                            data_readRegB; // default to original regfile output
+
+    assign wren = xm_is_sw;
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END MEM BYPASS
     
     // For lw/sw, address_dmem needs to be ALU result (rs + immediate)
     assign address_dmem = xm_o;
     
-    // data to write to memory (for sw) comes from the B register
+    // data to write to memory (for sw) comes from the B register (and is already prepped for bypass)
     assign data = xm_B;
     
     // write enable for memory is high only for sw instruction

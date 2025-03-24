@@ -239,14 +239,17 @@ module processor(
     and(bypassM_to_A, xm_writes_reg, regA_match_xm);
     and(bypassM_to_B, xm_writes_reg, regB_match_xm);
 
-    // ========== BYPASS DATA SELECTION ==========
 
-    assign bypassA_value = bypassX_to_A ? alu_result : 
+
+    // ========== BYPASS DATA SELECTION ==========
+    assign bypassA_value = bypassX_to_A ? (dx_is_MULTDIV && multdiv_resultRDY ? multdiv_result : alu_result) : 
                         bypassM_to_A ? xm_o : 
                         data_readRegA;
-    assign bypassB_value = bypassX_to_B ? alu_result : 
+    assign bypassB_value = bypassX_to_B ? (dx_is_MULTDIV && multdiv_resultRDY ? multdiv_result : alu_result) : 
                         bypassM_to_B ? xm_o : 
                         data_readRegB;
+
+
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BYPASS END ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
@@ -281,8 +284,8 @@ module processor(
         .overflow(branch_comp_overflow)
     );
 
-    assign control_branch_taken = (dx_is_bne && branch_comp_isNotEqual) || (dx_is_blt && branch_comp_isLessThan); //good?
-    or(control_flow_taken, is_jump, is_jal, fd_is_jr, bex_taken, control_branch_taken); // good?
+    assign control_branch_taken = (dx_is_bne && branch_comp_isNotEqual) || (dx_is_blt && branch_comp_isLessThan);
+    or(control_flow_taken, is_jump, is_jal, fd_is_jr, bex_taken, control_branch_taken);
     assign control_branch_or_jump = control_branch_taken || is_jump || is_jal || fd_is_jr || bex_taken;
     alu jal_pc_inc (.data_operandA(PC_current), .data_operandB(32'd1), 
                     .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), 
@@ -366,7 +369,7 @@ module processor(
     assign setx_value = {5'd0, dx_ir[26:0]}; // Take the 27-bit target field
 
     // xm will need result from multdiv if we did that operation, use mux from op
-    wire [31:0] dx_out = dx_is_MULTDIV ? multdiv_result : 
+    wire [31:0] dx_out = dx_is_MULTDIV ? (multdiv_resultRDY ? multdiv_result : multdiv_bypass_value) : 
                      dx_is_setx ? setx_value :
                      alu_result;
 
@@ -392,6 +395,17 @@ module processor(
                                (dx_is_SUB & alu_overflow)  ? 32'd3 :
                                (dx_is_MULT & multdiv_exception) ? 32'd4 :
                                (dx_is_DIV & multdiv_exception) ? 32'd5 : 32'd0;
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MULTDIV BYPASS ~~~~~~~~~~~~~~~~
+    // signal for when multdiv result is valid and should be used for bypass
+    wire multdiv_done;
+    assign multdiv_done = (dx_is_MULTDIV && multdiv_resultRDY);
+
+    // store the multdiv result for bypass (for conflicts with imm insns)
+    wire [31:0] multdiv_bypass_value;
+    register_32 MULTDIV_BYPASS_REG (.q(multdiv_bypass_value), .d(multdiv_result), .clk(~clock), .en(multdiv_resultRDY), .clr(reset));
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END MULTDIV BYPASS ~~~~~~~~~~~~~~~~
+
 
     // ~~~~~~~~~ execution/memory pipeline regs ~~~~~~~~~
     wire [31:0] xm_o;       // ALU output
@@ -498,10 +512,8 @@ module processor(
     register_32 MW_D (.q(mw_d), .d(control_branch_or_jump ? 32'd0 : q_dmem),  // wire memory output to MW_D register
         .clk(~clock), .en(1'b1), .clr(reset));
 
-    // Instruction register
     register_32 MW_IR (.q(mw_ir), .d(control_branch_or_jump ? 32'd0 : xm_ir), .clk(~clock), .en(1'b1), .clr(reset));
 
-    // Exception Code Register 
     wire [31:0] mw_exception_code;
     register_32 MW_EXCEPTION (.q(mw_exception_code), .d(control_branch_or_jump ? 32'd0 : xm_exception_code), .clk(~clock), .en(~stall), .clr(reset));
     wire mw_exception_code_flag = (mw_exception_code == 32'b0) ? 1'b0 : 1'b1; // any nonzero exception code is exception raised! this carries into writeback stage
@@ -518,47 +530,33 @@ module processor(
     // other instructions: ALU result
     wire [31:0] regwrite_data, jal_val;
     assign mw_is_jal = mw_ir[31:27] == 5'b00011;
-    // cla_32 jal_adder (.A(mw_link), .B(32'b1), .Cin(1'b0), .Sum(jal_val), .Cout(), .signed_ovf());
     assign jal_val = jal_wb_addr;
 
-    
     assign regwrite_data = mw_exception_code_flag ? mw_exception_code : 
                             (mw_is_lw ? mw_d : 
                             mw_o);
     
-    // normal register write enable logic (**excluding** JAL)
-    wire normal_write_enable;
+    wire normal_write_enable; // normal register write enable logic (**excluding** JAL)
     assign normal_write_enable = ~mw_is_sw && ~mw_is_jr && ~mw_is_branch;
 
     // combined write enable with JAL priority
     assign ctrl_writeEnable = jal_wb_active || (normal_write_enable && ~jal_wb_active);
 
-    // normal destination register select
-    wire [4:0] normal_dest_reg;
+    wire [4:0] normal_dest_reg; // normal destination register select
     assign normal_dest_reg = mw_exception_code_flag ? 5'd30 : 
                             mw_is_setx ? 5'd30 :
                             mw_rd;
 
-    // select destination register with JAL priority
-    assign ctrl_writeReg = jal_wb_active ? 5'd31 : normal_dest_reg;
-
-    // select write data with JAL priority
-    assign data_writeReg = jal_wb_active ? jal_val : regwrite_data;
-
+    assign ctrl_writeReg = jal_wb_active ? 5'd31 : normal_dest_reg; // select destination register with JAL priority
+    assign data_writeReg = jal_wb_active ? jal_val : regwrite_data; // select write data with JAL priority
 
     // disable register write for sw, jr, and branch instructions
     wire reg_write_enable;
     assign reg_write_enable = mw_is_jal || (~mw_is_sw && ~mw_is_jr && ~mw_is_branch);
     assign ctrl_writeEnable = reg_write_enable;
     
-    // select destination register
-    // jal: $r31
-    // other instructions: $rd
     wire [4:0] dest_reg;
-    // assign dest_reg = mw_exception_code_flag ? 5'd30 : (mw_is_jal ? 5'd31 : mw_rd);
     assign dest_reg = mw_exception_code_flag ? 5'd30 : 
                   mw_is_setx ? 5'd30 :
                   (mw_is_jal ? 5'd31 : mw_rd);
-    // assign ctrl_writeReg = dest_reg;
-    // assign data_writeReg = regwrite_data;
 endmodule

@@ -132,7 +132,7 @@ module processor(
 
     // if add_sw_stall, mux in nop to XM.
     wire wx_stall = (dx_is_lw) && ((fd_rs == dx_rd) || ((fd_rt == dx_rd) && (fd_is_sw)) 
-        || (fd_is_blt));
+        || (fd_is_blt || dx_is_MULTDIV));
     wire wx_stall_delayed1, wx_stall_delayed2;
     dffe_ref wx_stall_dff1 (.q(wx_stall_delayed1), .d(wx_stall), .en(1'b1), .clr(1'b0), .clk(~clock));
     dffe_ref wx_stall_dff2 (.q(wx_stall_delayed2), .d(wx_stall_delayed1), .en(1'b1), .clr(1'b0), .clk(~clock));

@@ -61,7 +61,7 @@ module processor(
     wire [31:0] jal_ex_addr, dx_branch_target, dx_exception_code;
     
     // XM stage
-    wire [31:0] xm_ir, xm_o, xm_B, xm_PC, xm_link, jal_mem_addr, xm_exception_code;
+    wire [31:0] xm_ir, xm_o, xm_B, xm_PC, xm_link, jal_mem_addr, xm_exception_code, xm_immediate;
     wire [4:0] xm_opcode, xm_rd, xm_rs, xm_rt;
     wire xm_is_lw, xm_is_sw, xm_is_jr, xm_is_rtype, xm_is_addi, xm_writes_reg, jal_mem_active, xm_exception_code_flag;
     
@@ -105,6 +105,45 @@ module processor(
     wire [31:0] regwrite_data, jal_val, setx_value, rstatus_value;
     wire normal_write_enable, reg_write_enable;
     wire [4:0] normal_dest_reg;
+
+
+    wire sw_bypass_from_M_using_dmem, lw_in_mem_stage;
+    wire [31:0] lw_dmem_data;
+
+    // Replace or add these lines to fix the SW bypass logic
+
+    // Detect when we have a LW in memory stage
+    and(lw_in_mem_stage, xm_is_lw, 1'b1);
+
+    // Check if LW's destination in memory stage matches SW's source in decode stage
+    // and we need to bypass memory data to SW
+    and(sw_bypass_from_M_using_dmem, fd_is_sw, (fd_rd == xm_rd), lw_in_mem_stage, fd_rd_not_zero);
+
+    // Use memory data (q_dmem) when we have a LW->SW bypass
+    assign sw_bypassed_data = sw_bypass_from_X ? alu_result : 
+                            sw_bypass_from_M_using_dmem ? q_dmem :
+                            sw_bypass_from_M ? xm_o : 
+                            data_readRegB; // default to original regfile output
+
+
+    
+    // after this, the rd of the sw insn can then be accessible from the regfile, to be used as rs for the addi insn.
+    // then run a WX bypass on em
+
+    // if add_sw_stall, mux in nop to XM.
+    wire wx_stall = (dx_is_lw) && ((fd_rs == dx_rd) || ((fd_rt == dx_rd) && (fd_is_sw)));
+    wire wx_stall_delayed1, wx_stall_delayed2;
+    dffe_ref wx_stall_dff1 (.q(wx_stall_delayed1), .d(wx_stall), .en(1'b1), .clr(1'b0), .clk(~clock));
+    dffe_ref wx_stall_dff2 (.q(wx_stall_delayed2), .d(wx_stall_delayed1), .en(1'b1), .clr(1'b0), .clk(~clock));
+
+
+
+
+
+
+
+
+
     
     // ~~~~~~~~~ fetch: program counter ~~~~~~~~~
 
@@ -163,7 +202,7 @@ module processor(
     alu PC_increment (.data_operandA(32'd1), .data_operandB(PC_current), .ctrl_ALUopcode(5'b00000), .ctrl_shiftamt(5'b00000), .data_result(PC_plus_1), .isNotEqual(), .isLessThan(), .overflow());
     assign PC_next = PC_plus_1;
     
-    register_32 PC (.q(PC_current), .d(next_pc), .clk(~clock), .en(~stall), .clr(reset)); // PC register
+    register_32 PC (.q(PC_current), .d(next_pc), .clk(~clock), .en(~stall && ~wx_stall), .clr(reset)); // PC register
     assign address_imem = PC_current;
     
     // r type
@@ -180,8 +219,8 @@ module processor(
     // j1 type: opcode is the same, the rest is target (unsigned, upper bits guaranteed not used)
     assign fd_target = {5'd0, fd_ir[26:0]};
 
-    register_32 FD_PC_reg (.q(fd_PC), .d(control_branch_or_jump ? 32'd0 : PC_current), .clk(~clock), .en(~stall), .clr(reset));
-    register_32 FD_IR_reg (.q(fd_ir), .d(control_branch_or_jump ? 32'd0 : q_imem), .clk(~clock), .en(~stall), .clr(reset));
+    register_32 FD_PC_reg (.q(fd_PC), .d(control_branch_or_jump ? 32'd0 : PC_current), .clk(~clock), .en(~stall && ~wx_stall), .clr(reset));
+    register_32 FD_IR_reg (.q(fd_ir), .d(control_branch_or_jump ? 32'd0 : q_imem), .clk(~clock), .en(~stall && ~wx_stall), .clr(reset));
 
     // ~~~~~~~~~ decode: instruction ~~~~~~~~~
     
@@ -208,10 +247,10 @@ module processor(
     // combined branch signal
     or(fd_is_branch, fd_is_bne, fd_is_blt);
 
-    dffe_ref jal_fd (.q(jal_fd_active), .d(is_jal), .clk(~clock), .en(~stall), .clr(reset));
+    dffe_ref jal_fd (.q(jal_fd_active), .d(is_jal), .clk(~clock), .en(~stall && ~wx_stall), .clr(reset));
 
     register_32 jal_fd_reg (.q(jal_fd_addr), .d(is_jal ? jal_ret_addr : 32'd0), 
-                            .clk(~clock), .en(~stall), .clr(reset));
+                            .clk(~clock), .en(~stall && ~wx_stall), .clr(reset));
 
     
     // register reads based on instruction type
@@ -238,7 +277,7 @@ module processor(
     
     // (reg A and B are modified to use bypass, all changes to bypass should be done through these vars)
     register_32 DX_PC (.q(dx_PC), .d(fd_PC), .clk(~clock), .en(~stall), .clr(reset)); // PC reg
-    register_32 DX_IR (.q(dx_ir), .d(control_branch_or_jump ? 32'd0 : fd_ir), .clk(~clock), .en(~stall), .clr(reset)); // Instruction reg
+    register_32 DX_IR (.q(dx_ir), .d(wx_stall ? 32'd0 : control_branch_or_jump ? 32'd0 : fd_ir), .clk(~clock), .en(~stall), .clr(reset)); // Instruction reg
     // A reg ($rs value or $rd for jr)
     register_32 DX_A_reg (.q(dx_A), .d(control_branch_or_jump ? 32'd0 : bypassA_value), .clk(~clock), .en(~stall), .clr(reset));
     // B reg ($rt or $rd value depending on instruction)
@@ -249,8 +288,8 @@ module processor(
     // ~~~~~~~~~ execute: main ALU + regfile ~~~~~~~~~
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ BYPASS BEGIN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Detect when we need to bypass from X->D
     
+    // Detect when we need to bypass from X->D
     // check if insn in X stage will write to register file
     and(dx_is_rtype, ~dx_opcode[4], ~dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]);
     and(dx_is_addi, ~dx_opcode[4], ~dx_opcode[3], dx_opcode[2], ~dx_opcode[1], dx_opcode[0]);
@@ -270,7 +309,6 @@ module processor(
     and(bypassX_to_B, dx_writes_reg, regB_match_dx);
 
     // detect when we need to bypass from M->D
-    
     // check if insn in M will write to register file
     and(xm_is_rtype, ~xm_opcode[4], ~xm_opcode[3], ~xm_opcode[2], ~xm_opcode[1], ~xm_opcode[0]);
     and(xm_is_addi, ~xm_opcode[4], ~xm_opcode[3], xm_opcode[2], ~xm_opcode[1], xm_opcode[0]);
@@ -351,7 +389,7 @@ module processor(
     or(dx_use_immediate, dx_is_addimmediate, dx_is_lw, dx_is_sw);
     
     // Select ALU inputs
-    assign main_alu_A = dx_A;  // $rs
+    assign main_alu_A = wx_stall_delayed2 ? mw_d : dx_A;  // $rs
     assign main_alu_B = dx_use_immediate ? dx_immediate : dx_B;
     
     // Select ALUop
@@ -466,9 +504,9 @@ module processor(
     or(sw_needs_bypass_B, sw_bypass_from_X, sw_bypass_from_M);
 
     // select the bypassed data based on matching stage
-    assign sw_bypassed_data = sw_bypass_from_X ? alu_result : 
-                            sw_bypass_from_M ? xm_o : 
-                            data_readRegB; // default to original regfile output
+    // assign sw_bypassed_data = sw_bypass_from_X ? alu_result : 
+    //                         sw_bypass_from_M ? xm_o : 
+    //                         data_readRegB; // default to original regfile output
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END MEM BYPASS
     
@@ -499,6 +537,7 @@ module processor(
     register_32 jal_wb_reg (.q(jal_wb_addr), .d(jal_mem_addr), .clk(~clock), .en(1'b1), .clr(reset));
 
     // i type: opcode, rd, rs are the same, the rest is immediate
+    assign xm_immediate = {{15{xm_ir[16]}}, xm_ir[16:0]};  // we sign extend here
     assign mw_immediate = {{15{mw_ir[16]}}, mw_ir[16:0]};  // we sign extend here
 
     assign mw_target = {5'd0, mw_ir[26:0]}; // j1 type: opcode is the same, the rest is target

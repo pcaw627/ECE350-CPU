@@ -1,0 +1,93 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Tue Mar 25 00:22:26 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\test_files\output_files\branch_memory.vcd"
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\branch_memory.gtkw"
+[timestart] 49600
+[size] 1536 889
+[pos] -61 -61
+*-16.887278 832600 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[sst_width] 197
+[signals_width] 222
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@24
+Wrapper_tb.CPU.branch_comp_isLessThan
+Wrapper_tb.CPU.branch_comp_isNotEqual
+Wrapper_tb.CPU.branch_comp_overflow
+@420
+Wrapper_tb.CPU.branch_comp_result[31:0]
+@24
+Wrapper_tb.CPU.alu_result[31:0]
+Wrapper_tb.CPU.mw_o[31:0]
+@28
+[color] 2
+Wrapper_tb.CPU.dx_is_addi
+@24
+[color] 3
+Wrapper_tb.CPU.dx_rd[4:0]
+@421
+[color] 2
+Wrapper_tb.CPU.dx_immediate[31:0]
+@24
+Wrapper_tb.CPU.control_branch_or_jump
+Wrapper_tb.CPU.control_branch_taken
+@c00024
+[color] 1
+Wrapper_tb.CPU.dx_branch_target[31:0]
+@28
+(0)Wrapper_tb.CPU.dx_branch_target[31:0]
+(1)Wrapper_tb.CPU.dx_branch_target[31:0]
+(2)Wrapper_tb.CPU.dx_branch_target[31:0]
+(3)Wrapper_tb.CPU.dx_branch_target[31:0]
+(4)Wrapper_tb.CPU.dx_branch_target[31:0]
+(5)Wrapper_tb.CPU.dx_branch_target[31:0]
+(6)Wrapper_tb.CPU.dx_branch_target[31:0]
+(7)Wrapper_tb.CPU.dx_branch_target[31:0]
+(8)Wrapper_tb.CPU.dx_branch_target[31:0]
+(9)Wrapper_tb.CPU.dx_branch_target[31:0]
+(10)Wrapper_tb.CPU.dx_branch_target[31:0]
+(11)Wrapper_tb.CPU.dx_branch_target[31:0]
+(12)Wrapper_tb.CPU.dx_branch_target[31:0]
+(13)Wrapper_tb.CPU.dx_branch_target[31:0]
+(14)Wrapper_tb.CPU.dx_branch_target[31:0]
+(15)Wrapper_tb.CPU.dx_branch_target[31:0]
+(16)Wrapper_tb.CPU.dx_branch_target[31:0]
+(17)Wrapper_tb.CPU.dx_branch_target[31:0]
+(18)Wrapper_tb.CPU.dx_branch_target[31:0]
+(19)Wrapper_tb.CPU.dx_branch_target[31:0]
+(20)Wrapper_tb.CPU.dx_branch_target[31:0]
+(21)Wrapper_tb.CPU.dx_branch_target[31:0]
+(22)Wrapper_tb.CPU.dx_branch_target[31:0]
+(23)Wrapper_tb.CPU.dx_branch_target[31:0]
+(24)Wrapper_tb.CPU.dx_branch_target[31:0]
+(25)Wrapper_tb.CPU.dx_branch_target[31:0]
+(26)Wrapper_tb.CPU.dx_branch_target[31:0]
+(27)Wrapper_tb.CPU.dx_branch_target[31:0]
+(28)Wrapper_tb.CPU.dx_branch_target[31:0]
+(29)Wrapper_tb.CPU.dx_branch_target[31:0]
+(30)Wrapper_tb.CPU.dx_branch_target[31:0]
+(31)Wrapper_tb.CPU.dx_branch_target[31:0]
+@1401200
+-group_end
+@24
+[color] 1
+Wrapper_tb.CPU.PC_current[31:0]
+Wrapper_tb.CPU.dx_take_branch
+Wrapper_tb.CPU.fd_is_branch
+Wrapper_tb.CPU.mw_is_branch
+Wrapper_tb.CPU.blt_result
+Wrapper_tb.CPU.blt_take
+Wrapper_tb.CPU.dx_is_blt
+Wrapper_tb.CPU.fd_is_blt
+Wrapper_tb.CPU.mw_is_blt
+Wrapper_tb.CPU.bne_result
+Wrapper_tb.CPU.bne_take
+Wrapper_tb.CPU.dx_is_bne
+Wrapper_tb.CPU.fd_is_bne
+Wrapper_tb.CPU.is_bne
+Wrapper_tb.CPU.mw_is_bne
+[pattern_trace] 1
+[pattern_trace] 0

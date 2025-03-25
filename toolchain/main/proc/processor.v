@@ -131,7 +131,8 @@ module processor(
     // then run a WX bypass on em
 
     // if add_sw_stall, mux in nop to XM.
-    wire wx_stall = (dx_is_lw) && ((fd_rs == dx_rd) || ((fd_rt == dx_rd) && (fd_is_sw)));
+    wire wx_stall = (dx_is_lw) && ((fd_rs == dx_rd) || ((fd_rt == dx_rd) && (fd_is_sw)) 
+        || (fd_is_blt));
     wire wx_stall_delayed1, wx_stall_delayed2;
     dffe_ref wx_stall_dff1 (.q(wx_stall_delayed1), .d(wx_stall), .en(1'b1), .clr(1'b0), .clk(~clock));
     dffe_ref wx_stall_dff2 (.q(wx_stall_delayed2), .d(wx_stall_delayed1), .en(1'b1), .clr(1'b0), .clk(~clock));
@@ -389,7 +390,11 @@ module processor(
     or(dx_use_immediate, dx_is_addimmediate, dx_is_lw, dx_is_sw);
     
     // Select ALU inputs
-    assign main_alu_A = wx_stall_delayed2 ? mw_d : dx_A;  // $rs
+    // wire alu_A_bypass_ctrl = (dx_rs == xm_rd) ? xm_o : 
+    //                         ((dx_rs == mw_rd) ? mw_o : 
+    //                                             dx_A); // $rs
+
+    assign main_alu_A = wx_stall_delayed2 ? mw_d : dx_A;// alu_A_bypass_ctrl; // if there's a load dependency (wx) prioritize that
     assign main_alu_B = dx_use_immediate ? dx_immediate : dx_B;
     
     // Select ALUop

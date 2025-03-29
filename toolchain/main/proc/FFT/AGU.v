@@ -34,7 +34,7 @@ module AGU (
     
     wire [3:0] idx_counter_out;
     wire idx_counter_ovf;
-    counter4 idx_counter (.count(idx_counter_out), .clk(clock), .clr(clear_hold || ****), .en(1'b1), .cout(idx_counter_ovf));
+    counter4 idx_counter (.count(idx_counter_out), .clk(clock), .clr(clear_hold || sr2_out), .en(1'b1), .cout(idx_counter_ovf));
 
     wire dff_idx_overflow_out;
     dffe_ref dff_idx_overflow (.q(dff_idx_overflow_out), .d(idx_counter_ovf), .clk(clock), .clr(1'b0), .en(1'b1));
@@ -60,6 +60,15 @@ module AGU (
     single_clock_delay  #(parameter WIDTH=5) scd_top (.q(scd_top_out), .d(scd_top_in), .clr(clear_hold), .clk(clock));
     single_clock_delay  #(parameter WIDTH=3) scd_bottom (.q(scd_bottom_out), .d(level_counter_out), .clr(clear_hold), .clk(clock));
     single_clock_delay  #(parameter WIDTH=5) scd_middle_latency_sum (.q(scd_middle_latency_sum_out), .d(scd_middle_latency_sum_in), .clr(clear_hold), .clk(clock));
+
+
+    rotate_left_by_S_5 r5_top (.clk(clock), .clr(clear_hold), .s(scd_bottom_out), .d(scd_top_out), .q(MemA_address));
+    rotate_left_by_S_5 r5_bottom (.clk(clock), .clr(clear_hold), .s(scd_bottom_out), .d(scd_middle_latency_sum_out), .q(MemB_address));
+
+    wire [3:0] twiddle_out;
+    twiddle_mask_gen twiddle_gen (.clk(dff_idx_overflow_out), .clr(clear_hold), .en(1'b1), .out(twiddle_out));
+
+    assign twiddle_address = twiddle_out && idx_counter_out;    
 
 
 

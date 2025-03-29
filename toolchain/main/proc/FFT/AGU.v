@@ -17,25 +17,49 @@ module AGU (
     wire dff1_dff2_out;
     and(dff1_dff2_out, dff1_out, ~dff2_out);
 
-    wire sr_1_out;
-    sr_latch sr1(.Q(sr_1_out), .Q_not(), .S(dff1_dff2_out), .R(****));
+    wire sr1_out, sr2_out;
+    sr_latch sr1(.Q(sr1_out), .Q_not(), .S(dff1_dff2_out), .R(level_counter_ovf && idx_counter_ovf), .clk(clk));
        
-    dff dff3(.q(dff3_out), .d(~sr_1_out), .p(dff1_dff2_out), .clk(clock), .clr(1'b0), .en(1'b1));
+    dff dff3(.q(dff3_out), .d(~sr1_out), .p(dff1_dff2_out), .clk(clock), .clr(1'b0), .en(1'b1));
     dff dff4(.q(dff4_out), .d(dff3_out), .p(dff1_dff2_out), .clk(clock), .clr(1'b0), .en(1'b1));
-    dffe_ref dff5(.q(dff5_out), .d(*****), .clk(clock), .clr(dff4_out), .en(1'b1));
+    dffe_ref dff5(.q(dff5_out), .d(~sr2_out && sr1_out), .clk(clock), .clr(dff4_out), .en(1'b1));
     dffe_ref dff6(.q(dff6_out), .d(dff4_out), .clk(clock), .clr(1'b0), .en(1'b1));
     dffe_ref dff7(.q(dff7_out), .d(dff5_out), .clk(clock), .clr(dff4_out), .en(1'b1));
     dffe_ref dff8(.q(dff8_out), .d(dff7_out), .clk(clock), .clr(1'b0), .en(1'b1));
     
     assign clear_hold = dff8_out;
     assign FFT_done = dff8_out;
+    assign mem_write = dff7_out;
 
-    01234567
-    01234012
     
+    wire [3:0] idx_counter_out;
+    wire idx_counter_ovf;
+    counter4 idx_counter (.count(idx_counter_out), .clk(clock), .clr(clear_hold || ****), .en(1'b1), .cout(idx_counter_ovf));
+
+    wire dff_idx_overflow_out;
+    dffe_ref dff_idx_overflow (.q(dff_idx_overflow_out), .d(idx_counter_ovf), .clk(clock), .clr(1'b0), .en(1'b1));
+
     
+    wire [3:0] writehold_counter_out;
+    wire writehold_counter_ovf;
+    counter4 writehold_counter (.count(idx_counter_out), .clk(clock), .clr(~sr2_out), .en(1'b1), .cout(writehold_counter_ovf));
+
+    sr_latch sr2 (.Q(sr2_out), .Q_not(), .S(idx_counter_ovf), .R(writehold_counter_ovf), .clk(clk));
 
 
+    wire [2:0] level_counter_out;
+    wire level_counter_ovf;
+    mod5counter3 level_counter(.clk(dff_idx_overflow_out), .clr(clear_hold), .cout(level_counter_ovf), .out(level_counter_out));
+
+
+
+    wire [4:0] scd_top_in = {idx_counter_out, 1'b0};
+    wire [4:0] scd_middle_latency_sum_in = {idx_counter_out, 1'b1};
+    wire [4:0] scd_top_out, scd_middle_latency_sum_out;
+    wire [2:0] scd_bottom_out;
+    single_clock_delay  #(parameter WIDTH=5) scd_top (.q(scd_top_out), .d(scd_top_in), .clr(clear_hold), .clk(clock));
+    single_clock_delay  #(parameter WIDTH=3) scd_bottom (.q(scd_bottom_out), .d(level_counter_out), .clr(clear_hold), .clk(clock));
+    single_clock_delay  #(parameter WIDTH=5) scd_middle_latency_sum (.q(scd_middle_latency_sum_out), .d(scd_middle_latency_sum_in), .clr(clear_hold), .clk(clock));
 
 
 

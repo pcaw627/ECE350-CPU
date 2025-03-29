@@ -1,6 +1,7 @@
-module counter4 (count, clk, clr, en);
+module counter4 (count, clk, clr, en, cout);
 
     output [3:0] count;
+    output cout;
     input clk, clr, en;
 
     tff t0(
@@ -36,5 +37,7 @@ module counter4 (count, clk, clr, en);
         .clk(clk),
         .clr(clr)
     );
+
+    assign cout = (count == 0) && (~clk);
     
 endmodule

@@ -1,61 +1,25 @@
-`timescale 1ns / 1ps
-
 module mod5counter3_tb;
+  parameter N = 5;
+  parameter WIDTH = 3;
 
-  // Declare signals to drive the inputs and capture the outputs of the module
   reg clk;
-  reg clr;
-  reg en;
-  wire [2:0] count;
+  reg rstn;
+  wire [WIDTH-1:0] out;
 
-  // Instantiate the mod5counter3 module
-  mod5counter3 uut (
-    .count(count),
-    .clk(clk),
-    .clr(clr),
-    .en(en)
-  );
+  mod5counter3 u0  ( 	.clk(clk),
+                	.rstn(rstn),
+                	.out(out));
 
-  // Clock generation
-  always begin
-    #5 clk = ~clk;  // Toggle clock every 5ns
-  end
+  always #10 clk = ~clk;
 
-  // Initial block for stimulus
   initial begin
-    // Initialize signals
-    clk = 0;
-    clr = 0;
-    en = 0;
+    {clk, rstn} <= 0;
 
-    // Display the result headers
-    $display("Time\tclk\tclr\ten\tcount");
-    $monitor("%0t\t%b\t%b\t%b\t%b", $time, clk, clr, en, count);
+    $monitor ("T=%0t rstn=%0b out=0x%0h", $time, rstn, out);
+    repeat(2) @ (posedge clk);
+    rstn <= 1;
 
-    // Apply reset and enable the counter
-    #10 clr = 1;   // Apply reset
-    #10 clr = 0;   // Release reset
-
-    // Enable counting
-    #10 en = 1;
-    #10 en = 0;
-    #10 en = 1;
-
-    // Run the simulation for a few cycles
-    #50;
-    
-    // Test with reset and enable variations
-    #10 clr = 1;   // Apply reset
-    #10 clr = 0;   // Release reset
-    #10 en = 1;
-    #50;
-
-    // Test with counter disabled
-    #10 en = 0;
-    #20;
-
-    // End the simulation
-    $stop;
+    repeat(20) @ (posedge clk);
+    $finish;
   end
-
 endmodule

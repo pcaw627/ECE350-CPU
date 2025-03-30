@@ -4,20 +4,20 @@ module twiddle_mask_gen (
     output [3:0] out
 );
 
-    wire [3:0] out_intermediate;
+    reg [3:0] out_intermediate;
 
     initial begin 
-        out = 4'b0;
+        out_intermediate <= 4'b0000;
     end
 
-    always @(posedge clock) begin
+    always @(negedge clock) begin
         if (clr) begin
-            out = 4'b0;
+            out_intermediate <= 4'b0000;
         end else begin
-            out_intermediate = {1'b1, out[3:1]};
+            out_intermediate <= {1'b1, out[3:1]};
         end
     end
 
-    dffe_ref [3:0] (.q(out), .d(out_intermediate), .clr(clr), .clk(clock), .en(1'b1));
+    dffe_ref dffs [3:0] (.q(out), .d(out_intermediate), .clr(clr), .clk(clock), .en(1'b1));
 
 endmodule

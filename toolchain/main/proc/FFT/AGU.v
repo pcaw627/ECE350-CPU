@@ -70,6 +70,21 @@ module AGU (
 
     assign twiddle_address = twiddle_out && idx_counter_out;    
 
+    // notes:
 
+    /*
+        For input data: the buses should be 16 bits, but we are only inputting 11 bits at the beginning, 
+        as we have the potential to double at each level of the FFT. We need to start with 16-n bits at the start, for n levels of FFTs. 
+        THIS is our Data_real/imag_in[15:0, 15:0] on p19 of writeup.
+
+        LoadEnable: Should be high when we're loading input data (Data_real_in, Data_imag_in) into memory. That means it should go 
+        low while we're executing, and we can treat it as a stall- pretty much just ~FFTDone. 
+
+
+        Pingpong behavior- we write bank0 while we read bank1, and we write bank1 while we read bank0.
+
+        P19-22 describe what's actually happening better
+
+    */
 
 endmodule

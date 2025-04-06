@@ -5,6 +5,8 @@ module BFU (
     output [15:0] Aprime_complex_out, output [15:0] Bprime_complex_out, output [15:0] Aprime_real_out, output [15:0] Bprime_real_out
 );
 
+    // TODO: Make mux slower (add one cycle delay, see fine print note on page 18)
+
     wire [15:0] wR_times_BR, wR_times_BC, BR_times_wC, BC_times_wC;
     wire [31:0] wB_RR, wB_CC, wB_RC, wB_CR, wB_R, wB_C;
 

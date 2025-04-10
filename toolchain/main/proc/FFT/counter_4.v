@@ -1,8 +1,12 @@
 module counter4 (count, clk, clr, en, cout);
-
+    
     output [3:0] count;
     output cout;
     input clk, clr, en;
+
+    // initial begin
+    //     cout = 0
+    // end
 
     tff t0_tff(
         .q(count[0]),
@@ -38,6 +42,6 @@ module counter4 (count, clk, clr, en, cout);
         .clr(clr)
     );
 
-    assign cout = (count == 4'b0000) && (~clk);
+    assign cout = (count == 4'd15);// && (~clk);
     
 endmodule

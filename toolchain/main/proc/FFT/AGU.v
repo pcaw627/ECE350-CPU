@@ -9,6 +9,10 @@ module AGU (
 
     wire clear_hold, dff1_out, dff2_out, dff3_out, dff4_out, dff5_out, dff6_out, dff7_out, dff8_out, dff9_out;
 
+    // initial begin
+    //     clear_hold = 0;
+    // end
+
     // DFF Chain
     // # dffs named from left to right, bottom to top
     dffe_ref dff1(.q(dff1_out), .d(start_FFT), .clk(clock), .clr(1'b0), .en(1'b1));
@@ -18,14 +22,14 @@ module AGU (
     and(dff1_dff2_out, dff1_out, ~dff2_out);
 
     wire sr1_out, sr2_out;
-    sr_latch sr1(.Q(sr1_out), .Q_not(), .S(dff1_dff2_out), .R(level_counter_ovf && idx_counter_ovf), .clk(clock));
+    sr_latch sr1(.Q(sr1_out), .S(dff1_dff2_out), .R(level_counter_ovf && idx_counter_ovf), .clk(clock));
        
     dff dff3(.q(dff3_out), .d(~sr1_out), .p(dff1_dff2_out), .clk(clock), .clr(1'b0), .en(1'b1));
     dff dff4(.q(dff4_out), .d(dff3_out), .p(dff1_dff2_out), .clk(clock), .clr(1'b0), .en(1'b1));
     dffe_ref dff5(.q(dff5_out), .d(~sr2_out && sr1_out), .clk(clock), .clr(dff4_out), .en(1'b1));
     dffe_ref dff6(.q(dff6_out), .d(dff4_out), .clk(clock), .clr(1'b0), .en(1'b1));
     dffe_ref dff7(.q(dff7_out), .d(dff5_out), .clk(clock), .clr(dff4_out), .en(1'b1));
-    dffe_ref dff8(.q(dff8_out), .d(dff7_out), .clk(clock), .clr(1'b0), .en(1'b1));
+    dffe_ref dff8(.q(dff8_out), .d(dff6_out), .clk(clock), .clr(1'b0), .en(1'b1));
     
     assign clear_hold = dff8_out;
     assign FFT_done = dff8_out;
@@ -34,7 +38,8 @@ module AGU (
     
     wire [3:0] idx_counter_out;
     wire idx_counter_ovf;
-    counter4 idx_counter (.count(idx_counter_out), .clk(clock), .clr(clear_hold || sr2_out), .en(1'b1), .cout(idx_counter_ovf));
+    // counter4 idx_counter (.count(idx_counter_out), .clk(clock), .clr(clear_hold || sr2_out), .en(1'b1), .cout(idx_counter_ovf));
+    mod5counter3 #(.WIDTH(4), .N(16)) idx_counter (.out(idx_counter_out), .clk(clock), .clr(clear_hold || sr2_out), .cout(idx_counter_ovf));
 
     wire dff_idx_overflow_out;
     dffe_ref dff_idx_overflow (.q(dff_idx_overflow_out), .d(idx_counter_ovf), .clk(clock), .clr(1'b0), .en(1'b1));
@@ -42,9 +47,10 @@ module AGU (
     
     wire [3:0] writehold_counter_out;
     wire writehold_counter_ovf;
-    counter4 writehold_counter (.count(idx_counter_out), .clk(clock), .clr(~sr2_out), .en(1'b1), .cout(writehold_counter_ovf));
+    // counter4 writehold_counter (.count(idx_counter_out), .clk(clock), .clr(~sr2_out), .en(1'b1), .cout(writehold_counter_ovf));
+    mod5counter3 #(.WIDTH(4), .N(16)) writehold_counter (.out(idx_counter_out), .clk(clock), .clr(~sr2_out), .cout(writehold_counter_ovf));
 
-    sr_latch sr2 (.Q(sr2_out), .Q_not(), .S(idx_counter_ovf), .R(writehold_counter_ovf), .clk(clock));
+    sr_latch sr2 (.Q(sr2_out), .S(idx_counter_ovf), .R(writehold_counter_ovf), .clk(clock));
 
 
     wire [2:0] level_counter_out;

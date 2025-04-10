@@ -16,8 +16,14 @@ module mod5counter3
     assign out = out_reg;
     assign cout = cout_reg;
 
+    // initial begin
+    //     out_reg = 0;
+    //     cout_reg = 0;
+        
+    // end
+
     always @ (posedge clk) begin
-        if (!clr) begin
+        if (clr) begin
             out_reg  <= 0;
             cout_reg <= 0;
         end else begin

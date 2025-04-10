@@ -1,70 +1,46 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Thu Apr 10 04:30:20 2025
+[*] Thu Apr 10 21:24:25 2025
 [*]
-[dumpfile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\FFT\AGU.vcd"
-[dumpfile_mtime] "Thu Apr 10 04:25:48 2025"
-[dumpfile_size] 143611
-[savefile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\FFT\AGU.gtkw"
-[timestart] 334700
-[size] 2560 1377
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\AGU.vcd"
+[dumpfile_mtime] "Thu Apr 10 21:24:08 2025"
+[dumpfile_size] 69358
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\AGU.gtkw"
+[timestart] 0
+[size] 1536 889
 [pos] -1 -1
-*-16.557301 965000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.524075 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] AGU_tb.
 [treeopen] AGU_tb.dut.
 [sst_width] 197
-[signals_width] 313
+[signals_width] 247
 [sst_expanded] 1
-[sst_vpaned_height] 426
+[sst_vpaned_height] 254
 @28
-AGU_tb.dut.FFT_done
-@22
-AGU_tb.dut.MemA_address[4:0]
-AGU_tb.dut.MemB_address[4:0]
-@28
-AGU_tb.dut.clear_hold
 AGU_tb.dut.clock
-AGU_tb.dut.dff1_dff2_out
-AGU_tb.dut.dff1_out
-AGU_tb.dut.dff2_out
-AGU_tb.dut.dff3_out
-AGU_tb.dut.dff4_out
-AGU_tb.dut.dff5_out
-AGU_tb.dut.dff6_out
-AGU_tb.dut.dff7_out
-AGU_tb.dut.dff8_out
+AGU_tb.dut.clear_hold
 AGU_tb.dut.dff_idx_overflow_out
 @22
 AGU_tb.dut.idx_counter_out[3:0]
 @28
+[color] 7
 AGU_tb.dut.idx_counter_ovf
-@24
 AGU_tb.dut.level_counter_out[2:0]
-@28
 AGU_tb.dut.level_counter_ovf
-AGU_tb.dut.mem_write
-AGU_tb.dut.scd_bottom_out[2:0]
-@24
-AGU_tb.dut.scd_middle_latency_sum_in[4:0]
-AGU_tb.dut.scd_middle_latency_sum_out[4:0]
-AGU_tb.dut.scd_top_in[4:0]
-AGU_tb.dut.scd_top_out[4:0]
-@28
-AGU_tb.dut.sr1_out
 AGU_tb.dut.sr2_out
+@29
 [color] 7
-AGU_tb.dut.start_FFT
-@22
-AGU_tb.dut.twiddle_address[3:0]
-@28
-AGU_tb.dut.twiddle_out[3:0]
 AGU_tb.dut.writehold_counter_ovf
-[color] 7
-AGU_tb.dut.sr1.Q
-[color] 7
-AGU_tb.dut.sr1.Q_not
-AGU_tb.dut.sr1.R
-AGU_tb.dut.sr1.S
-AGU_tb.dut.sr1.clk
+@420
+AGU_tb.dut.idx_counter.N
+AGU_tb.dut.idx_counter.WIDTH
+@28
+AGU_tb.dut.idx_counter.clk
+AGU_tb.dut.idx_counter.clr
+AGU_tb.dut.idx_counter.cout
+AGU_tb.dut.idx_counter.cout_reg
+@22
+AGU_tb.dut.idx_counter.out[3:0]
+AGU_tb.dut.idx_counter.out_reg[3:0]
 [pattern_trace] 1
 [pattern_trace] 0

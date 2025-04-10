@@ -1,36 +1,39 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Thu Apr 10 21:24:25 2025
+[*] Thu Apr 10 21:53:27 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\AGU.vcd"
-[dumpfile_mtime] "Thu Apr 10 21:24:08 2025"
-[dumpfile_size] 69358
+[dumpfile_mtime] "Thu Apr 10 21:37:03 2025"
+[dumpfile_size] 48541
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\AGU.gtkw"
-[timestart] 0
+[timestart] 1173900
 [size] 1536 889
 [pos] -1 -1
-*-16.524075 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.524075 1565000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] AGU_tb.
 [treeopen] AGU_tb.dut.
-[sst_width] 197
+[sst_width] 218
 [signals_width] 247
 [sst_expanded] 1
 [sst_vpaned_height] 254
 @28
 AGU_tb.dut.clock
+[color] 3
+AGU_tb.dut.FFT_done
+[color] 3
 AGU_tb.dut.clear_hold
+AGU_tb.mem_write
 AGU_tb.dut.dff_idx_overflow_out
-@22
-AGU_tb.dut.idx_counter_out[3:0]
-@28
 [color] 7
 AGU_tb.dut.idx_counter_ovf
-AGU_tb.dut.level_counter_out[2:0]
+[color] 7
 AGU_tb.dut.level_counter_ovf
+AGU_tb.dut.sr1_out
 AGU_tb.dut.sr2_out
-@29
 [color] 7
 AGU_tb.dut.writehold_counter_ovf
+@22
++{writehold_count} AGU_tb.dut.writehold_counter.out[3:0]
 @420
 AGU_tb.dut.idx_counter.N
 AGU_tb.dut.idx_counter.WIDTH
@@ -42,5 +45,20 @@ AGU_tb.dut.idx_counter.cout_reg
 @22
 AGU_tb.dut.idx_counter.out[3:0]
 AGU_tb.dut.idx_counter.out_reg[3:0]
+@28
+[color] 2
+AGU_tb.dut.level_counter_out[2:0]
+@22
+[color] 2
+AGU_tb.dut.idx_counter_out[3:0]
+@25
+[color] 7
+AGU_tb.MemA_address[4:0]
+@24
+[color] 7
+AGU_tb.MemB_address[4:0]
+@22
+[color] 7
+AGU_tb.twiddle_address[3:0]
 [pattern_trace] 1
 [pattern_trace] 0

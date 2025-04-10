@@ -39,7 +39,7 @@ module AGU (
     wire [3:0] idx_counter_out;
     wire idx_counter_ovf;
     // counter4 idx_counter (.count(idx_counter_out), .clk(clock), .clr(clear_hold || sr2_out), .en(1'b1), .cout(idx_counter_ovf));
-    mod5counter3 #(.WIDTH(4), .N(16)) idx_counter (.out(idx_counter_out), .clk(clock), .clr(clear_hold || sr2_out), .cout(idx_counter_ovf));
+    modNcounter #(.WIDTH(4), .N(16)) idx_counter (.out(idx_counter_out), .clk(clock), .clr(clear_hold || sr2_out), .cout(idx_counter_ovf));
 
     wire dff_idx_overflow_out;
     dffe_ref dff_idx_overflow (.q(dff_idx_overflow_out), .d(idx_counter_ovf), .clk(clock), .clr(1'b0), .en(1'b1));
@@ -47,15 +47,15 @@ module AGU (
     
     wire [3:0] writehold_counter_out;
     wire writehold_counter_ovf;
-    // counter4 writehold_counter (.count(idx_counter_out), .clk(clock), .clr(~sr2_out), .en(1'b1), .cout(writehold_counter_ovf));
-    mod5counter3 #(.WIDTH(4), .N(16)) writehold_counter (.out(idx_counter_out), .clk(clock), .clr(~sr2_out), .cout(writehold_counter_ovf));
+    // counter4 writehold_counter (.count(writehold_counter_out), .clk(clock), .clr(~sr2_out), .en(1'b1), .cout(writehold_counter_ovf));
+    modNcounter #(.WIDTH(4), .N(16)) writehold_counter (.out(writehold_counter_out), .clk(clock), .clr(~sr2_out), .cout(writehold_counter_ovf));
 
     sr_latch sr2 (.Q(sr2_out), .S(idx_counter_ovf), .R(writehold_counter_ovf), .clk(clock));
 
 
     wire [2:0] level_counter_out;
     wire level_counter_ovf;
-    mod5counter3 level_counter(.clk(dff_idx_overflow_out), .clr(clear_hold), .cout(level_counter_ovf), .out(level_counter_out));
+    modNcounter #(.WIDTH(3), .N(5)) level_counter(.clk(dff_idx_overflow_out), .clr(clear_hold), .cout(level_counter_ovf), .out(level_counter_out));
 
 
 

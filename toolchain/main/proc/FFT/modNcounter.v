@@ -1,4 +1,4 @@
-module mod5counter3
+module modNcounter
     #(
         parameter N = 5,
         parameter WIDTH = 3
@@ -16,11 +16,11 @@ module mod5counter3
     assign out = out_reg;
     assign cout = cout_reg;
 
-    // initial begin
-    //     out_reg = 0;
-    //     cout_reg = 0;
+    initial begin
+        out_reg = 0;
+        cout_reg = 0;
         
-    // end
+    end
 
     always @ (posedge clk) begin
         if (clr) begin
@@ -39,4 +39,4 @@ module mod5counter3
 
 endmodule
 
-// iverilog -o mod5counter3 -c FileList.txt -s modcounter3_tb; vvp .\mod5counter3
+// iverilog -o modNcounter -c FileList.txt -s modcounter3_tb; vvp .\modNcounter

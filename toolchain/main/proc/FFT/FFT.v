@@ -168,7 +168,7 @@ multi_clock_delay #(parameter WIDTH=1, CYCLES=9) mcd_memwrite_9delay(
     .clk(clk)
 );
 
-FFT_RAMBlock fft_data_memory (
+FFT_DMEM fft_data_memory (
     // inputs
     .clock(clock),
     .LoadDataWrite(LoadDataWrite),

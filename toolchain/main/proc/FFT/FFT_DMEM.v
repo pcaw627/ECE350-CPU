@@ -1,4 +1,4 @@
-module FFT_RAMBlock (
+module FFT_DMEM (
     input clock,
     input LoadDataWrite,
     input LoadEnable,

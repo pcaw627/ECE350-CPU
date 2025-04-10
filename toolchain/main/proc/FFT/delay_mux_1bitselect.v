@@ -1,4 +1,4 @@
-module #(parameter WIDTH=1) delay_mux_1bitselect(
+module delay_mux_1bitselect #(parameter WIDTH=1) (
     input clock,
     input select,
     input [WIDTH-1:0] in0,
@@ -8,7 +8,7 @@ module #(parameter WIDTH=1) delay_mux_1bitselect(
     wire [WIDTH-1:0] out_predelay;
     assign out_predelay = select ? in1 : in0;
 
-    single_clock_delay #(WIDTH=WIDTH) scd (
+    single_clock_delay #(.WIDTH(WIDTH)) scd (
         .q(out),
         .d(out_predelay),
         .clr(1'b0),

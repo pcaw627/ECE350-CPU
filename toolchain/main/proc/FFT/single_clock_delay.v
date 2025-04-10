@@ -1,4 +1,4 @@
-module #(parameter WIDTH=3) single_clock_delay(q, d, clr, clk);
+module single_clock_delay #(parameter WIDTH=3) (q, d, clr, clk);
     input clr, clk;
     input [WIDTH-1 : 0] d;
     output [WIDTH-1 : 0] q;

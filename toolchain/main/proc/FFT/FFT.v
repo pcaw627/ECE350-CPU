@@ -73,78 +73,6 @@ initial begin
     twiddle_imag[15] = 16'h1859;
 end
 
-// use these for testbench instead!
-// // real values lookup table
-// initial begin
-//     twiddle_real[0]  = 64'h0000;
-//     twiddle_real[1]  = 64'h0800;
-//     twiddle_real[2]  = 64'h0000;
-//     twiddle_real[3]  = 64'h07fd;
-//     twiddle_real[4]  = 64'h0000;
-//     twiddle_real[5]  = 64'h07fc;
-//     twiddle_real[6]  = 64'h0000;
-//     twiddle_real[7]  = 64'h07fc;
-//     twiddle_real[8]  = 64'h0000;
-//     twiddle_real[9]  = 64'h07fd;
-//     twiddle_real[10] = 64'h0000;
-//     twiddle_real[11] = 64'h07fc;
-//     twiddle_real[12] = 64'h0000;
-//     twiddle_real[13] = 64'h07fd;
-//     twiddle_real[14] = 64'h0000;
-//     twiddle_real[15] = 64'h07fd;
-//     twiddle_real[16] = 64'h0000;
-//     twiddle_real[17] = 64'h07fe;
-//     twiddle_real[18] = 64'h0000;
-//     twiddle_real[19] = 64'h07fd;
-//     twiddle_real[20] = 64'h0000;
-//     twiddle_real[21] = 64'h07fe;
-//     twiddle_real[22] = 64'h0000;
-//     twiddle_real[23] = 64'h07fe;
-//     twiddle_real[24] = 64'h0000;
-//     twiddle_real[25] = 64'h07fd;
-//     twiddle_real[26] = 64'h0000;
-//     twiddle_real[27] = 64'h07fe;
-//     twiddle_real[28] = 64'h0000;
-//     twiddle_real[29] = 64'h0801;
-//     twiddle_real[30] = 64'h0000;
-//     twiddle_real[31] = 64'h0805;
-// end
-
-// // imaginary values lookup table
-// initial begin
-//     twiddle_imag[0]  = 64'h0000;
-//     twiddle_imag[1]  = 64'h511b;
-//     twiddle_imag[2]  = 64'h0000;
-//     twiddle_imag[3]  = 64'h1a54;
-//     twiddle_imag[4]  = 64'h0000;
-//     twiddle_imag[5]  = 64'h0ef2;
-//     twiddle_imag[6]  = 64'h0000;
-//     twiddle_imag[7]  = 64'h09bc;
-//     twiddle_imag[8]  = 64'h0000;
-//     twiddle_imag[9]  = 64'h068e;
-//     twiddle_imag[10] = 64'h0000;
-//     twiddle_imag[11] = 64'h0445;
-//     twiddle_imag[12] = 64'h0000;
-//     twiddle_imag[13] = 64'h026d;
-//     twiddle_imag[14] = 64'h0000;
-//     twiddle_imag[15] = 64'h00c9;
-//     twiddle_imag[16] = 64'h0000;
-//     twiddle_imag[17] = 64'hff37;
-//     twiddle_imag[18] = 64'h0000;
-//     twiddle_imag[19] = 64'hfd94;
-//     twiddle_imag[20] = 64'h0000;
-//     twiddle_imag[21] = 64'hfbbc;
-//     twiddle_imag[22] = 64'h0000;
-//     twiddle_imag[23] = 64'hf972;
-//     twiddle_imag[24] = 64'h0000;
-//     twiddle_imag[25] = 64'hf644;
-//     twiddle_imag[26] = 64'h0000;
-//     twiddle_imag[27] = 64'hf10f;
-//     twiddle_imag[28] = 64'h0000;
-//     twiddle_imag[29] = 64'he5a9;
-//     twiddle_imag[30] = 64'h0000;
-//     twiddle_imag[31] = 64'haee5;
-// end
 
 twiddlefactor_real = twiddle_real[twiddle_address];
 twiddlefactor_imag = twiddle_imag[twiddle_address];
@@ -160,22 +88,22 @@ wire memwrite_7delay, memwrite_8delay, memwrite_7delay_dff_out, memwrite_tff_out
 
 multi_clock_delay #(parameter WIDTH=1, CYCLES=7) scd_memwrite_7delay(
     .q(memwrite_7delay),
-    .d(memwrite),
+    .d(mem_write),
     .clr(ACLR), // TODO: confirm that this clear should be ACLR
     .clk(clk)
 );
 
 multi_clock_delay #(parameter WIDTH=1, CYCLES=8) scd_memwrite_8delay(
     .q(memwrite_8delay),
-    .d(memwrite),
-    .clr(1'b0), // maybe add ACLR back
+    .d(mem_write),
+    .clr(ACLR),
     .clk(clk)
 );
 
 dffe_ref memwrite_7delay_dff(
     .q(memwrite_7delay_dff_out),
     .d(memwrite_7delay),
-    .clr(ACLR), // TODO: confirm that this clear should be ACLR
+    .clr(ACLR), // maybe change this back to 1'b0
     .clk(clk),
     .en(1'b1)
 );
@@ -204,36 +132,68 @@ BFU fft_BFU (
 // delay X and Y before going into DMEM
 // put dflip flops here to delay signal
 wire [15:0] Xr_del, Xi_del, Yr_del, Yi_del;
+single_clock_delay #(parameter WIDTH=16) dmem_input_Xi_delay (.q(Xi_del), .d(Xi), .clr(ACLR), .clk(clock));
+single_clock_delay #(parameter WIDTH=16) dmem_input_Xr_delay (.q(Xr_del), .d(Xr), .clr(ACLR), .clk(clock));
+single_clock_delay #(parameter WIDTH=16) dmem_input_Yi_delay (.q(Yi_del), .d(Yi), .clr(ACLR), .clk(clock));
+single_clock_delay #(parameter WIDTH=16) dmem_input_Yr_delay (.q(Yr_del), .d(Yr), .clr(ACLR), .clk(clock));
 
+// WHY are there 8 16bit inputs on FFT diagram on p19, but just 6 16bit inputs in dmem diagram on p18?
+// maybe add undelayed Xi Xr here...
 
 
 wire LoadEnable = ~FFT_done_internal; // TODO: add additional logic that makes sure we're not writing concurrently
 
+LoadDataAddr_reversed = {LoadDataAddr[0], LoadDataAddr[1], LoadDataAddr[2], LoadDataAddr[3], LoadDataAddr[4]};
+wire [4:0] MemA_address_9delay, MemB_address_9delay;
+wire memwrite_9delay; // to determine RWAddrEN(); this signal determines when we switch between reading and loading addresses into DMEM
+
+multi_clock_delay #(parameter WIDTH=5, CYCLES=9) mcd_memAaddr_9delay(
+    .q(MemA_address_9delay),
+    .d(MemA_address),
+    .clr(1'b0), // maybe add ACLR back
+    .clk(clk)
+);
+
+multi_clock_delay #(parameter WIDTH=5, CYCLES=9) mcd_memBaddr_9delay(
+    .q(MemB_address_9delay),
+    .d(MemB_address),
+    .clr(1'b0), // maybe add ACLR back
+    .clk(clk)
+);
+
+multi_clock_delay #(parameter WIDTH=1, CYCLES=9) mcd_memwrite_9delay(
+    .q(memwrite_9delay),
+    .d(mem_write),
+    .clr(1'b0), // maybe add ACLR back
+    .clk(clk)
+);
 
 FFT_RAMBlock fft_data_memory (
+    // inputs
+    .clock(clock),
     .LoadDataWrite(LoadDataWrite),
     .LoadEnable(LoadEnable),
     .Bank0WriteEN(Bank0WriteEN),
     .Bank1WriteEN(Bank1WriteEN),
     .Data_real_in(data_real_in), // [15:0] 
     .Data_imag_in(data_imag_in),  // [15:0] 
-    .RWAddrEN(),
-    .BankReadEnable(), 
-    .LoadDataAddr(), // [4:0]
-    .ReadGAddr(), // [4:0]
-    .ReadHAddr(), // [4:0]
-    .WriteGAddr(), // [4:0]
-    .WriteHAddr(), // [4:0]
-    .Xr(Xr), // [15:0] 
-    .Xi(Xi), // [15:0] 
-    .Yr(Yr), // [15:0] 
-    .Yi(Yi), // [15:0] 
+    .RWAddrEN(memwrite_9delay),
+    .BankReadSelect(MemBankReadSelect),
+    .LoadDataAddr(LoadDataAddr_reversed), // [4:0]    // NOTE: WHY is there both LoadDataAddr_reversed and LoadDataAddr going into the DMEM module on p19?
+    .ReadGAddr(MemA_address), // [4:0]
+    .ReadHAddr(MemB_address), // [4:0]
+    .WriteGAddr(MemA_address_9delay), // [4:0]
+    .WriteHAddr(MemB_address_9delay), // [4:0]
+    .Xr(Xr_del), // [15:0] 
+    .Xi(Xi_del), // [15:0] 
+    .Yr(Yr_del), // [15:0] 
+    .Yi(Yi_del), // [15:0] 
     
-    // check bit widths for these...
-    .G_real(), // [15:0] 
-    .G_imag(), // [15:0] 
-    .H_real(), // [15:0]  
-    .H_imag() // [15:0] 
+    // outputs
+    .G_real(G_real), // [15:0] 
+    .G_imag(G_imag), // [15:0] 
+    .H_real(H_real), // [15:0]  
+    .H_imag(H_imag) // [15:0] 
 );
 
 

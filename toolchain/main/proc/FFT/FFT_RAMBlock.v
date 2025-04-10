@@ -1,4 +1,5 @@
 module FFT_RAMBlock (
+    input clock,
     input LoadDataWrite,
     input LoadEnable,
     input Bank0WriteEN,
@@ -6,7 +7,7 @@ module FFT_RAMBlock (
     input [15:0] Data_real_in, 
     input [15:0] Data_imag_in, 
     input RWAddrEN,
-    input BankReadEnable, 
+    input BankReadSelect,
     input [4:0] LoadDataAddr,
     input [4:0] ReadGAddr,
     input [4:0] ReadHAddr,
@@ -17,24 +18,81 @@ module FFT_RAMBlock (
     input [15:0] Yr,
     input [15:0] Yi,
     
-    // check bit widths for these...
     output [15:0] G_real, 
     output [15:0] G_imag, 
     output [15:0] H_real, 
     output [15:0] H_imag);
 
 
-    wire [15:0] DataA_r, DataA_c, DataB_r, DataB0_c;
+    wire Bank0_A_WR, Bank0_B_WR;
+    single_clock_delay #(parameter WIDTH=1) Bank0_B_WR_delay (.q(Bank0_B_WR), .d(Bank0WriteEN), .clr(1'b0), .clk(clock));
+    
+    delay_mux_1bitselect #(parameter WIDTH=1) Bank0_A_WR_mux(
+        .clock(clock),
+        .select(******idk man*********), // TODO: LoadDataWrite: what select bit do we do for this mux?
+        .in0(Bank0WriteEN),
+        .in1(LoadDataWrite),
+        .out(Bank0_A_WR));
 
-    assign DataA_r = LoadEnable ? Xr : Data_real_in; // Load Enable is not specified
-    assign DataA_c = LoadEnable ? Xi : Data_imag_in;
+    wire [15:0] DataA0_r, DataA0_i, DataB_r, DataB_i;
 
-    wire [4:0] addrA0;
-    assign addrA0 = LoadEnable ? WriteGAddr : (RWAddrEN ? ReadGAddr : LoadDataAddr);
-    assign addrB0 = RWAddrEN ? WriteHAddr : ReadHAddr;
+    delay_mux_1bitselect #(parameter WIDTH=16) DataA0_r_mux(
+        .clock(clock),
+        .select(LoadEnable),
+        .in0(Data_real_in),
+        .in1(Xr),
+        .out(DataA0_r));
 
-    assign DataA0_c = LoadEnable ? Xi : Data_imag_in;
+    delay_mux_2bitselect #(parameter WIDTH=5) addrA0_mux(
+        .clock(clock),
+        .select({LoadEnable, RWAddrEN}),
+        .in0(ReadGAddr),
+        .in1(WriteGAddr),
+        .in2(LoadDataAddr),
+        .in3(5'bX), //unused
+        .out(addrA0));
 
+    single_clock_delay #(parameter WIDTH=16) DataB_r_delay (.q(DataB_r), .d(Yr), .clr(1'b0), .clk(clock));
+    
+    delay_mux_1bitselect #(parameter WIDTH=5) addrB0_mux(
+        .clock(clock),
+        .select(RWAddrEN),
+        .in0(ReadHAddr),
+        .in1(WriteHAddr),
+        .out(addrB0));
+    
+    delay_mux_1bitselect #(parameter WIDTH=16) DataA0_i_mux(
+        .clock(clock),
+        .select(LoadEnable),
+        .in0(Data_imag_in),
+        .in1(Xi),
+        .out(DataA0_i));
+    
+    single_clock_delay #(parameter WIDTH=16) DataB_i_delay (.q(DataB_i), .d(Yi), .clr(1'b0), .clk(clock));
+    
+    single_clock_delay #(parameter WIDTH=16) DataA1_r_delay (.q(DataA1_r), .d(Xr), .clr(1'b0), .clk(clock));
+    
+    delay_mux_2bitselect #(parameter WIDTH=5) addrA1_mux(
+        .clock(clock),
+        .select({LoadEnable, RWAddrEN}),
+        .in0(ReadGAddr),
+        .in1(WriteGAddr),
+        .in2(LoadDataAddr),
+        .in3(5'bX), //unused
+        .out(addrA1));
+    
+    delay_mux_1bitselect #(parameter WIDTH=5) addrB1_mux(
+        .clock(clock),
+        .select(RWAddrEN),
+        .in0(ReadHAddr),
+        .in1(WriteHAddr),
+        .out(addrB1));
+
+    single_clock_delay #(parameter WIDTH=16) DataA1_i_delay (.q(DataA1_i), .d(Xi), .clr(1'b0), .clk(clock));
+    
+    wire Bank1WriteEN_delay;
+    single_clock_delay #(parameter WIDTH=1) Bank1_WR_delay (.q(Bank1WriteEN_delay), .d(Bank1WriteEN), .clr(1'b0), .clk(clock));
+    
     wire [15:0] Bank0_A_r_out, Bank0_A_c_out, Bank0_B_r_out, Bank0_B_c_out, 
                 Bank1_A_r_out, Bank1_A_c_out, Bank1_B_r_out, Bank1_B_c_out;
 
@@ -43,12 +101,12 @@ module FFT_RAMBlock (
     // membank 0 and 1, each with real and imaginary component. each of the four components has a RAM module associated to it
     FFT_BankRAM bank0 (
         .clock(clock),
-        .A_en(Bank0WriteEN), // wtf is up with loadwriteenable
-        .B_en(Bank0WriteEN),
-        .A_dataInR(DataA_r),
-        .A_dataInC(DataA_c),
-        .B_dataInR(Yr)
-        .B_dataInC(Yi),
+        .A_en(Bank0_A_WR),
+        .B_en(Bank0_B_WR),
+        .A_dataInR(DataA0_r),
+        .A_dataInC(DataA0_i),
+        .B_dataInR(DataB_r)
+        .B_dataInC(DataB_i),
         .A_addr(addrA0),
         .B_addr(addrB0),
         .A_dataOutR(Bank0_A_r_out),
@@ -57,16 +115,14 @@ module FFT_RAMBlock (
         .B_dataOutC(Bank0_B_c_out)
     );
 
-    assign DataB0_c
-
     FFT_BankRAM bank1 (
         .clock(clock),
-        .A_en(Bank1WriteEN), // wtf is up with loadwriteenable
-        .B_en(Bank1WriteEN),
-        .A_dataInR(DataB_r),
-        .A_dataInC(DataB_c),
-        .B_dataInR(Yr)
-        .B_dataInC(Yi),
+        .A_en(Bank1WriteEN_delay),
+        .B_en(Bank1WriteEN_delay),
+        .A_dataInR(DataA1_r),
+        .A_dataInC(DataA1_i),
+        .B_dataInR(DataB_r)
+        .B_dataInC(DataB_i),
         .A_addr(addrA1),
         .B_addr(addrB1),
         .A_dataOutR(Bank1_A_r_out),
@@ -75,7 +131,9 @@ module FFT_RAMBlock (
         .B_dataOutC(Bank1_B_c_out)
     );
 
+    assign G_real = BankReadSelect ? Bank1_A_r_out : Bank0_A_r_out;
+    assign G_imag = BankReadSelect ? Bank1_A_c_out : Bank0_A_c_out;
+    assign H_real = BankReadSelect ? Bank1_B_r_out : Bank0_B_r_out;
+    assign H_imag = BankReadSelect ? Bank1_B_c_out : Bank0_B_c_out;
     
-
-
 endmodule

@@ -4,10 +4,20 @@ module FFT(
     input [4:0] LoadDataAddr,
     input [15:0] data_real_in,
     input [15:0] data_imag_in,
-    input LoadDataWrite,
+    input LoadDataWrite, // TODO: LoadDataWrite: what select bit do we do for this mux?
     input ACLR,
-    output FFT_done
+
+    output FFT_done,
+    output G_real_out, 
+    output G_imag_out, 
+    output H_real_out,
+    output H_imag_out
 );
+
+assign G_real_out = G_real;
+assign G_imag_out = G_imag;
+assign H_real_out = H_real;
+assign H_imag_out = H_imag;
 
 wire FFT_done_internal;
 assign FFT_done = FFT_done_internal;

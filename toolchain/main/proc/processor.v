@@ -446,12 +446,62 @@ module processor(
                      dx_is_setx ? setx_value :
                      alu_result;
 
-    and (stall, dx_is_MULTDIV, ~multdiv_resultRDY);
 
     dffe_ref jal_ex (.q(jal_ex_active), .d(jal_fd_active), .clk(~clock), .en(~stall), .clr(reset));
 
     register_32 jal_ex_reg (.q(jal_ex_addr), .d(jal_fd_addr), 
                             .clk(~clock), .en(~stall), .clr(reset));
+
+
+    // ~~~~~~~~~~~ FFT and INV FFT handling ~~~~~~~~~~~~~~~~~~~~~  
+    
+    wire dx_is_FFT, dx_is_INVFFT, dx_is_FFTCLR;
+    and (dx_is_FFT, ~dx_opcode[4], dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], ~dx_opcode[0]); // FFT: 01000
+    and (dx_is_INVFFT, ~dx_opcode[4], dx_opcode[3], ~dx_opcode[2], ~dx_opcode[1], dx_opcode[0]); // INV FFT: 01001
+    and (dx_is_FFTCLR, ~dx_opcode[4], dx_opcode[3], ~dx_opcode[2], dx_opcode[1], ~dx_opcode[0]); // FFT CLR: 01010
+    
+    wire dx_FFT_real_data_in = dx_ir[15:0];
+    wire FFT_done;
+
+    FFT fft(
+        .clock(clock),
+        .start_FFT(dx_is_FFT),
+        .[4:0] LoadDataAddr(),
+        .[15:0] data_real_in(dx_FFT_real_data_in),
+        .[15:0] data_imag_in(16'd0),
+        .LoadDataWrite(*******idk man*************), // TODO: LoadDataWrite: what select bit do we do for this mux?
+        .ACLR(dx_is_FFTCLR), //consider adding clear signal to 
+        .FFT_done(FFT_done),
+        .G_real_out(), // TODO: write G and H signals to main CPU DMEM after FFTdone goes high 
+        .G_imag_out(), 
+        .H_real_out(),
+        .H_imag_out()
+    );
+
+
+
+
+
+
+
+
+
+
+
+    // ~~~~~~~~~~~ END FFT and INV FFT handling ~~~~~~~~~~~~~~~~~~~~~  
+    
+    
+    
+    
+    // ~~~~~~~~~~~ STALL handling ~~~~~~~~~~~~~~~~~~~~~  
+    
+    wire md_stall, fft_stall, invfft_stall;
+    and(md_stall, dx_is_MULTDIV, ~multdiv_resultRDY);
+    and(fft_stall, dx_is_FFT, ~FFT_done);
+    // and(invfft_stall, dx_is_INVFFT, ~INVFFT_done); // uncomment when INVFFT is written
+
+    // or (stall, md_stall, fft_stall, invfft_stall); // uncomment when INVFFT is written
+    or (stall, md_stall, fft_stall);
 
 
     // ~~~~~~~~~~~ exception handling ~~~~~~~~~~~~~~~~~~~~~  

@@ -25,7 +25,7 @@ module cla_16 (
     cla_8 CLA1 (
         .A(A[15:8]),
         .B(B[15:8]),
-        .Cin(C[0]),
+        .Cin(C),
         .Sum(Sum[15:8]),
         .Cout(Cout), // don't ripple
         .Pout(P[1]),
@@ -36,7 +36,7 @@ module cla_16 (
     
     // C[0] (carry into second block)
     and (term[0], P[0], Cin);
-    or (C[0], G[0], term[0]);
+    or (C, G[0], term[0]);
 
     // C[1] (carry into third block)
     and (term[1], P[1], G[0]);

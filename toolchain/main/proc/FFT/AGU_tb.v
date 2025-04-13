@@ -22,28 +22,28 @@ AGU dut(
 
 // Clock generation
 always begin
-#5 clock = ~clock;  // Toggle clock every 5 time units
+    #5 clock = ~clock;  // Toggle clock every 5 time units
 end
 
 
 initial begin
-clock = 0;
-start_FFT = 0;
+    clock = 0;
+    start_FFT = 0;
 
-#50
-start_FFT = 1;
-#25
-start_FFT = 0;
+    #50
+    start_FFT = 1;
+    #25
+    start_FFT = 0;
 
 
-// Display header for the test
-$display("Time \t clock \t start_FFT \t MemA_address \t MemB_address \t twiddle_address \t mem_write \t FFT_done");
-$monitor("%0t\t%b\t%b\t%d\t%d\t%d\t%b\t%b", $time, clock, start_FFT, MemA_address, MemB_address, twiddle_address, mem_write, FFT_done);
+    // Display header for the test
+    $display("Time \t clock \t start_FFT \t MemA_address \t MemB_address \t twiddle_address \t mem_write \t FFT_done");
+    $monitor("%0t\t%b\t%b\t%d\t%d\t%d\t%b\t%b", $time, clock, start_FFT, MemA_address, MemB_address, twiddle_address, mem_write, FFT_done);
 
-// let him cook
-#4000
-// End of test
-$finish;
+    // let him cook
+    #4000
+    // End of test
+    $finish;
 
 end
 

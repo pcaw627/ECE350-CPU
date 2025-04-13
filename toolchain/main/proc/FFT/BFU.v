@@ -113,6 +113,9 @@ module BFU (
         .signed_ovf()
     );
 
+    // iverilog -o BFU -s BFU_tb -c FileList.txt; vvp .\BFU
+    // gtkwave .\BFU.vcd
+
 
 
 endmodule

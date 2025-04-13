@@ -6,8 +6,13 @@ counter_4.v
 delay_mux_1bitselect.v
 dff.v
 FFT_tb.v
-mod5counter3.v
-modcounter3_tb.v
+../alu-main/and_1.v
+../alu-main/or_1.v
+../alu-main/cla_8.v
+../alu-main/cla_16.v
+../alu-main/cla_32.v
+../alu-main/full_adder.v
+modNcounter.v
 rotate_left_by_S_5.v
 rotate_left_by_S_5_tb.v
 single_clock_delay.v

@@ -8,8 +8,9 @@ module single_clock_delay #(parameter WIDTH=3) (q, d, clr, clk);
     genvar i;
     generate
         for (i=0; i<WIDTH; i = i+1) begin : dff_loop
-            // wire dff_out_i;
-            dffe_ref dff1(.q(q[i]), .d(d[i]), .clr(clr), .clk(clk), .en(1'b1));
+            wire dff_out_i;
+            dffe_ref dff1(.q(dff_out_i), .d(d[i]), .clr(clr), .clk(clk), .en(1'b1));
+            dffe_ref dff2(.q(q[i]), .d(dff_out_i), .clr(clr), .clk(~clk), .en(1'b1));
 
         end
     endgenerate

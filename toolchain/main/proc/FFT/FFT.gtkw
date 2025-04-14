@@ -1,19 +1,17 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Mon Apr 14 02:43:11 2025
+[*] Mon Apr 14 03:18:13 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.vcd"
-[dumpfile_mtime] "Mon Apr 14 02:42:32 2025"
-[dumpfile_size] 4107909
+[dumpfile_mtime] "Mon Apr 14 03:07:03 2025"
+[dumpfile_size] 6200699
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.gtkw"
-[timestart] 3789900
+[timestart] 857500
 [size] 1536 889
 [pos] -1 -1
-*-16.241783 45700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.241783 1040000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] FFT_tb.
 [treeopen] FFT_tb.dut.
-[treeopen] FFT_tb.dut.fft_data_memory.
-[treeopen] FFT_tb.dut.scd_memwrite_7delay.
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[1].
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[2].
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[3].
@@ -23,28 +21,62 @@
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[5].
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[6].
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.scd_first.
-[sst_width] 304
-[signals_width] 222
+[sst_width] 281
+[signals_width] 271
 [sst_expanded] 1
 [sst_vpaned_height] 254
+@29
+FFT_tb.clock
+@28
+FFT_tb.LoadDataWrite
+@22
+FFT_tb.data_imag_in[15:0]
+FFT_tb.data_real_in[15:0]
 @28
 FFT_tb.ACLR
 [color] 2
 FFT_tb.start_FFT
-FFT_tb.dut.fft_AGU.sr1_out
+@22
+FFT_tb.LoadDataAddr[4:0]
+FFT_tb.dut.fft_data_memory.addrA0[4:0]
+FFT_tb.dut.fft_data_memory.addrA1[4:0]
+FFT_tb.dut.fft_data_memory.addrB0[4:0]
+FFT_tb.dut.fft_data_memory.addrB1[4:0]
+FFT_tb.dut.fft_data_memory.G_imag[15:0]
+FFT_tb.dut.fft_data_memory.G_real[15:0]
+FFT_tb.dut.fft_data_memory.H_imag[15:0]
+FFT_tb.dut.fft_data_memory.H_real[15:0]
+FFT_tb.dut.twiddlefactor_imag[15:0]
+FFT_tb.dut.twiddlefactor_real[15:0]
+@28
+FFT_tb.dut.Bank0WriteEN
+FFT_tb.dut.Bank1WriteEN
 FFT_tb.dut.fft_AGU.idx_counter_ovf
 FFT_tb.dut.fft_AGU.level_counter_ovf
 [color] 3
 FFT_tb.FFT_done
+@24
+[color] 6
+FFT_tb.dut.fft_AGU.level_counter_out[2:0]
+[color] 6
+FFT_tb.dut.fft_AGU.idx_counter_out[3:0]
 @22
-FFT_tb.G_imag_out[15:0]
-FFT_tb.G_real_out[15:0]
-FFT_tb.H_imag_out[15:0]
-FFT_tb.H_real_out[15:0]
-FFT_tb.LoadDataAddr[4:0]
-@28
-FFT_tb.LoadDataWrite
-FFT_tb.clock
+[color] 2
+FFT_tb.dut.Xi[15:0]
+[color] 2
+FFT_tb.dut.Xr[15:0]
+[color] 2
+FFT_tb.dut.Yi[15:0]
+[color] 2
+FFT_tb.dut.Yr[15:0]
+FFT_tb.dut.fft_data_memory.Bank0_A_c_out[15:0]
+FFT_tb.dut.fft_data_memory.Bank0_A_r_out[15:0]
+FFT_tb.dut.fft_data_memory.Bank0_B_c_out[15:0]
+FFT_tb.dut.fft_data_memory.Bank0_B_r_out[15:0]
+FFT_tb.dut.fft_data_memory.Bank1_A_c_out[15:0]
+FFT_tb.dut.fft_data_memory.Bank1_A_r_out[15:0]
+FFT_tb.dut.fft_data_memory.Bank1_B_c_out[15:0]
+FFT_tb.dut.fft_data_memory.Bank1_B_r_out[15:0]
 @c00200
 -stuf
 @22
@@ -129,48 +161,7 @@ FFT_tb.dut.fft_data_memory.bank1.clock
 @1401200
 -bank1
 @c00200
--bfu
-@22
-[color] 1
-FFT_tb.dut.fft_data_memory.Xi[15:0]
-[color] 1
-FFT_tb.dut.fft_data_memory.Xr[15:0]
-[color] 1
-FFT_tb.dut.fft_data_memory.Yi[15:0]
-[color] 1
-FFT_tb.dut.fft_data_memory.Yr[15:0]
-FFT_tb.dut.fft_BFU.Areal_in[15:0]
-FFT_tb.dut.fft_BFU.Acomplex_in[15:0]
-FFT_tb.dut.fft_BFU.Breal_in[15:0]
-FFT_tb.dut.fft_BFU.Bcomplex_in[15:0]
-FFT_tb.dut.fft_BFU.wreal_in[15:0]
-FFT_tb.dut.fft_BFU.wcomplex_in[15:0]
-[color] 3
-FFT_tb.dut.fft_BFU.Aprime_real_out[15:0]
-[color] 3
-FFT_tb.dut.fft_BFU.Aprime_complex_out[15:0]
-[color] 3
-FFT_tb.dut.fft_BFU.Bprime_real_out[15:0]
-[color] 3
-FFT_tb.dut.fft_BFU.Bprime_complex_out[15:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_CC[31:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_CR[31:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_C[31:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_C_upper[15:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_RC[31:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_RR[31:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_R[31:0]
-[color] 3
-FFT_tb.dut.fft_BFU.wB_R_upper[15:0]
-@1401200
--bfu
+-dmem
 @28
 [color] 7
 +{mcd_memwrite_9delay q} FFT_tb.dut.mcd_memwrite_9delay.q
@@ -247,7 +238,51 @@ FFT_tb.dut.scd_memwrite_7delay.delay_loop[4].scd.q
 FFT_tb.dut.scd_memwrite_7delay.delay_loop[5].scd.q
 FFT_tb.dut.scd_memwrite_7delay.delay_loop[6].scd.q
 FFT_tb.dut.scd_memwrite_7delay.scd_first.q
-@29
 FFT_tb.dut.scd_memwrite_7delay.scd_first.d
+@1401200
+-dmem
+@c00200
+-bfu
+@22
+[color] 1
+FFT_tb.dut.fft_data_memory.Xi[15:0]
+[color] 1
+FFT_tb.dut.fft_data_memory.Xr[15:0]
+[color] 1
+FFT_tb.dut.fft_data_memory.Yi[15:0]
+[color] 1
+FFT_tb.dut.fft_data_memory.Yr[15:0]
+FFT_tb.dut.fft_BFU.Areal_in[15:0]
+FFT_tb.dut.fft_BFU.Acomplex_in[15:0]
+FFT_tb.dut.fft_BFU.Breal_in[15:0]
+FFT_tb.dut.fft_BFU.Bcomplex_in[15:0]
+FFT_tb.dut.fft_BFU.wreal_in[15:0]
+FFT_tb.dut.fft_BFU.wcomplex_in[15:0]
+[color] 3
+FFT_tb.dut.fft_BFU.Aprime_real_out[15:0]
+[color] 3
+FFT_tb.dut.fft_BFU.Aprime_complex_out[15:0]
+[color] 3
+FFT_tb.dut.fft_BFU.Bprime_real_out[15:0]
+[color] 3
+FFT_tb.dut.fft_BFU.Bprime_complex_out[15:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_CC[31:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_CR[31:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_C[31:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_C_upper[15:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_RC[31:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_RR[31:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_R[31:0]
+[color] 3
+FFT_tb.dut.fft_BFU.wB_R_upper[15:0]
+@1401200
+-bfu
 [pattern_trace] 1
 [pattern_trace] 0

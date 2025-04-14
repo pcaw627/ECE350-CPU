@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Mon Apr 14 02:20:56 2025
+[*] Mon Apr 14 03:06:41 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\single_clock_delay_tb.vcd"
-[dumpfile_mtime] "Mon Apr 14 02:20:27 2025"
-[dumpfile_size] 2832
+[dumpfile_mtime] "Mon Apr 14 03:06:13 2025"
+[dumpfile_size] 4016
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\single_clock_delay.gtkw"
-[timestart] 0
+[timestart] 100160
 [size] 1536 889
-[pos] -35 -35
-*-16.092672 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -1 -1
+*-14.092672 160000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [sst_width] 197
 [signals_width] 150
 [sst_expanded] 1
@@ -20,7 +20,9 @@ single_clock_delay_tb.WIDTH
 @28
 single_clock_delay_tb.clk
 single_clock_delay_tb.clr
+@29
 single_clock_delay_tb.d[2:0]
+@28
 single_clock_delay_tb.expected_q[2:0]
 @420
 single_clock_delay_tb.i

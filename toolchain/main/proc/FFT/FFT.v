@@ -142,10 +142,10 @@ BFU fft_BFU (
 // delay X and Y before going into DMEM
 // put dflip flops here to delay signal
 wire [15:0] Xr_del, Xi_del, Yr_del, Yi_del;
-multi_clock_delay #(.WIDTH(16), .CYCLES(4)) dmem_input_Xi_delay (.q(Xi_del), .d(Xi), .clr(ACLR), .clk(clock));
-multi_clock_delay #(.WIDTH(16), .CYCLES(4)) dmem_input_Xr_delay (.q(Xr_del), .d(Xr), .clr(ACLR), .clk(clock));
-multi_clock_delay #(.WIDTH(16), .CYCLES(4)) dmem_input_Yi_delay (.q(Yi_del), .d(Yi), .clr(ACLR), .clk(clock));
-multi_clock_delay #(.WIDTH(16), .CYCLES(4)) dmem_input_Yr_delay (.q(Yr_del), .d(Yr), .clr(ACLR), .clk(clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Xi_delay (.q(Xi_del), .d(Xi), .clr(ACLR), .clk(clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Xr_delay (.q(Xr_del), .d(Xr), .clr(ACLR), .clk(clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Yi_delay (.q(Yi_del), .d(Yi), .clr(ACLR), .clk(clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Yr_delay (.q(Yr_del), .d(Yr), .clr(ACLR), .clk(clock));
 
 assign G_real_out = Xr; // FFT_done_internal ? Xr : 16'd0;
 assign G_imag_out = Xi; // FFT_done_internal ? Xi : 16'd0;

@@ -157,7 +157,7 @@ assign H_imag_out = Yi; // FFT_done_internal ? Yi : 16'd0;
 // because the diagram is redundant
 
 
-wire LoadEnable = ~FFT_done_internal; // TODO: add additional logic that makes sure we're not writing concurrently
+wire LoadEnable = LoadDataWrite;// && ~FFT_done_internal; // TODO: add additional logic that makes sure we're not writing concurrently
 
 wire [4:0] LoadDataAddr_reversed;
 assign LoadDataAddr_reversed = {LoadDataAddr[0], LoadDataAddr[1], LoadDataAddr[2], LoadDataAddr[3], LoadDataAddr[4]};

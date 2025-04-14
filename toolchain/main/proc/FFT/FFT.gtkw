@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Mon Apr 14 02:24:28 2025
+[*] Mon Apr 14 02:43:11 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.vcd"
-[dumpfile_mtime] "Mon Apr 14 02:21:12 2025"
-[dumpfile_size] 2204192
+[dumpfile_mtime] "Mon Apr 14 02:42:32 2025"
+[dumpfile_size] 4107909
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.gtkw"
-[timestart] 871100
+[timestart] 3789900
 [size] 1536 889
 [pos] -1 -1
-*-16.241783 2446900 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.241783 45700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] FFT_tb.
 [treeopen] FFT_tb.dut.
 [treeopen] FFT_tb.dut.fft_data_memory.
@@ -172,6 +172,8 @@ FFT_tb.dut.fft_BFU.wB_R_upper[15:0]
 @1401200
 -bfu
 @28
+[color] 7
++{mcd_memwrite_9delay q} FFT_tb.dut.mcd_memwrite_9delay.q
 FFT_tb.dut.fft_data_memory.Bank0WriteEN
 FFT_tb.dut.fft_data_memory.Bank1WriteEN
 FFT_tb.dut.fft_data_memory.Bank0_A_WR
@@ -199,15 +201,20 @@ FFT_tb.dut.fft_data_memory.DataA1_i[15:0]
 FFT_tb.dut.fft_data_memory.DataA1_r[15:0]
 FFT_tb.dut.fft_data_memory.DataB_i[15:0]
 FFT_tb.dut.fft_data_memory.DataB_r[15:0]
+[color] 3
 FFT_tb.dut.fft_data_memory.Data_imag_in[15:0]
+[color] 3
 FFT_tb.dut.fft_data_memory.Data_real_in[15:0]
 FFT_tb.dut.fft_data_memory.G_imag[15:0]
 FFT_tb.dut.fft_data_memory.G_real[15:0]
 FFT_tb.dut.fft_data_memory.H_imag[15:0]
 FFT_tb.dut.fft_data_memory.H_real[15:0]
+[color] 3
 FFT_tb.dut.fft_data_memory.LoadDataAddr[4:0]
 @28
+[color] 3
 FFT_tb.dut.fft_data_memory.LoadDataWrite
+[color] 2
 FFT_tb.dut.fft_data_memory.LoadEnable
 FFT_tb.dut.fft_data_memory.RWAddrEN
 @22
@@ -215,9 +222,13 @@ FFT_tb.dut.fft_data_memory.ReadGAddr[4:0]
 FFT_tb.dut.fft_data_memory.ReadHAddr[4:0]
 FFT_tb.dut.fft_data_memory.WriteGAddr[4:0]
 FFT_tb.dut.fft_data_memory.WriteHAddr[4:0]
+[color] 7
 FFT_tb.dut.fft_data_memory.Xi[15:0]
+[color] 7
 FFT_tb.dut.fft_data_memory.Xr[15:0]
+[color] 7
 FFT_tb.dut.fft_data_memory.Yi[15:0]
+[color] 7
 FFT_tb.dut.fft_data_memory.Yr[15:0]
 FFT_tb.dut.fft_data_memory.addrA0[4:0]
 FFT_tb.dut.fft_data_memory.addrA1[4:0]

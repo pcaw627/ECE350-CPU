@@ -20,7 +20,7 @@ module delay_mux_2bitselect #(parameter WIDTH=1) (
         .q(out),
         .d(out_predelay),
         .clr(1'b0),
-        .clk(clk)
+        .clk(clock)
     );
 
 endmodule

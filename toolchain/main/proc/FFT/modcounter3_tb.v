@@ -1,4 +1,4 @@
-module modcounter3_tb;
+module modNcounter_tb;
   parameter N = 5;
   parameter WIDTH = 3;
 
@@ -7,7 +7,7 @@ module modcounter3_tb;
   wire [WIDTH-1:0] out;
   wire cout;
 
-  mod5counter3 u0  ( 	.clk(clk),
+  modNcounter u0  ( 	.clk(clk),
                 	.clr(clr),
                 	.out(out),
                   .cout(cout));

@@ -11,7 +11,7 @@ module FFT_DMEM (
     input [4:0] LoadDataAddr,
     input [4:0] ReadGAddr,
     input [4:0] ReadHAddr,
-    input [4:0] WriteGAddr
+    input [4:0] WriteGAddr,
     input [4:0] WriteHAddr,
     input [15:0] Xr,
     input [15:0] Xi,
@@ -25,73 +25,75 @@ module FFT_DMEM (
 
 
     wire Bank0_A_WR, Bank0_B_WR;
-    single_clock_delay #(parameter WIDTH=1) Bank0_B_WR_delay (.q(Bank0_B_WR), .d(Bank0WriteEN), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(1)) Bank0_B_WR_delay (.q(Bank0_B_WR), .d(Bank0WriteEN), .clr(1'b0), .clk(clock));
     
-    delay_mux_1bitselect #(parameter WIDTH=1) Bank0_A_WR_mux(
+    delay_mux_1bitselect #(.WIDTH(1)) Bank0_A_WR_mux(
         .clock(clock),
-        .select(******idk man*********), // TODO: LoadDataWrite: what select bit do we do for this mux?
+        .select(LoadDataWrite), // TODO: LoadDataWrite: what select bit do we do for this mux?
         .in0(Bank0WriteEN),
         .in1(LoadDataWrite),
         .out(Bank0_A_WR));
 
     wire [15:0] DataA0_r, DataA0_i, DataB_r, DataB_i;
+    wire [4:0] addrA0, addrA1, addrB0, addrB1;
+    wire [15:0] DataA1_r, DataA1_i;
 
-    delay_mux_1bitselect #(parameter WIDTH=16) DataA0_r_mux(
+    delay_mux_1bitselect #(.WIDTH(16)) DataA0_r_mux(
         .clock(clock),
         .select(LoadEnable),
-        .in0(Data_real_in),
-        .in1(Xr),
+        .in0(Xr),
+        .in1(Data_real_in),
         .out(DataA0_r));
 
-    delay_mux_2bitselect #(parameter WIDTH=5) addrA0_mux(
+    delay_mux_2bitselect #(.WIDTH(5)) addrA0_mux(
         .clock(clock),
         .select({LoadEnable, RWAddrEN}),
         .in0(ReadGAddr),
         .in1(WriteGAddr),
         .in2(LoadDataAddr),
-        .in3(5'bX), //unused
+        .in3(LoadDataAddr),
         .out(addrA0));
 
-    single_clock_delay #(parameter WIDTH=16) DataB_r_delay (.q(DataB_r), .d(Yr), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataB_r_delay (.q(DataB_r), .d(Yr), .clr(1'b0), .clk(clock));
     
-    delay_mux_1bitselect #(parameter WIDTH=5) addrB0_mux(
+    delay_mux_1bitselect #(.WIDTH(5)) addrB0_mux(
         .clock(clock),
         .select(RWAddrEN),
         .in0(ReadHAddr),
         .in1(WriteHAddr),
         .out(addrB0));
     
-    delay_mux_1bitselect #(parameter WIDTH=16) DataA0_i_mux(
+    delay_mux_1bitselect #(.WIDTH(16)) DataA0_i_mux(
         .clock(clock),
         .select(LoadEnable),
-        .in0(Data_imag_in),
-        .in1(Xi),
+        .in0(Xi),
+        .in1(Data_imag_in),
         .out(DataA0_i));
     
-    single_clock_delay #(parameter WIDTH=16) DataB_i_delay (.q(DataB_i), .d(Yi), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataB_i_delay (.q(DataB_i), .d(Yi), .clr(1'b0), .clk(clock));
     
-    single_clock_delay #(parameter WIDTH=16) DataA1_r_delay (.q(DataA1_r), .d(Xr), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataA1_r_delay (.q(DataA1_r), .d(Xr), .clr(1'b0), .clk(clock));
     
-    delay_mux_2bitselect #(parameter WIDTH=5) addrA1_mux(
+    delay_mux_2bitselect #(.WIDTH(5)) addrA1_mux(
         .clock(clock),
         .select({LoadEnable, RWAddrEN}),
         .in0(ReadGAddr),
         .in1(WriteGAddr),
         .in2(LoadDataAddr),
-        .in3(5'bX), //unused
+        .in3(LoadDataAddr),
         .out(addrA1));
     
-    delay_mux_1bitselect #(parameter WIDTH=5) addrB1_mux(
+    delay_mux_1bitselect #(.WIDTH(5)) addrB1_mux(
         .clock(clock),
         .select(RWAddrEN),
         .in0(ReadHAddr),
         .in1(WriteHAddr),
         .out(addrB1));
 
-    single_clock_delay #(parameter WIDTH=16) DataA1_i_delay (.q(DataA1_i), .d(Xi), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataA1_i_delay (.q(DataA1_i), .d(Xi), .clr(1'b0), .clk(clock));
     
     wire Bank1WriteEN_delay;
-    single_clock_delay #(parameter WIDTH=1) Bank1_WR_delay (.q(Bank1WriteEN_delay), .d(Bank1WriteEN), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(1)) Bank1_WR_delay (.q(Bank1WriteEN_delay), .d(Bank1WriteEN), .clr(1'b0), .clk(clock));
     
     wire [15:0] Bank0_A_r_out, Bank0_A_c_out, Bank0_B_r_out, Bank0_B_c_out, 
                 Bank1_A_r_out, Bank1_A_c_out, Bank1_B_r_out, Bank1_B_c_out;
@@ -105,7 +107,7 @@ module FFT_DMEM (
         .B_en(Bank0_B_WR),
         .A_dataInR(DataA0_r),
         .A_dataInC(DataA0_i),
-        .B_dataInR(DataB_r)
+        .B_dataInR(DataB_r),
         .B_dataInC(DataB_i),
         .A_addr(addrA0),
         .B_addr(addrB0),
@@ -121,7 +123,7 @@ module FFT_DMEM (
         .B_en(Bank1WriteEN_delay),
         .A_dataInR(DataA1_r),
         .A_dataInC(DataA1_i),
-        .B_dataInR(DataB_r)
+        .B_dataInR(DataB_r),
         .B_dataInC(DataB_i),
         .A_addr(addrA1),
         .B_addr(addrB1),

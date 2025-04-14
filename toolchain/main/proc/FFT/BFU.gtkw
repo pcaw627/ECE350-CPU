@@ -1,29 +1,30 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Sun Apr 13 23:18:59 2025
+[*] Mon Apr 14 01:35:53 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\BFU.vcd"
-[dumpfile_mtime] "Sun Apr 13 23:17:56 2025"
-[dumpfile_size] 2282192
+[dumpfile_mtime] "Sun Apr 13 23:19:58 2025"
+[dumpfile_size] 2534075
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\BFU.gtkw"
-[timestart] 0
+[timestart] 241100
 [size] 1536 889
-[pos] -87 -87
-*-16.648071 150000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -61 -61
+*-16.318466 350000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] BFU_tb.
 [sst_width] 197
 [signals_width] 222
 [sst_expanded] 1
 [sst_vpaned_height] 254
 @22
-BFU_tb.wreal_in[15:0]
-BFU_tb.wcomplex_in[15:0]
-BFU_tb.Areal_in[15:0]
 BFU_tb.Acomplex_in[15:0]
-BFU_tb.Breal_in[15:0]
-BFU_tb.Bcomplex_in[15:0]
-BFU_tb.Bprime_real_out[15:0]
-BFU_tb.Bprime_complex_out[15:0]
-BFU_tb.Aprime_real_out[15:0]
 BFU_tb.Aprime_complex_out[15:0]
+BFU_tb.Aprime_real_out[15:0]
+BFU_tb.Areal_in[15:0]
+BFU_tb.Bcomplex_in[15:0]
+BFU_tb.Bprime_complex_out[15:0]
+BFU_tb.Bprime_real_out[15:0]
+BFU_tb.Breal_in[15:0]
+BFU_tb.wcomplex_in[15:0]
+BFU_tb.wreal_in[15:0]
 [pattern_trace] 1
 [pattern_trace] 0

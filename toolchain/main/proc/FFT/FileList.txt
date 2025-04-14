@@ -4,8 +4,14 @@ BFU.v
 BFU_tb.v
 counter_4.v
 delay_mux_1bitselect.v
+delay_mux_2bitselect.v
 dff.v
+FFT.v
 FFT_tb.v
+FFT_DMEM.v
+FFT_BankRAM.v
+FFT_PurpleRAM.v
+../RAM.v
 ../alu-main/and_1.v
 ../alu-main/or_1.v
 ../alu-main/cla_8.v
@@ -13,9 +19,11 @@ FFT_tb.v
 ../alu-main/cla_32.v
 ../alu-main/full_adder.v
 modNcounter.v
+multi_clock_delay.v
+single_clock_delay.v
+single_clock_delay_tb.v
 rotate_left_by_S_5.v
 rotate_left_by_S_5_tb.v
-single_clock_delay.v
 tff.v
 twiddle_mask_gen.v
 wallace_16.v

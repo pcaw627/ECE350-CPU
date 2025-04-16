@@ -27,6 +27,7 @@ wire Bank0WriteEN, Bank1WriteEN, MemBankReadSelect;
 wire [3:0] twiddle_address;
 wire [4:0] MemA_address, MemB_address;
 wire mem_write;
+wire [2:0] level;
 
 // get outputs from AGU
 AGU fft_AGU(
@@ -36,7 +37,8 @@ AGU fft_AGU(
     .MemB_address(MemB_address),
     .twiddle_address(twiddle_address),
     .mem_write(mem_write),
-    .FFT_done(FFT_done_internal));
+    .FFT_done(FFT_done_internal),
+    .level(level));
 
 // use LUT to convert twiddle address to twiddle factor. 
 reg [15:0] twiddle_real [0:15];
@@ -165,14 +167,14 @@ assign LoadDataAddr_reversed = {LoadDataAddr[0], LoadDataAddr[1], LoadDataAddr[2
 wire [4:0] MemA_address_9delay, MemB_address_9delay;
 wire memwrite_9delay; // to determine RWAddrEN(); this signal determines when we switch between reading and loading addresses into DMEM
 
-multi_clock_delay #(.WIDTH(5), .CYCLES(9)) mcd_memAaddr_9delay(
+multi_clock_delay #(.WIDTH(5), .CYCLES(8)) mcd_memAaddr_9delay(
     .q(MemA_address_9delay),
     .d(MemA_address),
     .clr(1'b0), // maybe add ACLR back
     .clk(clock)
 );
 
-multi_clock_delay #(.WIDTH(5), .CYCLES(9)) mcd_memBaddr_9delay(
+multi_clock_delay #(.WIDTH(5), .CYCLES(8)) mcd_memBaddr_9delay(
     .q(MemB_address_9delay),
     .d(MemB_address),
     .clr(1'b0), // maybe add ACLR back
@@ -186,6 +188,16 @@ multi_clock_delay #(.WIDTH(1), .CYCLES(9)) mcd_memwrite_9delay(
     .clk(clock)
 );
 
+wire level_parity = level[0];
+wire level_parity_delayed;
+
+multi_clock_delay #(.WIDTH(1), .CYCLES(9)) mcd_parity_9delay(
+    .q(level_parity_delayed),
+    .d(level_parity),
+    .clr(1'b0), // maybe add ACLR back
+    .clk(clock)
+);
+
 FFT_DMEM fft_data_memory (
     // inputs
     .clock(clock),
@@ -195,7 +207,7 @@ FFT_DMEM fft_data_memory (
     .Bank1WriteEN(Bank1WriteEN),
     .Data_real_in(data_real_in), // [15:0] 
     .Data_imag_in(data_imag_in),  // [15:0] 
-    .RWAddrEN(mem_write || memwrite_9delay),
+    .RWAddrEN(~level_parity_delayed),
     .BankReadSelect(MemBankReadSelect),
     .LoadDataAddr(LoadDataAddr_reversed), // [4:0]    // NOTE: WHY is there both LoadDataAddr_reversed and LoadDataAddr going into the DMEM module on p19?
     .ReadGAddr(MemA_address), // [4:0]

@@ -5,7 +5,8 @@ module AGU (
     output [4:0] MemB_address,
     output [3:0] twiddle_address,
     output mem_write,
-    output FFT_done);
+    output FFT_done,
+    output [2:0] level);
 
     wire clear_hold, dff1_out, dff2_out, dff3_out, dff4_out, dff5_out, dff6_out, dff7_out, dff8_out, dff9_out;
 
@@ -54,6 +55,7 @@ module AGU (
 
 
     wire [2:0] level_counter_out;
+    assign level = level_counter_out;
     wire level_counter_ovf;
     modNcounter #(.WIDTH(3), .N(5)) level_counter(.clk(dff_idx_overflow_out), .clr(clear_hold), .cout(level_counter_ovf), .out(level_counter_out));
 

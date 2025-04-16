@@ -25,7 +25,7 @@ module FFT_DMEM (
 
 
     wire Bank0_A_WR, Bank0_B_WR;
-    single_clock_delay #(.WIDTH(1)) Bank0_B_WR_delay (.q(Bank0_B_WR), .d(Bank0WriteEN), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(1)) Bank0_B_WR_delay (.q(Bank0_B_WR), .d(Bank0WriteEN), .clr(1'b0), .clk(~clock));
     
     delay_mux_1bitselect #(.WIDTH(1)) Bank0_A_WR_mux(
         .clock(~clock),
@@ -70,30 +70,30 @@ module FFT_DMEM (
         .in1(Data_imag_in),
         .out(DataA0_i));
     
-    single_clock_delay #(.WIDTH(16)) DataB_i_delay (.q(DataB_i), .d(Yi), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataB_i_delay (.q(DataB_i), .d(Yi), .clr(1'b0), .clk(~clock));
     
-    single_clock_delay #(.WIDTH(16)) DataA1_r_delay (.q(DataA1_r), .d(Xr), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataA1_r_delay (.q(DataA1_r), .d(Xr), .clr(1'b0), .clk(~clock));
     
     delay_mux_2bitselect #(.WIDTH(5)) addrA1_mux(
         .clock(~clock),
         .select({RWAddrEN, LoadEnable}),
-        .in0(WriteGAddr),
-        .in1(ReadGAddr),
-        .in2(LoadDataAddr),
+        .in0(ReadGAddr),
+        .in1(LoadDataAddr),
+        .in2(WriteGAddr),
         .in3(LoadDataAddr),
         .out(addrA1));
     
     delay_mux_1bitselect #(.WIDTH(5)) addrB1_mux(
-        .clock(clock),
+        .clock(~clock),
         .select(RWAddrEN),
-        .in0(WriteHAddr),
-        .in1(ReadHAddr),
+        .in0(ReadHAddr),
+        .in1(WriteHAddr),
         .out(addrB1));
 
-    single_clock_delay #(.WIDTH(16)) DataA1_i_delay (.q(DataA1_i), .d(Xi), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataA1_i_delay (.q(DataA1_i), .d(Xi), .clr(1'b0), .clk(~clock));
     
     wire Bank1WriteEN_delay;
-    single_clock_delay #(.WIDTH(1)) Bank1_WR_delay (.q(Bank1WriteEN_delay), .d(Bank1WriteEN), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(1)) Bank1_WR_delay (.q(Bank1WriteEN_delay), .d(Bank1WriteEN), .clr(1'b0), .clk(~clock));
     
     wire [15:0] Bank0_A_r_out, Bank0_A_c_out, Bank0_B_r_out, Bank0_B_c_out, 
                 Bank1_A_r_out, Bank1_A_c_out, Bank1_B_r_out, Bank1_B_c_out;

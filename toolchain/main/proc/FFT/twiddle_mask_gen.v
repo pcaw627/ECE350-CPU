@@ -14,7 +14,7 @@ module twiddle_mask_gen (
         if (clr) begin
             out_intermediate <= 4'b0000;
         end else begin
-            out_intermediate <= {1'b1, out[3:1]};
+            out_intermediate <= {out[3:1], 1'b1};
         end
     end
 

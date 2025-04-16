@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Wed Apr 16 18:52:21 2025
+[*] Wed Apr 16 19:58:02 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.vcd"
-[dumpfile_mtime] "Wed Apr 16 18:51:15 2025"
-[dumpfile_size] 6867845
+[dumpfile_mtime] "Wed Apr 16 19:56:24 2025"
+[dumpfile_size] 8674751
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.gtkw"
-[timestart] 969300
+[timestart] 3582000
 [size] 1536 889
 [pos] -1 -1
-*-16.241783 1212300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.241783 3670000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] FFT_tb.
 [treeopen] FFT_tb.dut.
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[1].
@@ -22,7 +22,7 @@
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[6].
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.scd_first.
 [sst_width] 235
-[signals_width] 271
+[signals_width] 278
 [sst_expanded] 1
 [sst_vpaned_height] 396
 @28
@@ -46,9 +46,7 @@ FFT_tb.dut.fft_data_memory.LoadEnable
 @22
 FFT_tb.dut.fft_data_memory.ReadGAddr[4:0]
 FFT_tb.dut.fft_data_memory.WriteGAddr[4:0]
-@23
 FFT_tb.dut.fft_data_memory.ReadHAddr[4:0]
-@22
 FFT_tb.dut.fft_data_memory.WriteHAddr[4:0]
 [color] 3
 FFT_tb.dut.fft_data_memory.addrA0[4:0]
@@ -62,8 +60,29 @@ FFT_tb.dut.fft_data_memory.G_imag[15:0]
 FFT_tb.dut.fft_data_memory.G_real[15:0]
 FFT_tb.dut.fft_data_memory.H_imag[15:0]
 FFT_tb.dut.fft_data_memory.H_real[15:0]
-FFT_tb.dut.twiddlefactor_imag[15:0]
-FFT_tb.dut.twiddlefactor_real[15:0]
+@c00022
+FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+@28
+(0)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(1)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(2)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(3)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(4)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(5)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(6)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(7)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(8)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(9)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(10)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(11)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(12)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(13)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(14)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+(15)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
+@1401200
+-group_end
+@23
+FFT_tb.dut.twiddlefactor_imag_6delay[15:0]
 @28
 FFT_tb.dut.Bank0WriteEN
 FFT_tb.dut.Bank1WriteEN

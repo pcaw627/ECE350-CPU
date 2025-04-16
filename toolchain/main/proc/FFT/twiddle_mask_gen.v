@@ -7,14 +7,14 @@ module twiddle_mask_gen (
     reg [3:0] out_intermediate;
 
     initial begin 
-        out_intermediate <= 4'b0000;
+        out_intermediate <= 4'b1000;
     end
 
     always @(negedge clock) begin
         if (clr) begin
-            out_intermediate <= 4'b0000;
+            out_intermediate <= 4'b1000;
         end else begin
-            out_intermediate <= {out[3:1], 1'b1};
+            out_intermediate <= {1'b1, out[3:1]};
         end
     end
 

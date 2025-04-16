@@ -44,6 +44,7 @@ AGU fft_AGU(
 reg [15:0] twiddle_real [0:15];
 reg [15:0] twiddle_imag [0:15];
 wire [15:0] twiddlefactor_real, twiddlefactor_imag;
+wire [15:0] twiddlefactor_real_6delay, twiddlefactor_imag_6delay;
 
 // real values lookup table
 initial begin
@@ -68,7 +69,7 @@ end
 // imaginary values lookup table
 initial begin
     twiddle_imag[0]  = 16'h0000;
-    twiddle_imag[1]  = 16'h1859;
+    twiddle_imag[1]  = 16'h18f9;  // discrepancy between waveform and table
     twiddle_imag[2]  = 16'h30fb;
     twiddle_imag[3]  = 16'h471c;
     twiddle_imag[4]  = 16'h5a82;
@@ -82,13 +83,28 @@ initial begin
     twiddle_imag[12] = 16'h5a82;
     twiddle_imag[13] = 16'h471c;
     twiddle_imag[14] = 16'h30fb;
-    twiddle_imag[15] = 16'h1859;
+    twiddle_imag[15] = 16'h18f9;
 end
 
 
 assign twiddlefactor_real = twiddle_real[twiddle_address];
 assign twiddlefactor_imag = twiddle_imag[twiddle_address];
 wire [15:0] G_real, G_imag, H_real, H_imag, Xr, Xi, Yr, Yi;
+
+multi_clock_delay #(.WIDTH(16), .CYCLES(6)) mcd_tw_real_6delay(
+    .q(twiddlefactor_real_6delay),
+    .d(twiddlefactor_real),
+    .clr(ACLR), // TODO: confirm that this clear should be ACLR
+    .clk(~clock)
+);
+
+multi_clock_delay #(.WIDTH(16), .CYCLES(6)) mcd_tw_imag_6delay(
+    .q(twiddlefactor_imag_6delay),
+    .d(twiddlefactor_imag),
+    .clr(ACLR), // TODO: confirm that this clear should be ACLR
+    .clk(~clock)
+);
+
 
 
 
@@ -134,7 +150,7 @@ assign Bank1WriteEN = memwrite_8delay && ~memwrite_tff_out;
 
 // then input to BFU
 BFU fft_BFU (
-    .wreal_in(twiddlefactor_real), .wcomplex_in(twiddlefactor_imag), 
+    .wreal_in(twiddlefactor_real_6delay), .wcomplex_in(twiddlefactor_imag_6delay), 
     .Areal_in(G_real), .Acomplex_in(G_imag), 
     .Breal_in(H_real), .Bcomplex_in(H_imag), 
     .Aprime_complex_out(Xi), .Bprime_complex_out(Yi), .Aprime_real_out(Xr), .Bprime_real_out(Yr)

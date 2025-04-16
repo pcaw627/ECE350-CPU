@@ -76,7 +76,7 @@ module AGU (
     wire [3:0] twiddle_out;
     twiddle_mask_gen twiddle_gen (.clock(dff_idx_overflow_out), .clr(clear_hold), .out(twiddle_out));
 
-    assign twiddle_address = twiddle_out && idx_counter_out;    
+    assign twiddle_address = twiddle_out & idx_counter_out;    
 
     // notes:
 

@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Mon Apr 14 03:18:13 2025
+[*] Tue Apr 15 21:48:14 2025
 [*]
-[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.vcd"
-[dumpfile_mtime] "Mon Apr 14 03:07:03 2025"
-[dumpfile_size] 6200699
-[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.gtkw"
-[timestart] 857500
-[size] 1536 889
+[dumpfile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\FFT\FFT.vcd"
+[dumpfile_mtime] "Tue Apr 15 21:42:53 2025"
+[dumpfile_size] 6873477
+[savefile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\FFT\FFT.gtkw"
+[timestart] 900800
+[size] 2560 1377
 [pos] -1 -1
-*-16.241783 1040000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.241783 1330000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] FFT_tb.
 [treeopen] FFT_tb.dut.
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[1].
@@ -24,10 +24,9 @@
 [sst_width] 281
 [signals_width] 271
 [sst_expanded] 1
-[sst_vpaned_height] 254
-@29
-FFT_tb.clock
+[sst_vpaned_height] 425
 @28
+FFT_tb.clock
 FFT_tb.LoadDataWrite
 @22
 FFT_tb.data_imag_in[15:0]
@@ -38,9 +37,24 @@ FFT_tb.ACLR
 FFT_tb.start_FFT
 @22
 FFT_tb.LoadDataAddr[4:0]
+[color] 3
 FFT_tb.dut.fft_data_memory.addrA0[4:0]
+@28
+[color] 1
+FFT_tb.dut.fft_data_memory.RWAddrEN
+FFT_tb.dut.fft_data_memory.LoadDataWrite
+@29
+[color] 1
+FFT_tb.dut.fft_data_memory.LoadEnable
+@22
+FFT_tb.dut.fft_data_memory.ReadGAddr[4:0]
+FFT_tb.dut.fft_data_memory.WriteGAddr[4:0]
+[color] 1
 FFT_tb.dut.fft_data_memory.addrA1[4:0]
+[color] 3
 FFT_tb.dut.fft_data_memory.addrB0[4:0]
+FFT_tb.dut.fft_data_memory.ReadHAddr[4:0]
+[color] 1
 FFT_tb.dut.fft_data_memory.addrB1[4:0]
 FFT_tb.dut.fft_data_memory.G_imag[15:0]
 FFT_tb.dut.fft_data_memory.G_real[15:0]

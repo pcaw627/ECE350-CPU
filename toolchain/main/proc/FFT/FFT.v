@@ -195,7 +195,7 @@ FFT_DMEM fft_data_memory (
     .Bank1WriteEN(Bank1WriteEN),
     .Data_real_in(data_real_in), // [15:0] 
     .Data_imag_in(data_imag_in),  // [15:0] 
-    .RWAddrEN(memwrite_9delay),
+    .RWAddrEN(mem_write || memwrite_9delay),
     .BankReadSelect(MemBankReadSelect),
     .LoadDataAddr(LoadDataAddr_reversed), // [4:0]    // NOTE: WHY is there both LoadDataAddr_reversed and LoadDataAddr going into the DMEM module on p19?
     .ReadGAddr(MemA_address), // [4:0]

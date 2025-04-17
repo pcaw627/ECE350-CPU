@@ -5,3 +5,7 @@
 ..\SDF-FFT\sdf_tb.v
 ..\SDF-FFT\sdf_fft.v
 ..\SDF-FFT\wallace_16.v
+..\SDF-FFT\Twiddle64.v
+..\FFT\multi_clock_delay.v
+..\FFT\single_clock_delay.v
+..\reg-main\dffe_ref.v

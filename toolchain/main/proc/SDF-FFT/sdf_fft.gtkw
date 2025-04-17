@@ -1,0 +1,58 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Thu Apr 17 06:02:40 2025
+[*]
+[dumpfile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\SDF-FFT\sdf_fft.vcd"
+[dumpfile_mtime] "Thu Apr 17 06:00:01 2025"
+[dumpfile_size] 6161033
+[savefile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\SDF-FFT\sdf_fft.gtkw"
+[timestart] 1029100
+[size] 2560 1377
+[pos] -165 -165
+*-15.000000 1067700 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] sdf_tb.
+[treeopen] sdf_tb.uut.
+[sst_width] 197
+[signals_width] 214
+[sst_expanded] 1
+[sst_vpaned_height] 900
+@420
+sdf_tb.N_SAMPLES
+@28
+sdf_tb.TWO_PI
+@420
+sdf_tb.WIDTH
+@28
+sdf_tb.amplitude
+sdf_tb.angle
+sdf_tb.clock
+sdf_tb.data_in_en
+@22
+sdf_tb.data_in_imag[15:0]
+sdf_tb.data_in_real[15:0]
+@28
+sdf_tb.data_out_en
+sdf_tb.uut.su1_data_out_en
+sdf_tb.uut.su2_data_out_en
+sdf_tb.uut.data_in_en
+@22
+sdf_tb.data_out_imag[15:0]
+sdf_tb.data_out_real[15:0]
+@420
+sdf_tb.i
+@28
+sdf_tb.reset
+sdf_tb.sin_val
+sdf_tb.uut.data_in_en
+@22
+sdf_tb.uut.data_in_imag[15:0]
+sdf_tb.uut.data_in_real[15:0]
+@28
+sdf_tb.uut.data_out_en
+[color] 7
+sdf_tb.uut.reset
+@421
+sdf_tb.data_out_imag[15:0]
+sdf_tb.data_out_real[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

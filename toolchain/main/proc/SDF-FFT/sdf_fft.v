@@ -1,5 +1,10 @@
-module sdf_fft (
-    input clock, reset, data_in_en, data_out_en,
+module sdf_fft #(
+   parameter N=64,
+   parameter M=64,
+   parameter WIDTH=16
+) (
+    input clock, reset, data_in_en, 
+    output data_out_en,
     input [WIDTH-1:0] data_in_real, data_in_imag,
     output [WIDTH-1:0] data_out_real, data_out_imag
 );
@@ -17,7 +22,7 @@ module sdf_fft (
 wire su1_data_out_en, su2_data_out_en;
 wire [WIDTH-1:0] su1_data_out_real, su1_data_out_imag, su2_data_out_real, su2_data_out_imag;
 
-sdf #(.N(64),.M(64),.WIDTH(WIDTH)) SU1 (
+sdf #(.N(N),.M(M),.WIDTH(WIDTH)) SU1 (
     .clock(clock),
     .reset(reset),
     .data_in_en(data_in_en),
@@ -28,7 +33,7 @@ sdf #(.N(64),.M(64),.WIDTH(WIDTH)) SU1 (
     .data_out_imag(su1_data_out_imag) 
 );
 
-sdf #(.N(64),.M(16),.WIDTH(WIDTH)) SU2 (
+sdf #(.N(N),.M(M>>2),.WIDTH(WIDTH)) SU2 (
     .clock(clock),
     .reset(reset),
     .data_in_en(su1_data_out_en),
@@ -39,13 +44,13 @@ sdf #(.N(64),.M(16),.WIDTH(WIDTH)) SU2 (
     .data_out_imag(su2_data_out_imag) 
 );
 
-sdf #(.N(64),.M(4),.WIDTH(WIDTH)) SU3 (
+sdf #(.N(N),.M(M>>4),.WIDTH(WIDTH)) SU3 (
     .clock(clock),
     .reset(reset),
     .data_in_en(su2_data_out_en),
     .data_in_real(su2_data_out_real),
     .data_in_imag(su2_data_out_imag),
-    .data_out_en(su3_data_out_en),
+    .data_out_en(data_out_en),
     .data_out_real(data_out_real),
     .data_out_imag(data_out_imag) 
 );

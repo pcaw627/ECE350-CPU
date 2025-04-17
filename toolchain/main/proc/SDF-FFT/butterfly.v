@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //  Butterfly: Add/Sub and Scaling
 //----------------------------------------------------------------------
-module butterfly #(
+module Butterfly #(
     parameter   WIDTH = 16
 )(
     input signed  [WIDTH-1:0] x0_real,  //  Input Data #0 (real)
@@ -21,6 +21,7 @@ assign  add_real = x0_real + x1_real;
 assign  add_imag = x0_imag + x1_imag;
 assign  sub_real = x0_real - x1_real;
 assign  sub_imag = x0_imag - x1_imag;
+
 //  Scaling
 assign  y0_real = (add_real) >>> 1;
 assign  y0_imag = (add_imag) >>> 1;

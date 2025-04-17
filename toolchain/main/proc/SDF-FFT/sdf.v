@@ -5,10 +5,10 @@ module sdf #(
 ) (
     input clock,
     input reset,
-    input data_in_enable,
+    input data_in_en,
     input [WIDTH-1:0] data_in_real,
     input [WIDTH-1:0] data_in_imag,
-    output data_out_enable,
+    output data_out_en,
     output [WIDTH-1:0] data_out_real,
     output [WIDTH-1:0] data_out_imag
 );
@@ -27,8 +27,19 @@ endfunction
 localparam  LOG_N = log2(N); // Bit Length of N
 localparam  LOG_M = log2(M); // Bit Length of M
 
+reg [WIDTH-1:0] bf1_data_out_real, bf1_data_out_imag;
+
 reg [LOG_N-1:0] data_in_count; // Input Data Count
 
+
+always @(posedge clock or posedge reset) begin
+    if (reset) begin
+        data_in_count <= {LOG_N{1'b0}};
+    end else begin
+        data_in_count <= data_in_en ? (data_in_count + 1'b1) : {LOG_N{1'b0}};
+    end
+end
+assign  bf1_bf = data_in_count[LOG_M-1];
 
 // BUTTERFLY 1
 wire bf1_bf; // Butterfly 1 Add/Sub Enable
@@ -52,7 +63,7 @@ reg [WIDTH-1:0] bf1_do_real, bf1_do_imag;  //  1st Butterfly Output Data (Real a
 
 
 // BUTTERFLY 2
-wire bf2_bf; // Butterfly Add/Sub Enable
+reg bf2_bf; // Butterfly Add/Sub Enable
 
 wire[WIDTH-1:0] bf2_x0_real, bf2_x0_imag, bf2_x1_real, bf2_x1_imag; // Data #0 and #1 TO Butterfly (Real and Imag for each)
 wire[WIDTH-1:0] bf2_y0_real, bf2_y0_imag, bf2_y1_real, bf2_y1_imag; // Data #0 and #1 FROM Butterfly (Real and Imag for each)
@@ -64,7 +75,7 @@ wire[WIDTH-1:0] bf2_sp_real, bf2_sp_imag; // Single-Path Data Output (Real and i
 
 reg bf2_sp_en;  // Single-Path Data Enable
 reg [LOG_N-1:0] bf2_count;  // Single-Path Data Count
-wire bf2_start;  // Single-Path Output Trigger
+reg bf2_start;  // Single-Path Output Trigger
 wire bf2_end;    // End of Single-Path Data
 wire bf2_mj;     // Twiddle (-j) Enable
 
@@ -85,22 +96,34 @@ assign bf1_x0_imag = bf1_bf ? db1_data_out_imag : {WIDTH{1'bx}};
 assign bf1_x1_real = bf1_bf ? data_in_real : {WIDTH{1'bx}};
 assign bf1_x1_imag = bf1_bf ? data_in_imag : {WIDTH{1'bx}};
 
-Butterfly #(.WIDTH(WIDTH),.RH(0)) BF1 (
-    .x0_re(bf1_x0_real), .x0_im(bf1_x0_imag),
-    .x1_re(bf1_x1_real), .x1_im(bf1_x1_imag),
-    .y0_re(bf1_y0_real), .y0_im(bf1_y0_imag),
-    .y1_re(bf1_y1_real), .y1_im(bf1_y1_imag)
+Butterfly #(.WIDTH(WIDTH)) BF1 (
+    .x0_real(bf1_x0_real), .x0_imag(bf1_x0_imag),
+    .x1_real(bf1_x1_real), .x1_imag(bf1_x1_imag),
+    .y0_real(bf1_y0_real), .y0_imag(bf1_y0_imag),
+    .y1_real(bf1_y1_real), .y1_imag(bf1_y1_imag)
 );
 
 // First delay buffer (depth = M/2)
 assign db1_data_in_real = bf1_bf ? bf1_y1_real : data_in_real;
 assign db1_data_in_imag = bf1_bf ? bf1_y1_imag : data_in_imag;
 
-DelayBuffer #(.DEPTH(2**(LOG_M-1)),.WIDTH(WIDTH)) DB1 (
-    .clock(clock),
-    .di_re(db1_data_in_real), .di_im(db1_data_in_imag),
-    .do_re(db1_data_out_real), .do_im(db1_data_out_imag)
+
+
+
+multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-1))) DB1_real (
+    .q(db1_data_out_real),
+    .d(db1_data_in_real),
+    .clr(reset),
+    .clk(clock)
 );
+
+multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-1))) DB1_imag (
+    .q(db1_data_out_imag),
+    .d(db1_data_in_imag),
+    .clr(reset),
+    .clk(clock)
+);
+
 
 // Single-path data formation with special -j handling
 assign bf1_sp_real = bf1_bf ? bf1_y0_real : 
@@ -109,6 +132,7 @@ assign bf1_sp_imag = bf1_bf ? bf1_y0_imag :
                                       (bf1_mj ? -db1_data_out_real : db1_data_out_imag);
 
 // Control logic
+
 assign bf1_start = (data_in_count == (2**(LOG_M-1)-1));
 assign bf1_end = (bf1_count == (2**LOG_N-1));
 assign bf1_mj = (bf1_count[LOG_M-1:LOG_M-2] == 2'd3);
@@ -148,11 +172,11 @@ assign bf2_x0_imag = bf2_bf ? db2_data_out_imag : {WIDTH{1'bx}};
 assign bf2_x1_real = bf2_bf ? bf1_data_out_real : {WIDTH{1'bx}};
 assign bf2_x1_imag = bf2_bf ? bf1_data_out_imag : {WIDTH{1'bx}};
 
-Butterfly #(.WIDTH(WIDTH),.RH(1)) BF2 (
-    .x0_re(bf2_x0_real), .x0_im(bf2_x0_imag),
-    .x1_re(bf2_x1_real), .x1_im(bf2_x1_imag),
-    .y0_re(bf2_y0_real), .y0_im(bf2_y0_imag),
-    .y1_re(bf2_y1_real), .y1_im(bf2_y1_imag)
+Butterfly #(.WIDTH(WIDTH)) BF2 (
+    .x0_real(bf2_x0_real), .x0_imag(bf2_x0_imag),
+    .x1_real(bf2_x1_real), .x1_imag(bf2_x1_imag),
+    .y0_real(bf2_y0_real), .y0_imag(bf2_y0_imag),
+    .y1_real(bf2_y1_real), .y1_imag(bf2_y1_imag)
 );
 
 // Second delay buffer (depth = M/4)
@@ -160,11 +184,20 @@ assign db2_data_in_real = bf2_bf ? bf2_y1_real : bf1_data_out_real;
 assign db2_data_in_imag = bf2_bf ? bf2_y1_imag : bf1_data_out_imag;
 wire [WIDTH-1:0] db2_data_out_real, db2_data_out_imag;
 
-DelayBuffer #(.DEPTH(2**(LOG_M-2)),.WIDTH(WIDTH)) DB2 (
-    .clock(clock),
-    .di_re(db2_data_in_real), .di_im(db2_data_in_imag),
-    .do_re(db2_data_out_real), .do_im(db2_data_out_imag)
+multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-2))) DB2_real (
+    .q(db2_data_out_real),
+    .d(db2_data_in_real),
+    .clr(reset),
+    .clk(clock)
 );
+
+multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-2))) DB2_imag (
+    .q(db2_data_out_imag),
+    .d(db2_data_in_imag),
+    .clr(reset),
+    .clk(clock)
+);
+
 
 // Single-path data formation
 assign bf2_sp_real = bf2_bf ? bf2_y0_real : db2_data_out_real;
@@ -210,9 +243,9 @@ reg  [WIDTH-1:0] mu_data_out_real, mu_data_out_imag;
 reg              mu_data_out_en;
 
 // Twiddle factor lookup
-Twiddle TW (
+Twiddle64 TW (
     .clock(clock), .addr(tw_addr),
-    .tw_re(tw_real), .tw_im(tw_imag)
+    .tw_real_out(tw_real), .tw_imag_out(tw_imag)
 );
 
 // Bypass multiplication when twiddle is 1+0j
@@ -224,7 +257,7 @@ end
 assign mu_a_real = mu_en ? bf2_data_out_real : {WIDTH{1'bx}};
 assign mu_a_imag = mu_en ? bf2_data_out_imag : {WIDTH{1'bx}};
 
-Multiply #(.WIDTH(WIDTH)) MU (
+mult #(.WIDTH(WIDTH)) MU (
     .a_re(mu_a_real), .a_im(mu_a_imag),
     .b_re(tw_real), .b_im(tw_imag),
     .m_re(mu_m_real), .m_im(mu_m_imag)

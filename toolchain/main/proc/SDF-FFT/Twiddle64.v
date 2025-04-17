@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //  Twiddle: 64-Point Twiddle Table for Radix-2^2 Butterfly
 //----------------------------------------------------------------------
-module Twiddle #(
+module Twiddle64 #(
     parameter   TW_FF = 1 //  Use Output Register
 )(
     input clock,

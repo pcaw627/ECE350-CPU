@@ -2,7 +2,7 @@
 
 module sdf_tb;
   // Parameters
-  localparam WIDTH     = 16;
+  localparam WIDTH = 16;
   localparam N_SAMPLES = 64;
   real       TWO_PI    = 6.283185307179586;
   real       amplitude;
@@ -10,21 +10,21 @@ module sdf_tb;
   // DUT Signals
   reg                     clock;
   reg                     reset;
-  reg                     di_en;
-  reg   [WIDTH-1:0]       di_re, di_im;
-  wire                    do_en;
-  wire  [WIDTH-1:0]       do_re, do_im;
+  reg                     data_in_en;
+  reg   [WIDTH-1:0]       data_in_real, data_in_imag;
+  wire                    data_out_en;
+  wire  [WIDTH-1:0]       data_out_real, data_out_imag;
 
   // Instantiate the 64-point FFT
-  sdf_fft #(.WIDTH(WIDTH)) uut (
+  sdf_fft #(.WIDTH(16)) uut (
     .clock  (clock),
     .reset  (reset),
-    .di_en  (di_en),
-    .di_re  (di_re),
-    .di_im  (di_im),
-    .do_en  (do_en),
-    .do_re  (do_re),
-    .do_im  (do_im)
+    .data_in_en  (data_in_en),
+    .data_in_real  (data_in_real),
+    .data_in_imag  (data_in_imag),
+    .data_out_en  (data_out_en),
+    .data_out_real  (data_out_real),
+    .data_out_imag  (data_out_imag)
   );
 
   // Clock generation: 10 ns period
@@ -41,9 +41,9 @@ module sdf_tb;
 
     // Reset sequence
     reset = 1;
-    di_en = 0;
-    di_re = 0;
-    di_im = 0;
+    data_in_en = 0;
+    data_in_real = 0;
+    data_in_imag = 0;
     repeat (2) @(posedge clock);
     reset = 0;
 
@@ -52,20 +52,20 @@ module sdf_tb;
       angle   = TWO_PI * i / N_SAMPLES;
       sin_val = amplitude * $sin(angle);
       @(posedge clock);
-      di_en = 1;
-      di_re = $rtoi(sin_val);
-      di_im = 0;
+      data_in_en = 1;
+      data_in_real = $rtoi(sin_val);
+      data_in_imag = 0;
     end
 
     // Turn off input
     @(posedge clock);
-    di_en = 0;
+    data_in_en = 0;
   end
 
 // Monitor FFT output
   always @(posedge clock) begin
-    if (do_en) begin
-      $display("%0t ns: Out[%0d] = %0d (Re), %0d (Im)", $time, $urandom_range(0, N_SAMPLES-1), $signed(do_re), $signed(do_im));
+    if (data_out_en) begin
+      $display("%0t ns: Out[%0d] = %0d (Re), %0d (Im)", $time, $urandom_range(0, N_SAMPLES-1), $signed(data_out_real), $signed(data_out_imag));
     end
   end
 
@@ -76,8 +76,10 @@ module sdf_tb;
   end
 
 initial begin
-        $dumpfile("FFT.vcd");
-        $dumpvars(0, TB64);
+        $dumpfile("sdf_fft.vcd");
+        $dumpvars(0, sdf_tb);
 end
 
 endmodule
+
+// clear; iverilog -o sdf_fft -c FileList.txt -s sdf_tb; vvp sdf_fft; gtkwave sdf_fft.vcd

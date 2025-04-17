@@ -96,7 +96,7 @@ assign bf1_x0_imag = bf1_bf ? db1_data_out_imag : {WIDTH{1'bx}};
 assign bf1_x1_real = bf1_bf ? data_in_real : {WIDTH{1'bx}};
 assign bf1_x1_imag = bf1_bf ? data_in_imag : {WIDTH{1'bx}};
 
-Butterfly #(.WIDTH(WIDTH)) BF1 (
+Butterfly #(.WIDTH(WIDTH), .RH(0)) BF1 (
     .x0_real(bf1_x0_real), .x0_imag(bf1_x0_imag),
     .x1_real(bf1_x1_real), .x1_imag(bf1_x1_imag),
     .y0_real(bf1_y0_real), .y0_imag(bf1_y0_imag),
@@ -172,7 +172,7 @@ assign bf2_x0_imag = bf2_bf ? db2_data_out_imag : {WIDTH{1'bx}};
 assign bf2_x1_real = bf2_bf ? bf1_data_out_real : {WIDTH{1'bx}};
 assign bf2_x1_imag = bf2_bf ? bf1_data_out_imag : {WIDTH{1'bx}};
 
-Butterfly #(.WIDTH(WIDTH)) BF2 (
+Butterfly #(.WIDTH(WIDTH), .RH(1)) BF2 (
     .x0_real(bf2_x0_real), .x0_imag(bf2_x0_imag),
     .x1_real(bf2_x1_real), .x1_imag(bf2_x1_imag),
     .y0_real(bf2_y0_real), .y0_imag(bf2_y0_imag),

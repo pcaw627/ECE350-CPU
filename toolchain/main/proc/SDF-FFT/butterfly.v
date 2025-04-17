@@ -2,7 +2,8 @@
 //  Butterfly: Add/Sub and Scaling
 //----------------------------------------------------------------------
 module Butterfly #(
-    parameter   WIDTH = 16
+    parameter   WIDTH = 16,
+    parameter   RH = 0  //  Round Half Up
 )(
     input signed  [WIDTH-1:0] x0_real,  //  Input Data #0 (real)
     input signed  [WIDTH-1:0] x0_imag,  //  Input Data #0 (imag)
@@ -23,9 +24,9 @@ assign  sub_real = x0_real - x1_real;
 assign  sub_imag = x0_imag - x1_imag;
 
 //  Scaling
-assign  y0_real = (add_real) >>> 1;
-assign  y0_imag = (add_imag) >>> 1;
-assign  y1_real = (sub_real) >>> 1;
-assign  y1_imag = (sub_imag) >>> 1;
+assign  y0_real = (add_real + RH) >>> 1;
+assign  y0_imag = (add_imag + RH) >>> 1;
+assign  y1_real = (sub_real + RH) >>> 1;
+assign  y1_imag = (sub_imag + RH) >>> 1;
 
 endmodule

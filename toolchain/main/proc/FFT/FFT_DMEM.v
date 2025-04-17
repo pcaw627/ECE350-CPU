@@ -54,7 +54,7 @@ module FFT_DMEM (
         .in3(LoadDataAddr),
         .out(addrA0));
 
-    single_clock_delay #(.WIDTH(16)) DataB_r_delay (.q(DataB_r), .d(Yr), .clr(1'b0), .clk(clock));
+    single_clock_delay #(.WIDTH(16)) DataB_r_delay (.q(DataB_r), .d(Yr), .clr(1'b0), .clk(~clock));
     
     delay_mux_1bitselect #(.WIDTH(5)) addrB0_mux(
         .clock(~clock),

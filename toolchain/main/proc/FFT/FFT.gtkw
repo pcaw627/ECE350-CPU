@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Wed Apr 16 19:58:02 2025
+[*] Thu Apr 17 01:08:32 2025
 [*]
-[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.vcd"
-[dumpfile_mtime] "Wed Apr 16 19:56:24 2025"
+[dumpfile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\FFT\FFT.vcd"
+[dumpfile_mtime] "Thu Apr 17 01:03:48 2025"
 [dumpfile_size] 8674751
-[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\main\proc\FFT\FFT.gtkw"
-[timestart] 3582000
-[size] 1536 889
+[savefile] "C:\Users\Phillip Williams\DUKE\ECE 350\ECE350-CPU\toolchain\main\proc\FFT\FFT.gtkw"
+[timestart] 930100
+[size] 2560 1377
 [pos] -1 -1
-*-16.241783 3670000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.241783 1032000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] FFT_tb.
 [treeopen] FFT_tb.dut.
 [treeopen] FFT_tb.dut.scd_memwrite_7delay.delay_loop[1].
@@ -24,7 +24,7 @@
 [sst_width] 235
 [signals_width] 278
 [sst_expanded] 1
-[sst_vpaned_height] 396
+[sst_vpaned_height] 663
 @28
 FFT_tb.clock
 FFT_tb.LoadDataWrite
@@ -56,9 +56,14 @@ FFT_tb.dut.fft_data_memory.addrA1[4:0]
 FFT_tb.dut.fft_data_memory.addrB0[4:0]
 [color] 1
 FFT_tb.dut.fft_data_memory.addrB1[4:0]
+@23
+[color] 6
 FFT_tb.dut.fft_data_memory.G_imag[15:0]
+[color] 6
 FFT_tb.dut.fft_data_memory.G_real[15:0]
+[color] 6
 FFT_tb.dut.fft_data_memory.H_imag[15:0]
+[color] 6
 FFT_tb.dut.fft_data_memory.H_real[15:0]
 @c00022
 FFT_tb.dut.twiddlefactor_real_6delay[15:0]
@@ -81,7 +86,7 @@ FFT_tb.dut.twiddlefactor_real_6delay[15:0]
 (15)FFT_tb.dut.twiddlefactor_real_6delay[15:0]
 @1401200
 -group_end
-@23
+@22
 FFT_tb.dut.twiddlefactor_imag_6delay[15:0]
 @28
 FFT_tb.dut.Bank0WriteEN
@@ -319,5 +324,14 @@ FFT_tb.dut.fft_BFU.wB_R[31:0]
 FFT_tb.dut.fft_BFU.wB_R_upper[15:0]
 @1401200
 -bfu
+@22
+FFT_tb.dut.G_imag[15:0]
+FFT_tb.dut.G_imag_out[15:0]
+FFT_tb.dut.G_real[15:0]
+FFT_tb.dut.G_real_out[15:0]
+FFT_tb.dut.H_imag[15:0]
+FFT_tb.dut.H_imag_out[15:0]
+FFT_tb.dut.H_real[15:0]
+FFT_tb.dut.H_real_out[15:0]
 [pattern_trace] 1
 [pattern_trace] 0

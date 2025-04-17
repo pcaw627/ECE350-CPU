@@ -118,21 +118,21 @@ multi_clock_delay #(.WIDTH(1), .CYCLES(7)) scd_memwrite_7delay(
     .q(memwrite_7delay),
     .d(mem_write),
     .clr(ACLR), // TODO: confirm that this clear should be ACLR
-    .clk(clock)
+    .clk(~clock)
 );
 
 multi_clock_delay #(.WIDTH(1), .CYCLES(8)) scd_memwrite_8delay(
     .q(memwrite_8delay),
     .d(mem_write),
     .clr(ACLR),
-    .clk(clock)
+    .clk(~clock)
 );
 
 dffe_ref memwrite_7delay_dff(
     .q(memwrite_7delay_dff_out),
     .d(memwrite_7delay),
     .clr(ACLR), // maybe change this back to 1'b0
-    .clk(clock),
+    .clk(~clock),
     .en(1'b1)
 );
 
@@ -140,7 +140,7 @@ wire memwrite_7delay_and_out = ~memwrite_7delay && memwrite_7delay_dff_out;
 
 tff memwrite_tff(.q(memwrite_tff_out), .t(memwrite_7delay_and_out), 
     .clr(ACLR), // TODO: confirm that this clear should be ACLR
-    .clk(clock)
+    .clk(~clock)
 );
 
 assign MemBankReadSelect = memwrite_tff_out;
@@ -160,15 +160,15 @@ BFU fft_BFU (
 // delay X and Y before going into DMEM
 // put dflip flops here to delay signal
 wire [15:0] Xr_del, Xi_del, Yr_del, Yi_del;
-multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Xi_delay (.q(Xi_del), .d(Xi), .clr(ACLR), .clk(clock));
-multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Xr_delay (.q(Xr_del), .d(Xr), .clr(ACLR), .clk(clock));
-multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Yi_delay (.q(Yi_del), .d(Yi), .clr(ACLR), .clk(clock));
-multi_clock_delay #(.WIDTH(16), .CYCLES(5)) dmem_input_Yr_delay (.q(Yr_del), .d(Yr), .clr(ACLR), .clk(clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(1)) dmem_input_Xi_delay (.q(Xi_del), .d(Xi), .clr(ACLR), .clk(~clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(1)) dmem_input_Xr_delay (.q(Xr_del), .d(Xr), .clr(ACLR), .clk(~clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(1)) dmem_input_Yi_delay (.q(Yi_del), .d(Yi), .clr(ACLR), .clk(~clock));
+multi_clock_delay #(.WIDTH(16), .CYCLES(1)) dmem_input_Yr_delay (.q(Yr_del), .d(Yr), .clr(ACLR), .clk(~clock));
 
-assign G_real_out = Xr; // FFT_done_internal ? Xr : 16'd0;
-assign G_imag_out = Xi; // FFT_done_internal ? Xi : 16'd0;
-assign H_real_out = Yr; // FFT_done_internal ? Yr : 16'd0;
-assign H_imag_out = Yi; // FFT_done_internal ? Yi : 16'd0;
+assign G_real_out = Xr_del; // FFT_done_internal ? Xr : 16'd0;
+assign G_imag_out = Xi_del; // FFT_done_internal ? Xi : 16'd0;
+assign H_real_out = Yr_del; // FFT_done_internal ? Yr : 16'd0;
+assign H_imag_out = Yi_del; // FFT_done_internal ? Yi : 16'd0;
 
 // WHY are there 8 16bit inputs on FFT diagram on p19, but just 6 16bit inputs in dmem diagram on p18?
 // maybe add undelayed Xi Xr here...
@@ -183,18 +183,18 @@ assign LoadDataAddr_reversed = {LoadDataAddr[0], LoadDataAddr[1], LoadDataAddr[2
 wire [4:0] MemA_address_9delay, MemB_address_9delay;
 wire memwrite_9delay; // to determine RWAddrEN(); this signal determines when we switch between reading and loading addresses into DMEM
 
-multi_clock_delay #(.WIDTH(5), .CYCLES(8)) mcd_memAaddr_9delay(
+multi_clock_delay #(.WIDTH(5), .CYCLES(6)) mcd_memAaddr_9delay(
     .q(MemA_address_9delay),
     .d(MemA_address),
     .clr(1'b0), // maybe add ACLR back
-    .clk(clock)
+    .clk(~clock)
 );
 
-multi_clock_delay #(.WIDTH(5), .CYCLES(8)) mcd_memBaddr_9delay(
+multi_clock_delay #(.WIDTH(5), .CYCLES(6)) mcd_memBaddr_9delay(
     .q(MemB_address_9delay),
     .d(MemB_address),
     .clr(1'b0), // maybe add ACLR back
-    .clk(clock)
+    .clk(~clock)
 );
 
 multi_clock_delay #(.WIDTH(1), .CYCLES(9)) mcd_memwrite_9delay(
@@ -211,12 +211,12 @@ multi_clock_delay #(.WIDTH(1), .CYCLES(9)) mcd_parity_9delay(
     .q(level_parity_delayed),
     .d(level_parity),
     .clr(1'b0), // maybe add ACLR back
-    .clk(clock)
+    .clk(~clock)
 );
 
 FFT_DMEM fft_data_memory (
     // inputs
-    .clock(clock),
+    .clock(~clock),
     .LoadDataWrite(LoadDataWrite),
     .LoadEnable(LoadEnable),
     .Bank0WriteEN(Bank0WriteEN),

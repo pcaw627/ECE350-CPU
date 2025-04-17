@@ -5,9 +5,6 @@ module FFT_PurpleRAM (
     output [15:0] A_dataOut, B_dataOut
 );
 
-    wire A_en;
-    wire [4:0] A_addr;
-    wire [15:0] A_dataIn, A_dataOut;
     RAM #(.DATA_WIDTH(16), .ADDRESS_WIDTH(5), .DEPTH(32)) A(
         .clk(clock),
         .wEn(A_en),
@@ -17,9 +14,6 @@ module FFT_PurpleRAM (
     );
 
     
-    wire B_en;
-    wire [4:0] B_addr;
-    wire [15:0] B_dataIn, B_dataOut;
     RAM #(.DATA_WIDTH(16), .ADDRESS_WIDTH(5), .DEPTH(32)) B(
         .clk(clock),
         .wEn(B_en),

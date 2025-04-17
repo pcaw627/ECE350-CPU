@@ -3,6 +3,8 @@
 !reg-main/*
 multdiv-main/*
 multdiv-main/multdiv
+SDF-FFT/*
+FFT/*
 # !multdiv-main/*.v
 # Include .v files
 !*.v

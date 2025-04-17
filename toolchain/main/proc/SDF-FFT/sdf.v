@@ -113,23 +113,23 @@ assign db1_data_in_imag = bf1_bf ? bf1_y1_imag : data_in_imag;
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-1))) DB1_real (
     .q(db1_data_out_real),
     .d(db1_data_in_real),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-1))) DB1_imag (
     .q(db1_data_out_imag),
     .d(db1_data_in_imag),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 
 
 // Single-path data formation with special -j handling
 assign bf1_sp_real = bf1_bf ? bf1_y0_real : 
-                                      (bf1_mj ? db1_data_out_imag : db1_data_out_real);
+                    (bf1_mj ? db1_data_out_imag : db1_data_out_real);
 assign bf1_sp_imag = bf1_bf ? bf1_y0_imag : 
-                                      (bf1_mj ? -db1_data_out_real : db1_data_out_imag);
+                    (bf1_mj ? -db1_data_out_real : db1_data_out_imag);
 
 // Control logic
 
@@ -139,11 +139,11 @@ assign bf1_mj = (bf1_count[LOG_M-1:LOG_M-2] == 2'd3);
 
 always @(posedge clock or posedge reset) begin
     if (reset) begin
-        bf1_sp_en <= 0;
-        bf1_count <= 0;
+        bf1_sp_en <= 1'b0;
+        bf1_count <= {LOG_N{1'b0}};
     end else begin
         bf1_sp_en <= bf1_start ? 1'b1 : bf1_end ? 1'b0 : bf1_sp_en;
-        bf1_count <= bf1_sp_en ? (bf1_count + 1'b1) : 0;
+        bf1_count <= bf1_sp_en ? (bf1_count + 1'b1) : {LOG_N{1'b0}};
     end
 end
 
@@ -187,14 +187,14 @@ wire [WIDTH-1:0] db2_data_out_real, db2_data_out_imag;
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-2))) DB2_real (
     .q(db2_data_out_real),
     .d(db2_data_in_real),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-2))) DB2_imag (
     .q(db2_data_out_imag),
     .d(db2_data_in_imag),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 
@@ -212,11 +212,11 @@ assign bf2_end = (bf2_count == (2**LOG_N-1));
 always @(posedge clock or posedge reset) begin
     if (reset) begin
         bf2_sp_en <= 0;
-        bf2_count <= 0;
+        bf2_count <= {LOG_N{1'b0}};
         bf2_data_out_en <= 0;
     end else begin
         bf2_sp_en <= bf2_start ? 1'b1 : bf2_end ? 1'b0 : bf2_sp_en;
-        bf2_count <= bf2_sp_en ? (bf2_count + 1'b1) : 0;
+        bf2_count <= bf2_sp_en ? (bf2_count + 1'b1) : {LOG_N{1'b0}};
         bf2_data_out_en <= bf2_sp_en;
     end
 end
@@ -250,7 +250,7 @@ Twiddle64 TW (
 
 // Bypass multiplication when twiddle is 1+0j
 always @(posedge clock) begin
-    mu_en <= (tw_addr != 0);
+    mu_en <= (tw_addr != {LOG_N{1'b0}});
 end
 
 // Complex multiplier

@@ -370,7 +370,8 @@ module processor(
 
 
     // FFT opcode = 01000
-    
+
+    reg [31:0] fft_regs [0:63]; // holding values in between fft, modulation, and ifft
 
     wire  fft_in_en, fft_reset;
     wire [WIDTH-1:0] fft_in_re,  fft_in_im;
@@ -382,29 +383,72 @@ module processor(
     wire ifft_out_en;
     wire [WIDTH-1:0] ifft_out_re, ifft_out_im;
 
+    wire ex_is_fft, ex_is_ifft;
+    assign ex_is_fft = (idex_instr_out[31:27] == 5'b01000);
+    assign ex_is_ifft = (idex_instr_out[31:27] == 5'b01001);
 
-    assign fft_reset = reset; // figure this out
+
+    reg [7:0] fft_count;
+    always @(posedge clock or posedge fft_reset) begin
+        if (fft_reset) begin
+            fft_count <= 7'd138;
+        end else begin
+            fft_count <= ex_is_fft ? (fft_count - 1'b1) : fft_count;
+        end
+    end
+
+    
+    assign fft_reset = reset | (~ex_is_fft | ~ex_is_ifft) | ((ifid_instr_out[31:27] == 5'b01000) | (ifid_instr_out[31:27] == 5'b01001));
+    assign fft_in_en = (fft_count > 73) | (fft_count<138);
+
+    // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
+    assign fft_in_re = {adc_in, 4'd0};
+
+
     sdf_fft  #(.WIDTH(WIDTH)) U_FFT  (
       .clock        (clock),
       .reset        (fft_reset),
       .data_in_en   (fft_in_en),
       .data_in_real (fft_in_re),
-      .data_in_imag (fft_in_im),
-      .data_out_en  (fft_out_en),
+      .data_in_imag (16'd0),
+      .data_out_en  (fft_out_en | ex_is_fft),
       .data_out_real(fft_out_re),
-      .data_out_imag(fft_out_im)
+      .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
     );
+
+   function integer bitrev6;       // 6‑bit bit‑reverse
+      input integer idx;
+      integer j;
+      begin
+         bitrev6 = 0;
+         for (j = 0; j < 6; j = j + 1)
+            bitrev6 = bitrev6 | (((idx >> j) & 1) << (5 - j));
+      end
+   endfunction
+
+    reg [5:0] fft_data_out_count;
+    always @(posedge clock or posedge fft_reset) begin
+        if (fft_reset) begin
+            fft_data_out_count <= 5'd0;
+        end if (fft_out_en) begin
+            fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
+            assign fft_regs [bitrev6(fft_data_out_count)] = fft_out_re; // inverse bit order for output
+        end
+    end
+
+    
+
 
     // ifft opcode = 01001
     sdf_ifft #(.WIDTH(WIDTH)) U_IFFT (
       .clock        (clock),
       .reset        (fft_reset),
       .data_in_en   (ifft_in_en),
-      .data_in_real (ifft_in_re),
+      .data_in_real (16'd0),
       .data_in_imag (ifft_in_im),
       .data_out_en  (ifft_out_en),
       .data_out_real(ifft_out_re),
-      .data_out_imag(ifft_out_im)
+      .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
     );
 
 
@@ -449,6 +493,11 @@ module processor(
     wire stall_multdiv, stall_fft, stall_ifft, stall;
     assign stall_multdiv = idex_isMultDiv_out & ~md_resultRDY;
     
+    assign stall_fft = ex_is_fft & (fft_count != 8'd0);
+
+    assign stall_ifft = ex_is_ifft & (ifft_count != 8'd0);
+
+
     assign stall = stall_multdiv | stall_fft | stall_ifft;
 
 
@@ -598,6 +647,8 @@ module processor(
     wire is_jalWB = memwb_instr_out[31:27] == 5'b00011;
     wire is_setxWB = memwb_instr_out[31:27] == 5'b10101;
     wire is_storeWB = memwb_instr_out[31:27] == 5'b00111;
+    wire memwb_is_fft = memwb_instr_out[31:27] == 5'b01000;
+
 
     wire [4:0] normal_rd = memwb_instr_out[26:22];
     wire [4:0] wb_rd;
@@ -612,7 +663,7 @@ module processor(
                     (is_jalWB ? memwb_link_out : memwb_result_out);
     assign data_writeReg = (failed_jump) ? 32'd0 : wb_data;
     
-    assign ctrl_writeEnable = is_storeWB ? 1'b0 : 1'b1;
+    assign ctrl_writeEnable = (is_storeWB | memwb_is_fft) ? 1'b0 : 1'b1;
     
     
 endmodule

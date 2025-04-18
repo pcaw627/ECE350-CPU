@@ -66,8 +66,8 @@ module processor(
     
     // Define a dedicated PC write-enable.
     wire pc_we;
-    // (stall_multdiv is defined later in the EX stage.)
-    assign pc_we = ~stall_multdiv;
+    // (stall is defined later in the EX stage.)
+    assign pc_we = ~stall;
     
     // PC register (latched on falling edge) now uses pc_we.
     wire [31:0] pc_in, pc_out;
@@ -140,7 +140,7 @@ module processor(
 
     wire flushControl = isJump_ID || branchTaken || bexTaken || isJr_ID || isJal_ID;
     wire we_ifid;
-    assign we_ifid = ~stall_multdiv;
+    assign we_ifid = ~stall;
     
     registerDFFE #(.WIDTH(32)) IFID_INSTR (
         .clock(~clock),
@@ -221,7 +221,7 @@ module processor(
     // ID/EX pipeline latches for register data
     wire [31:0] idex_A_out, idex_B_out;
     wire we_idex;  // pipeline register enable (also gated by stall)
-    assign we_idex = ~stall_multdiv; // flush during jump
+    assign we_idex = ~stall; // flush during jump
     
     registerDFFE #(.WIDTH(32)) ID_EX_A (
         .clock(~clock),
@@ -336,7 +336,7 @@ module processor(
         .clr(~idex_isMultDiv_out || md_resultRDY),
         .en(1'b1)
     );
-    
+
     // Generate one-cycle start pulse: high only when the instruction is mult/div and counter is zero.
     wire multdiv_start;
     assign multdiv_start = idex_isMultDiv_out & (ex_cycle_counter == 6'd0);
@@ -363,6 +363,55 @@ module processor(
         .data_exception(md_exception),
         .data_resultRDY(md_resultRDY)
     );
+
+
+
+    // FFT & IFFT Multi-cycle operations
+
+
+    // FFT opcode = 01000
+    
+
+    wire  fft_in_en, fft_reset;
+    wire [WIDTH-1:0] fft_in_re,  fft_in_im;
+    wire fft_out_en;
+    wire [WIDTH-1:0] fft_out_re, fft_out_im;
+    // inverse FFT
+    wire ifft_in_en;
+    wire [WIDTH-1:0] ifft_in_re, ifft_in_im;
+    wire ifft_out_en;
+    wire [WIDTH-1:0] ifft_out_re, ifft_out_im;
+
+
+    assign fft_reset = reset; // figure this out
+    sdf_fft  #(.WIDTH(WIDTH)) U_FFT  (
+      .clock        (clock),
+      .reset        (fft_reset),
+      .data_in_en   (fft_in_en),
+      .data_in_real (fft_in_re),
+      .data_in_imag (fft_in_im),
+      .data_out_en  (fft_out_en),
+      .data_out_real(fft_out_re),
+      .data_out_imag(fft_out_im)
+    );
+
+    // ifft opcode = 01001
+    sdf_ifft #(.WIDTH(WIDTH)) U_IFFT (
+      .clock        (clock),
+      .reset        (fft_reset),
+      .data_in_en   (ifft_in_en),
+      .data_in_real (ifft_in_re),
+      .data_in_imag (ifft_in_im),
+      .data_out_en  (ifft_out_en),
+      .data_out_real(ifft_out_re),
+      .data_out_imag(ifft_out_im)
+    );
+
+
+
+
+
+
     
     // Choose the final EX result: if mult/div, use multdiv result; otherwise use ALU result.
     wire [31:0] ex_result;
@@ -397,10 +446,13 @@ module processor(
     // Stall Logic for Mult/Div
 
     // Stall the pipeline (IF/ID, ID/EX, EX/MEM) if the multdiv operation hasn't completed.
-    wire stall_multdiv;
+    wire stall_multdiv, stall_fft, stall_ifft, stall;
     assign stall_multdiv = idex_isMultDiv_out & ~md_resultRDY;
     
-    wire we_exmem = ~stall_multdiv;
+    assign stall = stall_multdiv | stall_fft | stall_ifft;
+
+
+    wire we_exmem = ~stall;
     wire we_memwb = 1'b1; // MEM->WB always updates
 
     // Latches for load/store

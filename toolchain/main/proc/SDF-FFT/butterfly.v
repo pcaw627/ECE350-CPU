@@ -2,7 +2,8 @@
 //  Butterfly: Add/Sub and Scaling
 //----------------------------------------------------------------------
 module Butterfly #(
-    parameter   WIDTH = 16
+    parameter   WIDTH = 16,
+    parameter   RH = 0
 )(
     input signed  [WIDTH-1:0] x0_real,  //  Input Data #0 (real)
     input signed  [WIDTH-1:0] x0_imag,  //  Input Data #0 (imag)

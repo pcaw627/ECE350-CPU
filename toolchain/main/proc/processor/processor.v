@@ -391,18 +391,87 @@ module processor(
     reg [7:0] fft_count;
     always @(posedge clock or posedge fft_reset) begin
         if (fft_reset) begin
-            fft_count <= 7'd138;
+            fft_count <= 7'd0;
         end else begin
-            fft_count <= ex_is_fft ? (fft_count - 1'b1) : fft_count;
+            fft_count <= ex_is_fft ? (fft_count + 1'b1) : fft_count;
         end
     end
 
     
     assign fft_reset = reset | (~ex_is_fft | ~ex_is_ifft) | ((ifid_instr_out[31:27] == 5'b01000) | (ifid_instr_out[31:27] == 5'b01001));
-    assign fft_in_en = (fft_count > 73) | (fft_count<138);
+    assign fft_in_en = (fft_count < 64) | (fft_count>0);
 
     // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
-    assign fft_in_re = {adc_in, 4'd0};
+    assign fft_in_re = {adc_data_out, 4'd0};
+
+    wire [31:0] adc_data_out [0:63];
+    assign adc_data_out [0] = 32'h0000;
+    assign adc_data_out [1] = 32'h0C8B;
+    assign adc_data_out [2] = 32'h18F8;
+    assign adc_data_out [3] = 32'h2527;
+    assign adc_data_out [4] = 32'h30FB;
+    assign adc_data_out [5] = 32'h3C56;
+    assign adc_data_out [6] = 32'h471C;
+    assign adc_data_out [7] = 32'h5133;
+    assign adc_data_out [8] = 32'h5A81;
+    assign adc_data_out [9] = 32'h62F1;
+    assign adc_data_out [10] = 32'h6A6C;
+    assign adc_data_out [11] = 32'h70E1;
+    assign adc_data_out [12] = 32'h7640;
+    assign adc_data_out [13] = 32'h7A7C;
+    assign adc_data_out [14] = 32'h7D89;
+    assign adc_data_out [15] = 32'h7F61;
+    assign adc_data_out [16] = 32'h7FFF;
+    assign adc_data_out [17] = 32'h7F61;
+    assign adc_data_out [18] = 32'h7D89;
+    assign adc_data_out [19] = 32'h7A7C;
+    assign adc_data_out [20] = 32'h7640;
+    assign adc_data_out [21] = 32'h70E1;
+    assign adc_data_out [22] = 32'h6A6C;
+    assign adc_data_out [23] = 32'h62F1;
+    assign adc_data_out [24] = 32'h5A81;
+    assign adc_data_out [25] = 32'h5133;
+    assign adc_data_out [26] = 32'h471C;
+    assign adc_data_out [27] = 32'h3C56;
+    assign adc_data_out [28] = 32'h30FB;
+    assign adc_data_out [29] = 32'h2527;
+    assign adc_data_out [30] = 32'h18F8;
+    assign adc_data_out [31] = 32'h0C8B;
+    assign adc_data_out [32] = 32'h0000;
+    assign adc_data_out [33] = 32'hF375;
+    assign adc_data_out [34] = 32'hE708;
+    assign adc_data_out [35] = 32'hDAD9;
+    assign adc_data_out [36] = 32'hCF05;
+    assign adc_data_out [37] = 32'hC3AA;
+    assign adc_data_out [38] = 32'hB8E4;
+    assign adc_data_out [39] = 32'hAECD;
+    assign adc_data_out [40] = 32'hA57F;
+    assign adc_data_out [41] = 32'h9D0F;
+    assign adc_data_out [42] = 32'h9594;
+    assign adc_data_out [43] = 32'h8F1F;
+    assign adc_data_out [44] = 32'h89C0;
+    assign adc_data_out [45] = 32'h8584;
+    assign adc_data_out [46] = 32'h8277;
+    assign adc_data_out [47] = 32'h809F;
+    assign adc_data_out [48] = 32'h8001;
+    assign adc_data_out [49] = 32'h809F;
+    assign adc_data_out [50] = 32'h8277;
+    assign adc_data_out [51] = 32'h8584;
+    assign adc_data_out [52] = 32'h89C0;
+    assign adc_data_out [53] = 32'h8F1F;
+    assign adc_data_out [54] = 32'h9594;
+    assign adc_data_out [55] = 32'h9D0F;
+    assign adc_data_out [56] = 32'hA57F;
+    assign adc_data_out [57] = 32'hAECD;
+    assign adc_data_out [58] = 32'h58E4;
+    assign adc_data_out [59] = 32'hC3AA;
+    assign adc_data_out [60] = 32'hCF05;
+    assign adc_data_out [61] = 32'hDAD9;
+    assign adc_data_out [62] = 32'hE708;
+    assign adc_data_out [63] = 32'hF375;
+
+
+    assign fft_in_re = adc_data_out[fft_count-2]
 
 
     sdf_fft  #(.WIDTH(WIDTH)) U_FFT  (
@@ -432,7 +501,8 @@ module processor(
             fft_data_out_count <= 5'd0;
         end if (fft_out_en) begin
             fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            assign fft_regs [bitrev6(fft_data_out_count)] = fft_out_re; // inverse bit order for output
+            // put bitrev6 back in ****************
+            assign fft_regs [fft_data_out_count] = fft_out_re; // inverse bit order for output
         end
     end
 
@@ -493,9 +563,9 @@ module processor(
     wire stall_multdiv, stall_fft, stall_ifft, stall;
     assign stall_multdiv = idex_isMultDiv_out & ~md_resultRDY;
     
-    assign stall_fft = ex_is_fft & (fft_count != 8'd0);
+    assign stall_fft = ex_is_fft & (fft_count != 8'd138);
 
-    assign stall_ifft = ex_is_ifft & (ifft_count != 8'd0);
+    assign stall_ifft = ex_is_ifft & (ifft_count != 8'd138);
 
 
     assign stall = stall_multdiv | stall_fft | stall_ifft;

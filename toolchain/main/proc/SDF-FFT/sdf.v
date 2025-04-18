@@ -113,14 +113,14 @@ assign db1_data_in_imag = bf1_bf ? bf1_y1_imag : data_in_imag;
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-1))) DB1_real (
     .q(db1_data_out_real),
     .d(db1_data_in_real),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-1))) DB1_imag (
     .q(db1_data_out_imag),
     .d(db1_data_in_imag),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 
@@ -187,14 +187,14 @@ wire [WIDTH-1:0] db2_data_out_real, db2_data_out_imag;
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-2))) DB2_real (
     .q(db2_data_out_real),
     .d(db2_data_in_real),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 
 multi_clock_delay #(.WIDTH(WIDTH), .CYCLES(2**(LOG_M-2))) DB2_imag (
     .q(db2_data_out_imag),
     .d(db2_data_in_imag),
-    .clr(reset),
+    .clr(),
     .clk(clock)
 );
 

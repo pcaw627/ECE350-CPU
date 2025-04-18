@@ -1,0 +1,48 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Thu Apr 17 17:46:05 2025
+[*]
+[dumpfile] "/Users/aidanfrutos/Documents/ECE 350/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_ifft.vcd"
+[dumpfile_mtime] "Thu Apr 17 17:39:17 2025"
+[dumpfile_size] 12668189
+[savefile] "/Users/aidanfrutos/Documents/ECE 350/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_ifft.gtkw"
+[timestart] 594500
+[size] 1280 600
+[pos] -1 -1
+*-16.000000 735000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[sst_width] 240
+[signals_width] 169
+[sst_expanded] 1
+[sst_vpaned_height] 159
+@28
+sdf_ifft_tb.clock
+sdf_ifft_tb.amplitude
+[color] 2
+sdf_ifft_tb.fft_in_en
+@22
+[color] 2
+sdf_ifft_tb.fft_in_im[15:0]
+[color] 2
+sdf_ifft_tb.fft_in_re[15:0]
+@29
+sdf_ifft_tb.fft_out_en
+@22
+sdf_ifft_tb.fft_out_im[15:0]
+sdf_ifft_tb.fft_out_re[15:0]
+@28
+[color] 2
+sdf_ifft_tb.ifft_in_en
+@22
+[color] 2
+sdf_ifft_tb.ifft_in_im[15:0]
+[color] 2
+sdf_ifft_tb.ifft_in_re[15:0]
+@28
+sdf_ifft_tb.ifft_out_en
+@22
+sdf_ifft_tb.ifft_out_im[15:0]
+sdf_ifft_tb.ifft_out_re[15:0]
+@28
+sdf_ifft_tb.start_ifft
+[pattern_trace] 1
+[pattern_trace] 0

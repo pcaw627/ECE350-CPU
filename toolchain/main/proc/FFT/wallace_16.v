@@ -120,8 +120,8 @@ module wallace_16(
         end
     endgenerate
     
-    wire [15:0] product_hi;
-    wire [15:0] product_lo;
+    // wire [15:0] product_hi;
+    // wire [15:0] product_lo;
 
     assign product_hi = product[31:16];
     assign product_lo = product[15:0];

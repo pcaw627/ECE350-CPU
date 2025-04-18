@@ -1,11 +1,12 @@
-..\SDF-FFT\butterfly.v
-..\SDF-FFT\modNcounter.v
-..\SDF-FFT\mult.v
-..\SDF-FFT\sdf.v
-..\SDF-FFT\sdf_tb.v
-..\SDF-FFT\sdf_fft.v
-..\SDF-FFT\wallace_16.v
-..\SDF-FFT\Twiddle64.v
-..\FFT\multi_clock_delay.v
-..\FFT\single_clock_delay.v
-..\reg-main\dffe_ref.v
+butterfly.v
+modNcounter.v
+mult.v
+sdf.v
+sdf_tb.v
+sdf_ifft_tb.v
+sdf_fft.v
+sdf_ifft.v
+Twiddle64.v
+/Users/aidanfrutos/Documents/ECE 350/ECE350-CPU/toolchain/main/proc/FFT/multi_clock_delay.v
+/Users/aidanfrutos/Documents/ECE 350/ECE350-CPU/toolchain/main/proc/FFT/single_clock_delay.v
+/Users/aidanfrutos/Documents/ECE 350/ECE350-CPU/toolchain/main/proc/reg-main/dffe_ref.v

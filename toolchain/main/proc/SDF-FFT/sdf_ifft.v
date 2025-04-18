@@ -46,8 +46,13 @@ module sdf_ifft #(
     wire signed [WIDTH:0] real_ext = {fft_im[WIDTH-1], fft_im};  // imag -> real
     wire signed [WIDTH:0] imag_ext = {fft_re[WIDTH-1], fft_re};  // real -> imag
 
+    wire [WIDTH:0] shift_real, shift_imag;
+
     assign data_out_en   = fft_valid;
-    assign data_out_real = real_ext <<< SHIFT;
-    assign data_out_imag = imag_ext <<< SHIFT;
+    assign shift_real = real_ext <<< (SHIFT);
+    assign shift_imag = imag_ext <<< (SHIFT);
+    assign data_out_real = shift_real-1;
+    assign data_out_imag = shift_imag-1;
+
 
 endmodule

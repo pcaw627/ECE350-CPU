@@ -1,4 +1,4 @@
-butterfly.v
+Butterfly.v
 modNcounter.v
 mult.v
 sdf.v

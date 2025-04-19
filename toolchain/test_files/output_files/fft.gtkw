@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Sat Apr 19 00:51:01 2025
+[*] Sat Apr 19 01:22:45 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\fft.vcd"
-[dumpfile_mtime] "Sat Apr 19 00:50:37 2025"
-[dumpfile_size] 10457870
+[dumpfile_mtime] "Sat Apr 19 01:20:35 2025"
+[dumpfile_size] 15542588
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\fft.gtkw"
-[timestart] 2442800
+[timestart] 3505700
 [size] 1536 889
 [pos] -1 -1
-*-17.000000 2681300 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-16.152117 3481500 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] Wrapper_tb.
 [treeopen] Wrapper_tb.CPU.
 [treeopen] Wrapper_tb.CPU.U_FFT.
@@ -19,46 +19,16 @@
 [sst_vpaned_height] 255
 @28
 Wrapper_tb.CPU.U_FFT.clock
-Wrapper_tb.CPU.ex_is_fft
-Wrapper_tb.CPU.ex_is_ifft
 @22
 Wrapper_tb.CPU.fft_count[7:0]
-Wrapper_tb.CPU.fft_data_out_count[5:0]
 @28
-Wrapper_tb.CPU.fft_in_en
-@22
-Wrapper_tb.CPU.fft_in_re[15:0]
-@28
-Wrapper_tb.CPU.fft_out_en
-@22
-Wrapper_tb.CPU.fft_out_re[15:0]
-Wrapper_tb.CPU.ifid_instr_out[31:0]
-Wrapper_tb.CPU.idex_instr_out[31:0]
-Wrapper_tb.CPU.exmem_instr_out[31:0]
-@28
-Wrapper_tb.CPU.fft_reset
-@22
-Wrapper_tb.CPU.ifft_count[7:0]
-@28
-Wrapper_tb.CPU.ifft_in_en
-@22
-Wrapper_tb.CPU.ifft_in_im[15:0]
-@28
-Wrapper_tb.CPU.ifft_out_en
-@22
-Wrapper_tb.CPU.ifft_out_re[15:0]
-@28
-Wrapper_tb.CPU.memwb_is_fft
-Wrapper_tb.CPU.stall_fft
-Wrapper_tb.CPU.stall_ifft
 Wrapper_tb.CPU.U_FFT.data_in_en
 @22
 Wrapper_tb.CPU.U_FFT.data_in_imag[15:0]
-@23
 Wrapper_tb.CPU.U_FFT.data_in_real[15:0]
 @28
 Wrapper_tb.CPU.U_FFT.data_out_en
-@22
+@421
 Wrapper_tb.CPU.U_FFT.data_out_imag[15:0]
 Wrapper_tb.CPU.U_FFT.data_out_real[15:0]
 @28
@@ -72,5 +42,9 @@ Wrapper_tb.CPU.U_FFT.su2_data_out_en
 @22
 Wrapper_tb.CPU.U_FFT.su2_data_out_imag[15:0]
 Wrapper_tb.CPU.U_FFT.su2_data_out_real[15:0]
+@28
+Wrapper_tb.CPU.fft_reset
+Wrapper_tb.CPU.fft_reset_unsynced
+Wrapper_tb.CPU.reset
 [pattern_trace] 1
 [pattern_trace] 0

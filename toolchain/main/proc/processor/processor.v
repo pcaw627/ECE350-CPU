@@ -374,7 +374,7 @@ module processor(
 
     reg [31:0] fft_regs [0:63]; // holding values in between fft, modulation, and ifft
 
-    wire  fft_in_en, fft_reset;
+    wire  fft_in_en, fft_reset, fft_reset_unsynced;
     wire [WIDTH-1:0] fft_in_re,  fft_in_im;
     wire fft_out_en;
     wire [WIDTH-1:0] fft_out_re, fft_out_im;
@@ -408,8 +408,9 @@ module processor(
     end
 
     
-    assign fft_reset = reset | ((ifid_instr_out[31:27] == 5'b10000) | (ifid_instr_out[31:27] == 5'b10001));
-    assign fft_in_en = (fft_count < 66) & (fft_count>1);
+    assign fft_reset_unsynced = reset | ((ifid_instr_out[31:27] == 5'b10000) | (ifid_instr_out[31:27] == 5'b10001));
+    dffe_ref fft_dff (.q(fft_reset), .d(fft_reset_unsynced), .en(1'b1), .clk(clock), .clr(1'b0));
+    assign fft_in_en = (fft_count < 65) & (fft_count>0);
 
     // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
     // assign fft_in_re = {adc_data_out, 4'd0};
@@ -473,7 +474,7 @@ module processor(
     assign adc_data_out [55] = 16'h9D0F;
     assign adc_data_out [56] = 16'hA57F;
     assign adc_data_out [57] = 16'hAECD;
-    assign adc_data_out [58] = 16'h58E4;
+    assign adc_data_out [58] = 16'hB8E4;
     assign adc_data_out [59] = 16'hC3AA;
     assign adc_data_out [60] = 16'hCF05;
     assign adc_data_out [61] = 16'hDAD9;
@@ -481,7 +482,7 @@ module processor(
     assign adc_data_out [63] = 16'hF375;
 
 
-    assign fft_in_re = adc_data_out[fft_count-2];
+    assign fft_in_re = adc_data_out[fft_count-1];
 
 
     sdf_fft  #(.WIDTH(16)) U_FFT  (
@@ -511,7 +512,7 @@ module processor(
             fft_data_out_count <= 5'd0;
         end else if (fft_out_en) begin
             fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_re; // inverse bit order for output
+            fft_regs [fft_data_out_count] <= fft_out_re; // inverse bit order for output
         end
     end
 

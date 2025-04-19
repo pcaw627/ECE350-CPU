@@ -204,5 +204,11 @@ module sdf_ifft_tb;
       $finish;
    end
 
+   
+   initial begin
+         $dumpfile("sdf_ifft.vcd");
+         $dumpvars(0, sdf_ifft_tb);
+   end
+
 
 endmodule

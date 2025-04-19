@@ -602,7 +602,17 @@ module processor(
       .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
     );
 
+    
 
+    reg [5:0] ifft_data_out_count;
+    always @(posedge clock or posedge fft_reset) begin
+        if (fft_reset) begin
+            ifft_data_out_count <= 5'd0;
+        end else if (ifft_out_en) begin
+            ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
+            fft_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
+        end
+    end
 
 
 
@@ -646,7 +656,7 @@ module processor(
     
     assign stall_fft = ex_is_fft & (fft_count != 8'd136);
 
-    assign stall_ifft = ex_is_ifft & (ifft_count != 8'd136);
+    assign stall_ifft = ex_is_ifft & (ifft_count != 8'd138);
 
 
     assign stall = stall_multdiv | stall_fft | stall_ifft;

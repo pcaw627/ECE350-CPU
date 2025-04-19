@@ -372,7 +372,7 @@ module processor(
 
     // FFT opcode = 01000
 
-    reg [31:0] fft_regs [0:63]; // holding values in between fft, modulation, and ifft
+    reg [15:0] fft_regs [0:63]; // holding values in between fft, modulation, and ifft
 
     wire  fft_in_en, fft_reset, fft_reset_unsynced;
     wire [WIDTH-1:0] fft_in_re,  fft_in_im;
@@ -518,9 +518,62 @@ module processor(
             fft_data_out_count <= 5'd0;
         end else if (fft_out_en) begin
             fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
+            fft_regs [bitrev6(fft_data_out_count)] <= 16'd32767; //fft_out_im; // inverse bit order for output
         end
     end
+
+
+    wire ex_is_mod = (idex_instr_out[31:27] == 5'b11000);
+    wire [5:0] ex_mod_index = (idex_instr_out[21:17]-1)<<2;
+    wire [15:0] ex_mod_operandA = ex_operandA[15:0];
+    wire [15:0] mod_out1, mod_out2, mod_out3, mod_out4;
+    wallace_16 mod_mult1(
+        .a(ex_mod_operandA),
+        .b(fft_regs[ex_mod_index]),
+        .product(),
+        .product_hi(mod_out1),
+        .product_lo(),
+        .ovf()
+    );  
+    wallace_16 mod_mult2(
+        .a(ex_mod_operandA),
+        .b(fft_regs[ex_mod_index+1]),
+        .product(),
+        .product_hi(mod_out2),
+        .product_lo(),
+        .ovf()
+    );      
+    wallace_16 mod_mult3(
+        .a(ex_mod_operandA),
+        .b(fft_regs[ex_mod_index+2]),
+        .product(),
+        .product_hi(mod_out3),
+        .product_lo(),
+        .ovf()
+    );      
+    wallace_16 mod_mult4(
+        .a(ex_mod_operandA),
+        .b(fft_regs[ex_mod_index+3]),
+        .product(),
+        .product_hi(mod_out4),
+        .product_lo(),
+        .ovf()
+    );  
+
+    always @(negedge clock) begin
+        if (ex_is_mod) begin
+            fft_regs[ex_mod_index] <= mod_out1;
+            fft_regs[ex_mod_index+1] <= mod_out2;
+            fft_regs[ex_mod_index+2] <= mod_out3;
+            fft_regs[ex_mod_index+3] <= mod_out4;
+        end 
+    end
+    
+    
+
+
+
+
 
 
     wire [15:0] fft_out_0 = fft_regs[0];
@@ -809,6 +862,10 @@ module processor(
     wire is_setxWB = memwb_instr_out[31:27] == 5'b10101;
     wire is_storeWB = memwb_instr_out[31:27] == 5'b00111;
     wire memwb_is_fft = memwb_instr_out[31:27] == 5'b10000;
+    wire memwb_is_ifft = memwb_instr_out[31:27] == 5'b10001;
+    wire memwb_is_mod = memwb_instr_out[31:27] == 5'b11000;
+
+
 
 
     wire [4:0] normal_rd = memwb_instr_out[26:22];
@@ -824,7 +881,7 @@ module processor(
                     (is_jalWB ? memwb_link_out : memwb_result_out);
     assign data_writeReg = (failed_jump) ? 32'd0 : wb_data;
     
-    assign ctrl_writeEnable = (is_storeWB | memwb_is_fft) ? 1'b0 : 1'b1;
+    assign ctrl_writeEnable = (is_storeWB | memwb_is_fft | memwb_is_ifft | memwb_is_mod) ? 1'b0 : 1'b1;
     
     
 endmodule

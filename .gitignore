@@ -26,4 +26,3 @@ FFT/*
 *.html
 *.pyc
 *.vvp
-toolchain/main/proc/SDF-FFT/Butterfly.v

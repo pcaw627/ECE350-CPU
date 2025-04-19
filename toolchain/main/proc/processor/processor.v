@@ -380,7 +380,8 @@ module processor(
     wire [WIDTH-1:0] fft_out_re, fft_out_im;
     // inverse FFT
     wire ifft_in_en;
-    wire [WIDTH-1:0] ifft_in_re, ifft_in_im;
+    wire [WIDTH-1:0] ifft_in_re;
+    reg [WIDTH-1:0] ifft_in_im;
     wire ifft_out_en;
     wire [WIDTH-1:0] ifft_out_re, ifft_out_im;
 
@@ -401,9 +402,13 @@ module processor(
     reg [7:0] ifft_count;
     always @(posedge clock or posedge fft_reset) begin
         if (fft_reset) begin
-            fft_count <= 7'd0;
+            ifft_count <= 7'd0;
+        end else if (ifft_in_en) begin
+            ifft_in_im <= fft_regs[ifft_count-2];
+            // ifft_in_im <= fft_regs[bitrev6(ifft_count-2)];
+            ifft_count <= ex_is_ifft ? (ifft_count + 1'b1) : ifft_count;
         end else begin
-            fft_count <= ex_is_fft ? (fft_count + 1'b1) : fft_count;
+            ifft_count <= ex_is_ifft ? (ifft_count + 1'b1) : ifft_count;
         end
     end
 
@@ -411,6 +416,7 @@ module processor(
     assign fft_reset_unsynced = reset | ((ifid_instr_out[31:27] == 5'b10000) | (ifid_instr_out[31:27] == 5'b10001));
     dffe_ref fft_dff (.q(fft_reset), .d(fft_reset_unsynced), .en(1'b1), .clk(clock), .clr(1'b0));
     assign fft_in_en = (fft_count < 65) & (fft_count>0);
+    assign ifft_in_en = (ifft_count < 67) & (ifft_count>2);
 
     // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
     // assign fft_in_re = {adc_data_out, 4'd0};
@@ -493,7 +499,7 @@ module processor(
       .data_in_imag (16'd0),
       .data_out_en  (fft_out_en),
       .data_out_real(fft_out_re),
-      .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
+      .data_out_imag(fft_out_im) // 16'd0 will always be 0 bc imag is always 0
     );
 
    function integer bitrev6;       // 6‑bit bit‑reverse
@@ -512,12 +518,76 @@ module processor(
             fft_data_out_count <= 5'd0;
         end else if (fft_out_en) begin
             fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            fft_regs [fft_data_out_count] <= fft_out_re; // inverse bit order for output
+            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
         end
     end
 
 
-    
+    wire [15:0] fft_out_0 = fft_regs[0];
+    wire [15:0] fft_out_1 = fft_regs[1];
+    wire [15:0] fft_out_2 = fft_regs[2];
+    wire [15:0] fft_out_3 = fft_regs[3];
+    wire [15:0] fft_out_4 = fft_regs[4];
+    wire [15:0] fft_out_5 = fft_regs[5];
+    wire [15:0] fft_out_6 = fft_regs[6];
+    wire [15:0] fft_out_7 = fft_regs[7];
+    wire [15:0] fft_out_8 = fft_regs[8];
+    wire [15:0] fft_out_9 = fft_regs[9];
+    wire [15:0] fft_out_10 = fft_regs[10];
+    wire [15:0] fft_out_11 = fft_regs[11];
+    wire [15:0] fft_out_12 = fft_regs[12];
+    wire [15:0] fft_out_13 = fft_regs[13];
+    wire [15:0] fft_out_14 = fft_regs[14];
+    wire [15:0] fft_out_15 = fft_regs[15];
+    wire [15:0] fft_out_16 = fft_regs[16];
+    wire [15:0] fft_out_17 = fft_regs[17];
+    wire [15:0] fft_out_18 = fft_regs[18];
+    wire [15:0] fft_out_19 = fft_regs[19];
+    wire [15:0] fft_out_20 = fft_regs[20];
+    wire [15:0] fft_out_21 = fft_regs[21];
+    wire [15:0] fft_out_22 = fft_regs[22];
+    wire [15:0] fft_out_23 = fft_regs[23];
+    wire [15:0] fft_out_24 = fft_regs[24];
+    wire [15:0] fft_out_25 = fft_regs[25];
+    wire [15:0] fft_out_26 = fft_regs[26];
+    wire [15:0] fft_out_27 = fft_regs[27];
+    wire [15:0] fft_out_28 = fft_regs[28];
+    wire [15:0] fft_out_29 = fft_regs[29];
+    wire [15:0] fft_out_30 = fft_regs[30];
+    wire [15:0] fft_out_31 = fft_regs[31];
+    wire [15:0] fft_out_32 = fft_regs[32];
+    wire [15:0] fft_out_33 = fft_regs[33];
+    wire [15:0] fft_out_34 = fft_regs[34];
+    wire [15:0] fft_out_35 = fft_regs[35];
+    wire [15:0] fft_out_36 = fft_regs[36];
+    wire [15:0] fft_out_37 = fft_regs[37];
+    wire [15:0] fft_out_38 = fft_regs[38];
+    wire [15:0] fft_out_39 = fft_regs[39];
+    wire [15:0] fft_out_40 = fft_regs[40];
+    wire [15:0] fft_out_41 = fft_regs[41];
+    wire [15:0] fft_out_42 = fft_regs[42];
+    wire [15:0] fft_out_43 = fft_regs[43];
+    wire [15:0] fft_out_44 = fft_regs[44];
+    wire [15:0] fft_out_45 = fft_regs[45];
+    wire [15:0] fft_out_46 = fft_regs[46];
+    wire [15:0] fft_out_47 = fft_regs[47];
+    wire [15:0] fft_out_48 = fft_regs[48];
+    wire [15:0] fft_out_49 = fft_regs[49];
+    wire [15:0] fft_out_50 = fft_regs[50];
+    wire [15:0] fft_out_51 = fft_regs[51];
+    wire [15:0] fft_out_52 = fft_regs[52];
+    wire [15:0] fft_out_53 = fft_regs[53];
+    wire [15:0] fft_out_54 = fft_regs[54];
+    wire [15:0] fft_out_55 = fft_regs[55];
+    wire [15:0] fft_out_56 = fft_regs[56];
+    wire [15:0] fft_out_57 = fft_regs[57];
+    wire [15:0] fft_out_58 = fft_regs[58];
+    wire [15:0] fft_out_59 = fft_regs[59];
+    wire [15:0] fft_out_60 = fft_regs[60];
+    wire [15:0] fft_out_61 = fft_regs[61];
+    wire [15:0] fft_out_62 = fft_regs[62];
+    wire [15:0] fft_out_63 = fft_regs[63];
+
 
 
     // ifft opcode = 01001
@@ -574,9 +644,9 @@ module processor(
     wire stall_multdiv, stall_fft, stall_ifft, stall;
     assign stall_multdiv = idex_isMultDiv_out & ~md_resultRDY;
     
-    assign stall_fft = ex_is_fft & (fft_count != 8'd138);
+    assign stall_fft = ex_is_fft & (fft_count != 8'd136);
 
-    assign stall_ifft = ex_is_ifft & (ifft_count != 8'd138);
+    assign stall_ifft = ex_is_ifft & (ifft_count != 8'd136);
 
 
     assign stall = stall_multdiv | stall_fft | stall_ifft;

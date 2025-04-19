@@ -1,0 +1,74 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sat Apr 19 02:53:43 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\fft_ifft.vcd"
+[dumpfile_mtime] "Sat Apr 19 02:47:32 2025"
+[dumpfile_size] 23656547
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\fft_ifft.gtkw"
+[timestart] 5595800
+[size] 1536 889
+[pos] -1 -1
+*-16.440727 5670000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[treeopen] Wrapper_tb.CPU.
+[sst_width] 197
+[signals_width] 209
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@28
+Wrapper_tb.CPU.ex_is_fft
+Wrapper_tb.CPU.ex_is_ifft
+Wrapper_tb.CPU.clock
+@c00024
+Wrapper_tb.CPU.ifft_count[7:0]
+@28
+(0)Wrapper_tb.CPU.ifft_count[7:0]
+(1)Wrapper_tb.CPU.ifft_count[7:0]
+(2)Wrapper_tb.CPU.ifft_count[7:0]
+(3)Wrapper_tb.CPU.ifft_count[7:0]
+(4)Wrapper_tb.CPU.ifft_count[7:0]
+(5)Wrapper_tb.CPU.ifft_count[7:0]
+(6)Wrapper_tb.CPU.ifft_count[7:0]
+(7)Wrapper_tb.CPU.ifft_count[7:0]
+@1401200
+-group_end
+@24
+Wrapper_tb.CPU.fft_count[7:0]
+@420
+Wrapper_tb.CPU.U_FFT.data_out_real[15:0]
+Wrapper_tb.CPU.U_FFT.data_out_imag[15:0]
+@28
+Wrapper_tb.CPU.U_IFFT.data_in_en
+Wrapper_tb.CPU.U_IFFT.data_out_en
+@420
+Wrapper_tb.CPU.U_IFFT.data_out_imag[15:0]
+Wrapper_tb.CPU.U_IFFT.data_out_real[15:0]
+[color] 3
+Wrapper_tb.CPU.U_IFFT.data_in_imag[15:0]
+@28
+Wrapper_tb.CPU.U_IFFT.clock
+[color] 3
+Wrapper_tb.CPU.U_IFFT.data_in_en
+@420
+Wrapper_tb.CPU.U_IFFT.data_in_imag[15:0]
+@22
+Wrapper_tb.CPU.U_IFFT.data_in_real[15:0]
+@28
+[color] 3
+Wrapper_tb.CPU.U_IFFT.data_out_en
+@25
+[color] 6
+Wrapper_tb.CPU.U_IFFT.data_out_real[15:0]
+@22
+Wrapper_tb.CPU.U_IFFT.fft_im[15:0]
+@28
+Wrapper_tb.CPU.U_IFFT.fft_valid
+@22
+Wrapper_tb.CPU.U_IFFT.real_ext[16:0]
+@28
+Wrapper_tb.CPU.U_IFFT.reset
+@22
+Wrapper_tb.CPU.U_IFFT.shift_real[16:0]
+[pattern_trace] 1
+[pattern_trace] 0

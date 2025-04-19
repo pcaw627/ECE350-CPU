@@ -91,11 +91,11 @@ module wallace_16(
             for(j = 1; j < 32; j = j + 1) begin : add_bits
 
                 full_adder fa(
-                    .a(row_sums[i-1][j]),
-                    .b(extended_pp[j]),
-                    .cin(row_carries[i-1][j-1]),
-                    .sum(row_sums[i][j]),
-                    .cout(row_carries[i][j])
+                    .A(row_sums[i-1][j]),
+                    .B(extended_pp[j]),
+                    .Cin(row_carries[i-1][j-1]),
+                    .S(row_sums[i][j]),
+                    .Cout(row_carries[i][j])
                 );
             end
         end
@@ -111,11 +111,11 @@ module wallace_16(
     generate
         for(i = 1; i < 32; i = i + 1) begin : final_addition
             full_adder fa_final(
-                .a(row_sums[31][i]),
-                .b(row_carries[31][i-1]),
-                .cin(final_carry[i-1]),
-                .sum(product[i]),
-                .cout(final_carry[i])
+                .A(row_sums[31][i]),
+                .B(row_carries[31][i-1]),
+                .Cin(final_carry[i-1]),
+                .S(product[i]),
+                .Cout(final_carry[i])
             );
         end
     endgenerate

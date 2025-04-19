@@ -1,0 +1,147 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sat Apr 19 18:45:36 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\low_pass.vcd"
+[dumpfile_mtime] "Sat Apr 19 18:41:35 2025"
+[dumpfile_size] 30799423
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\low_pass.gtkw"
+[timestart] 2599000
+[size] 1536 889
+[pos] -1 -1
+*-17.821634 3090000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[treeopen] Wrapper_tb.CPU.
+[sst_width] 197
+[signals_width] 276
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@28
+Wrapper_tb.CPU.clock
+Wrapper_tb.CPU.ex_is_mod
+@22
+Wrapper_tb.CPU.ex_mod_index[5:0]
+@420
+[color] 2
+Wrapper_tb.CPU.ex_mod_operandA[15:0]
+@c00420
++{product 1} Wrapper_tb.CPU.mod_mult1.product[31:0]
+@28
+(0)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(1)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(2)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(3)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(4)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(5)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(6)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(7)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(8)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(9)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(10)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(11)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(12)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(13)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(14)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(15)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(16)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(17)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(18)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(19)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(20)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(21)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(22)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(23)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(24)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(25)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(26)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(27)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(28)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(29)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(30)Wrapper_tb.CPU.mod_mult1.product[31:0]
+(31)Wrapper_tb.CPU.mod_mult1.product[31:0]
+@1401200
+-group_end
+@420
+Wrapper_tb.CPU.mod_mult1.product_hi[15:0]
+@22
++{product 2} Wrapper_tb.CPU.mod_mult2.product[31:0]
+Wrapper_tb.CPU.mod_mult2.product_hi[15:0]
+@420
+Wrapper_tb.CPU.memwb_is_mod
+Wrapper_tb.CPU.mod_out1[15:0]
+Wrapper_tb.CPU.mod_out2[15:0]
+Wrapper_tb.CPU.mod_out3[15:0]
+Wrapper_tb.CPU.mod_out4[15:0]
+@28
+[color] 1
+Wrapper_tb.CPU.ifft_out_en
+@29
+[color] 1
+Wrapper_tb.CPU.fft_out_en
+@420
+Wrapper_tb.CPU.fft_out_0[15:0]
+Wrapper_tb.CPU.fft_out_1[15:0]
+Wrapper_tb.CPU.fft_out_2[15:0]
+Wrapper_tb.CPU.fft_out_3[15:0]
+Wrapper_tb.CPU.fft_out_4[15:0]
+Wrapper_tb.CPU.fft_out_5[15:0]
+Wrapper_tb.CPU.fft_out_6[15:0]
+Wrapper_tb.CPU.fft_out_7[15:0]
+Wrapper_tb.CPU.fft_out_8[15:0]
+Wrapper_tb.CPU.fft_out_9[15:0]
+Wrapper_tb.CPU.fft_out_10[15:0]
+Wrapper_tb.CPU.fft_out_11[15:0]
+Wrapper_tb.CPU.fft_out_12[15:0]
+Wrapper_tb.CPU.fft_out_13[15:0]
+Wrapper_tb.CPU.fft_out_14[15:0]
+Wrapper_tb.CPU.fft_out_15[15:0]
+Wrapper_tb.CPU.fft_out_16[15:0]
+Wrapper_tb.CPU.fft_out_17[15:0]
+Wrapper_tb.CPU.fft_out_18[15:0]
+Wrapper_tb.CPU.fft_out_19[15:0]
+Wrapper_tb.CPU.fft_out_20[15:0]
+Wrapper_tb.CPU.fft_out_21[15:0]
+Wrapper_tb.CPU.fft_out_22[15:0]
+Wrapper_tb.CPU.fft_out_23[15:0]
+Wrapper_tb.CPU.fft_out_24[15:0]
+Wrapper_tb.CPU.fft_out_25[15:0]
+Wrapper_tb.CPU.fft_out_26[15:0]
+Wrapper_tb.CPU.fft_out_27[15:0]
+Wrapper_tb.CPU.fft_out_28[15:0]
+Wrapper_tb.CPU.fft_out_29[15:0]
+Wrapper_tb.CPU.fft_out_30[15:0]
+Wrapper_tb.CPU.fft_out_31[15:0]
+Wrapper_tb.CPU.fft_out_32[15:0]
+Wrapper_tb.CPU.fft_out_33[15:0]
+Wrapper_tb.CPU.fft_out_34[15:0]
+Wrapper_tb.CPU.fft_out_35[15:0]
+Wrapper_tb.CPU.fft_out_36[15:0]
+Wrapper_tb.CPU.fft_out_37[15:0]
+Wrapper_tb.CPU.fft_out_38[15:0]
+Wrapper_tb.CPU.fft_out_39[15:0]
+Wrapper_tb.CPU.fft_out_40[15:0]
+Wrapper_tb.CPU.fft_out_41[15:0]
+Wrapper_tb.CPU.fft_out_42[15:0]
+Wrapper_tb.CPU.fft_out_43[15:0]
+Wrapper_tb.CPU.fft_out_44[15:0]
+Wrapper_tb.CPU.fft_out_45[15:0]
+Wrapper_tb.CPU.fft_out_46[15:0]
+Wrapper_tb.CPU.fft_out_47[15:0]
+Wrapper_tb.CPU.fft_out_48[15:0]
+Wrapper_tb.CPU.fft_out_49[15:0]
+Wrapper_tb.CPU.fft_out_50[15:0]
+Wrapper_tb.CPU.fft_out_51[15:0]
+Wrapper_tb.CPU.fft_out_52[15:0]
+Wrapper_tb.CPU.fft_out_53[15:0]
+Wrapper_tb.CPU.fft_out_54[15:0]
+Wrapper_tb.CPU.fft_out_55[15:0]
+Wrapper_tb.CPU.fft_out_56[15:0]
+Wrapper_tb.CPU.fft_out_57[15:0]
+Wrapper_tb.CPU.fft_out_58[15:0]
+Wrapper_tb.CPU.fft_out_59[15:0]
+Wrapper_tb.CPU.fft_out_60[15:0]
+Wrapper_tb.CPU.fft_out_61[15:0]
+Wrapper_tb.CPU.fft_out_62[15:0]
+Wrapper_tb.CPU.fft_out_63[15:0]
+[pattern_trace] 1
+[pattern_trace] 0

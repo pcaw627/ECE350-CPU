@@ -518,7 +518,7 @@ module processor(
             fft_data_out_count <= 5'd0;
         end else if (fft_out_en) begin
             fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            fft_regs [bitrev6(fft_data_out_count)] <= 16'd32767; //fft_out_im; // inverse bit order for output
+            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
         end
     end
 
@@ -562,10 +562,10 @@ module processor(
 
     always @(negedge clock) begin
         if (ex_is_mod) begin
-            fft_regs[ex_mod_index] <= mod_out1;
-            fft_regs[ex_mod_index+1] <= mod_out2;
-            fft_regs[ex_mod_index+2] <= mod_out3;
-            fft_regs[ex_mod_index+3] <= mod_out4;
+            fft_regs[ex_mod_index] <= mod_out1 <<< 1;
+            fft_regs[ex_mod_index+1] <= mod_out2 <<< 1;
+            fft_regs[ex_mod_index+2] <= mod_out3 <<< 1;
+            fft_regs[ex_mod_index+3] <= mod_out4 <<< 1;
         end 
     end
     

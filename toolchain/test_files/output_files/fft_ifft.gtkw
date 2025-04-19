@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Sat Apr 19 04:50:29 2025
+[*] Sat Apr 19 18:17:44 2025
 [*]
 [dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\fft_ifft.vcd"
-[dumpfile_mtime] "Sat Apr 19 04:40:25 2025"
-[dumpfile_size] 23661445
+[dumpfile_mtime] "Sat Apr 19 18:17:02 2025"
+[dumpfile_size] 24773308
 [savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\fft_ifft.gtkw"
-[timestart] 3944000
+[timestart] 4639000
 [size] 1536 889
 [pos] -1 -1
-*-19.440727 6870000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-19.440727 5685000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] Wrapper_tb.
 [treeopen] Wrapper_tb.CPU.
 [treeopen] Wrapper_tb.CPU.U_IFFT.

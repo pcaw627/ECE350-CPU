@@ -91,7 +91,7 @@ module processor(
     end
 
     // ----------- drive the LEDs -----------
-    assign LED = {1'b0, btn_latch};   // LED[4:0]=latch, LED[5]=unused
+    assign LED = {btn_latch};   // LED[4:0]=latch
 
 
 

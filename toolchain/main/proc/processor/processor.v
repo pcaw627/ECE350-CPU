@@ -385,8 +385,8 @@ module processor(
     wire [WIDTH-1:0] ifft_out_re, ifft_out_im;
 
     wire ex_is_fft, ex_is_ifft;
-    assign ex_is_fft = (idex_instr_out[31:27] == 5'b01000);
-    assign ex_is_ifft = (idex_instr_out[31:27] == 5'b01001);
+    assign ex_is_fft = (idex_instr_out[31:27] == 5'b10000);
+    assign ex_is_ifft = (idex_instr_out[31:27] == 5'b10001);
 
 
     reg [7:0] fft_count;
@@ -408,8 +408,8 @@ module processor(
     end
 
     
-    assign fft_reset = reset | (~ex_is_fft | ~ex_is_ifft) | ((ifid_instr_out[31:27] == 5'b01000) | (ifid_instr_out[31:27] == 5'b01001));
-    assign fft_in_en = (fft_count < 64) | (fft_count>0);
+    assign fft_reset = reset | ((ifid_instr_out[31:27] == 5'b10000) | (ifid_instr_out[31:27] == 5'b10001));
+    assign fft_in_en = (fft_count < 66) & (fft_count>1);
 
     // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
     // assign fft_in_re = {adc_data_out, 4'd0};
@@ -727,7 +727,7 @@ module processor(
     wire is_jalWB = memwb_instr_out[31:27] == 5'b00011;
     wire is_setxWB = memwb_instr_out[31:27] == 5'b10101;
     wire is_storeWB = memwb_instr_out[31:27] == 5'b00111;
-    wire memwb_is_fft = memwb_instr_out[31:27] == 5'b01000;
+    wire memwb_is_fft = memwb_instr_out[31:27] == 5'b10000;
 
 
     wire [4:0] normal_rd = memwb_instr_out[26:22];

@@ -1,2 +1,2 @@
-num cycles:800
-r1=3
+num cycles:150
+r1=0

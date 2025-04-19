@@ -1,5 +1,0 @@
-cla_8_tb.v
-cla_8.v
-full_adder.v
-logic\and_1.v
-logic\or_1.v

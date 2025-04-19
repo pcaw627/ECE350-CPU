@@ -1,2 +1,0 @@
-reg-main\decode_32_bi.v
-reg-main\decode_32_bi_tb.v

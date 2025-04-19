@@ -1,0 +1,2 @@
+num cycles:800
+r1=3

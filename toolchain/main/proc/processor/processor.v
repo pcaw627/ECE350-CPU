@@ -365,6 +365,7 @@ module processor(
     );
 
 
+    localparam WIDTH = 16;
 
     // FFT & IFFT Multi-cycle operations
 
@@ -396,91 +397,100 @@ module processor(
             fft_count <= ex_is_fft ? (fft_count + 1'b1) : fft_count;
         end
     end
+    
+    reg [7:0] ifft_count;
+    always @(posedge clock or posedge fft_reset) begin
+        if (fft_reset) begin
+            fft_count <= 7'd0;
+        end else begin
+            fft_count <= ex_is_fft ? (fft_count + 1'b1) : fft_count;
+        end
+    end
 
     
     assign fft_reset = reset | (~ex_is_fft | ~ex_is_ifft) | ((ifid_instr_out[31:27] == 5'b01000) | (ifid_instr_out[31:27] == 5'b01001));
     assign fft_in_en = (fft_count < 64) | (fft_count>0);
 
-    // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
-    assign fft_in_re = {adc_data_out, 4'd0};
+    // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
+    // assign fft_in_re = {adc_data_out, 4'd0};
 
-    wire [31:0] adc_data_out [0:63];
-    assign adc_data_out [0] = 32'h0000;
-    assign adc_data_out [1] = 32'h0C8B;
-    assign adc_data_out [2] = 32'h18F8;
-    assign adc_data_out [3] = 32'h2527;
-    assign adc_data_out [4] = 32'h30FB;
-    assign adc_data_out [5] = 32'h3C56;
-    assign adc_data_out [6] = 32'h471C;
-    assign adc_data_out [7] = 32'h5133;
-    assign adc_data_out [8] = 32'h5A81;
-    assign adc_data_out [9] = 32'h62F1;
-    assign adc_data_out [10] = 32'h6A6C;
-    assign adc_data_out [11] = 32'h70E1;
-    assign adc_data_out [12] = 32'h7640;
-    assign adc_data_out [13] = 32'h7A7C;
-    assign adc_data_out [14] = 32'h7D89;
-    assign adc_data_out [15] = 32'h7F61;
-    assign adc_data_out [16] = 32'h7FFF;
-    assign adc_data_out [17] = 32'h7F61;
-    assign adc_data_out [18] = 32'h7D89;
-    assign adc_data_out [19] = 32'h7A7C;
-    assign adc_data_out [20] = 32'h7640;
-    assign adc_data_out [21] = 32'h70E1;
-    assign adc_data_out [22] = 32'h6A6C;
-    assign adc_data_out [23] = 32'h62F1;
-    assign adc_data_out [24] = 32'h5A81;
-    assign adc_data_out [25] = 32'h5133;
-    assign adc_data_out [26] = 32'h471C;
-    assign adc_data_out [27] = 32'h3C56;
-    assign adc_data_out [28] = 32'h30FB;
-    assign adc_data_out [29] = 32'h2527;
-    assign adc_data_out [30] = 32'h18F8;
-    assign adc_data_out [31] = 32'h0C8B;
-    assign adc_data_out [32] = 32'h0000;
-    assign adc_data_out [33] = 32'hF375;
-    assign adc_data_out [34] = 32'hE708;
-    assign adc_data_out [35] = 32'hDAD9;
-    assign adc_data_out [36] = 32'hCF05;
-    assign adc_data_out [37] = 32'hC3AA;
-    assign adc_data_out [38] = 32'hB8E4;
-    assign adc_data_out [39] = 32'hAECD;
-    assign adc_data_out [40] = 32'hA57F;
-    assign adc_data_out [41] = 32'h9D0F;
-    assign adc_data_out [42] = 32'h9594;
-    assign adc_data_out [43] = 32'h8F1F;
-    assign adc_data_out [44] = 32'h89C0;
-    assign adc_data_out [45] = 32'h8584;
-    assign adc_data_out [46] = 32'h8277;
-    assign adc_data_out [47] = 32'h809F;
-    assign adc_data_out [48] = 32'h8001;
-    assign adc_data_out [49] = 32'h809F;
-    assign adc_data_out [50] = 32'h8277;
-    assign adc_data_out [51] = 32'h8584;
-    assign adc_data_out [52] = 32'h89C0;
-    assign adc_data_out [53] = 32'h8F1F;
-    assign adc_data_out [54] = 32'h9594;
-    assign adc_data_out [55] = 32'h9D0F;
-    assign adc_data_out [56] = 32'hA57F;
-    assign adc_data_out [57] = 32'hAECD;
-    assign adc_data_out [58] = 32'h58E4;
-    assign adc_data_out [59] = 32'hC3AA;
-    assign adc_data_out [60] = 32'hCF05;
-    assign adc_data_out [61] = 32'hDAD9;
-    assign adc_data_out [62] = 32'hE708;
-    assign adc_data_out [63] = 32'hF375;
-
-
-    assign fft_in_re = adc_data_out[fft_count-2]
+    wire [15:0] adc_data_out [0:63];
+    assign adc_data_out [0] = 16'h0000;
+    assign adc_data_out [1] = 16'h0C8B;
+    assign adc_data_out [2] = 16'h18F8;
+    assign adc_data_out [3] = 16'h2527;
+    assign adc_data_out [4] = 16'h30FB;
+    assign adc_data_out [5] = 16'h3C56;
+    assign adc_data_out [6] = 16'h471C;
+    assign adc_data_out [7] = 16'h5133;
+    assign adc_data_out [8] = 16'h5A81;
+    assign adc_data_out [9] = 16'h62F1;
+    assign adc_data_out [10] = 16'h6A6C;
+    assign adc_data_out [11] = 16'h70E1;
+    assign adc_data_out [12] = 16'h7640;
+    assign adc_data_out [13] = 16'h7A7C;
+    assign adc_data_out [14] = 16'h7D89;
+    assign adc_data_out [15] = 16'h7F61;
+    assign adc_data_out [16] = 16'h7FFF;
+    assign adc_data_out [17] = 16'h7F61;
+    assign adc_data_out [18] = 16'h7D89;
+    assign adc_data_out [19] = 16'h7A7C;
+    assign adc_data_out [20] = 16'h7640;
+    assign adc_data_out [21] = 16'h70E1;
+    assign adc_data_out [22] = 16'h6A6C;
+    assign adc_data_out [23] = 16'h62F1;
+    assign adc_data_out [24] = 16'h5A81;
+    assign adc_data_out [25] = 16'h5133;
+    assign adc_data_out [26] = 16'h471C;
+    assign adc_data_out [27] = 16'h3C56;
+    assign adc_data_out [28] = 16'h30FB;
+    assign adc_data_out [29] = 16'h2527;
+    assign adc_data_out [30] = 16'h18F8;
+    assign adc_data_out [31] = 16'h0C8B;
+    assign adc_data_out [32] = 16'h0000;
+    assign adc_data_out [33] = 16'hF375;
+    assign adc_data_out [34] = 16'hE708;
+    assign adc_data_out [35] = 16'hDAD9;
+    assign adc_data_out [36] = 16'hCF05;
+    assign adc_data_out [37] = 16'hC3AA;
+    assign adc_data_out [38] = 16'hB8E4;
+    assign adc_data_out [39] = 16'hAECD;
+    assign adc_data_out [40] = 16'hA57F;
+    assign adc_data_out [41] = 16'h9D0F;
+    assign adc_data_out [42] = 16'h9594;
+    assign adc_data_out [43] = 16'h8F1F;
+    assign adc_data_out [44] = 16'h89C0;
+    assign adc_data_out [45] = 16'h8584;
+    assign adc_data_out [46] = 16'h8277;
+    assign adc_data_out [47] = 16'h809F;
+    assign adc_data_out [48] = 16'h8001;
+    assign adc_data_out [49] = 16'h809F;
+    assign adc_data_out [50] = 16'h8277;
+    assign adc_data_out [51] = 16'h8584;
+    assign adc_data_out [52] = 16'h89C0;
+    assign adc_data_out [53] = 16'h8F1F;
+    assign adc_data_out [54] = 16'h9594;
+    assign adc_data_out [55] = 16'h9D0F;
+    assign adc_data_out [56] = 16'hA57F;
+    assign adc_data_out [57] = 16'hAECD;
+    assign adc_data_out [58] = 16'h58E4;
+    assign adc_data_out [59] = 16'hC3AA;
+    assign adc_data_out [60] = 16'hCF05;
+    assign adc_data_out [61] = 16'hDAD9;
+    assign adc_data_out [62] = 16'hE708;
+    assign adc_data_out [63] = 16'hF375;
 
 
-    sdf_fft  #(.WIDTH(WIDTH)) U_FFT  (
+    assign fft_in_re = adc_data_out[fft_count-2];
+
+
+    sdf_fft  #(.WIDTH(16)) U_FFT  (
       .clock        (clock),
       .reset        (fft_reset),
       .data_in_en   (fft_in_en),
       .data_in_real (fft_in_re),
       .data_in_imag (16'd0),
-      .data_out_en  (fft_out_en | ex_is_fft),
+      .data_out_en  (fft_out_en),
       .data_out_real(fft_out_re),
       .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
     );
@@ -499,18 +509,18 @@ module processor(
     always @(posedge clock or posedge fft_reset) begin
         if (fft_reset) begin
             fft_data_out_count <= 5'd0;
-        end if (fft_out_en) begin
+        end else if (fft_out_en) begin
             fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            // put bitrev6 back in ****************
-            assign fft_regs [fft_data_out_count] = fft_out_re; // inverse bit order for output
+            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_re; // inverse bit order for output
         end
     end
+
 
     
 
 
     // ifft opcode = 01001
-    sdf_ifft #(.WIDTH(WIDTH)) U_IFFT (
+    sdf_ifft #(.WIDTH(16)) U_IFFT (
       .clock        (clock),
       .reset        (fft_reset),
       .data_in_en   (ifft_in_en),

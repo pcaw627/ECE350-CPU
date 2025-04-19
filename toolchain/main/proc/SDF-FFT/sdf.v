@@ -39,10 +39,10 @@ always @(posedge clock or posedge reset) begin
         data_in_count <= data_in_en ? (data_in_count + 1'b1) : {LOG_N{1'b0}};
     end
 end
-assign  bf1_bf = data_in_count[LOG_M-1];
 
 // BUTTERFLY 1
-wire bf1_bf; // Butterfly 1 Add/Sub Enable
+wire bf1_bf = data_in_count[LOG_M-1];
+// wire bf1_bf; // Butterfly 1 Add/Sub Enable
 
 wire[WIDTH-1:0] bf1_x0_real, bf1_x0_imag, bf1_x1_real, bf1_x1_imag; // Data #0 and #1 TO Butterfly (Real and Imag for each)
 wire[WIDTH-1:0] bf1_y0_real, bf1_y0_imag, bf1_y1_real, bf1_y1_imag; // Data #0 and #1 FROM Butterfly (Real and Imag for each)

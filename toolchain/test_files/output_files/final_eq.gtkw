@@ -1,0 +1,24 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sun Apr 20 18:37:36 2025
+[*]
+[dumpfile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\test_files\output_files\final_eq.vcd"
+[savefile] "C:\DUKE\ECE350\ECE350-CPU\toolchain\test_files\output_files\final_eq.gtkw"
+[timestart] 0
+[size] 1536 889
+[pos] -217 -217
+*-20.832272 7580000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] Wrapper_tb.
+[sst_width] 253
+[signals_width] 203
+[sst_expanded] 1
+[sst_vpaned_height] 254
+@28
+Wrapper_tb.CPU.clock
+Wrapper_tb.CPU.ex_is_fft
+Wrapper_tb.CPU.ex_is_ifft
+@22
+Wrapper_tb.CPU.fft_count[7:0]
+Wrapper_tb.CPU.ifft_count[7:0]
+[pattern_trace] 1
+[pattern_trace] 0

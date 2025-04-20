@@ -36,27 +36,40 @@ module Wrapper (
     //input XA_P,
     output reg [4:0] LED);
     
-    
+    wire clock;
     assign clock = clk_40mhz;
     
     wire locked, clk_40mhz; 
     clk_wiz_0 pll (
-      // Clock out ports
-      .clk_out1(clk_40mhz),
-      // Status and control signals
-      .reset(1'b0),
-      .locked(locked),
-     // Clock in ports
-      .clk_in1(clk_100mhz)
-     );
-     wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
-     always @(posedge clock) begin
+        // Clock out ports
+        .clk_out1(clk_40mhz),
+        // Status and control signals
+        .reset(1'b0),
+        .locked(locked),
+        // Clock in ports
+        .clk_in1(clk_100mhz)
+    );
+
+    reg [15:0] clk_audio_44kHz;
+    initial begin
+        clk_audio_44kHz <= 16'd0;
+    end
+    wire [15:0] clk_audio_44kHz_out = clk_audio_44kHz;
+
+    wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
+    always @(posedge clock) begin
+        if (clk_audio_44kHz == 16'd44000) begin
+            clk_audio_44kHz <= 16'd0;
+        end else begin
+            clk_audio_44kHz <= clk_audio_44kHz + 16'd1;
+        end
+
         LED[0] <= BTNU_out;     
         LED[1] <= BTND_out;
         LED[2] <= BTNR_out;     
         LED[3] <= BTNL_out;     
         LED[4] <= BTNC_out;     
-     end
+    end
 
      
 

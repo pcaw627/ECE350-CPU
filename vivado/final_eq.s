@@ -1,85 +1,40 @@
 
-nop
-# 64 nops to allow ADC to sample, after which it samples one at a time
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
-nop
+# Register conventions:
+# $1-16 are dedicated FFT/IFFT registers
+# $17 PRESET_ADDR
+# $18 ADC_READY (ready for processing new sample, ~44kHz)
+
+
 # start sampling the ADC
+
+# FFT-MOD-IFFT block done, continue main block
+MAIN: 
+
+# if 44kHz clock signal goes high (status in $18), then jump to AUDIO block address (which leads 
+# to different presets )
+
+addi $20, $20, 5
+nop
+bne $18, $0, AUDIO
+nop
+
+j MAIN
+
+
 
 # 44kHz signal is set asynchonously, triggering JAL ra, PRESET_START
 
 PRESET_START:
 
-# run FFT to get wave spectrum
-fft 5
-nop
-nop
 
 
 # initiate low pass modulation factors into registers 1 through 16
 PRESET_0:
 
+# run FFT to get wave spectrum
+fft 5
+nop
+nop
 addi $1, $0, 32767        # r1 = 0
 addi $2, $0, 32767        # r2 = 0
 addi $3, $0, 16636        # r3 = 0
@@ -107,6 +62,10 @@ nop
 # initiate low pass frequency modulation factors into registers 1 through 16
 PRESET_1:
 
+# run FFT to get wave spectrum
+fft 5
+nop
+nop
 addi $1, $0, 32767        # r1 = 0
 addi $2, $0, 32767        # r2 = 0
 addi $3, $0, 16636        # r3 = 0
@@ -135,6 +94,10 @@ nop
 # initiate high-pass frequency modulation factors into registers 1 through 16
 PRESET_2:
 
+# run FFT to get wave spectrum
+fft 5
+nop
+nop
 addi $1, $0, 0        # r1 = 0
 addi $2, $0, 0        # r2 = 0
 addi $3, $0, 0        # r3 = 0
@@ -181,12 +144,18 @@ mod $0, $15, 0
 mod $0, $16, 0
 
 ifft 5
+$
+j MAIN
 
 
 
 # initiate fast-waver time-modulation factors into registers 1 through 16
 PRESET_3:
 
+# run FFT to get wave spectrum
+fft 5
+nop
+nop
 addi $1, $0, 32767        # r1 = 0
 addi $2, $0, 32767        # r2 = 0
 addi $3, $0, 16636        # r3 = 0
@@ -205,6 +174,8 @@ addi $15, $0, 0           # r15 = 0
 addi $16, $0, 0           # r16 = 0
 nop
 nop
+# after frequency modulation, execute IFFT
+ifft 5
 
 
 
@@ -212,6 +183,10 @@ nop
 # initiate slow-waver time-modulation factors into registers 1 through 16
 PRESET_4:
 
+# run FFT to get wave spectrum
+fft 5
+nop
+nop
 addi $1, $0, 32767        # r1 = 0
 addi $2, $0, 32767        # r2 = 0
 addi $3, $0, 16636        # r3 = 0
@@ -230,9 +205,6 @@ addi $15, $0, 0           # r15 = 0
 addi $16, $0, 0           # r16 = 0
 nop
 nop
-
-
-
 # after frequency modulation, execute IFFT
 ifft 5
 
@@ -240,9 +212,9 @@ ifft 5
 
 
 # arbitrary instructions
-addi $17, $0, 25           # r14 = 0
-addi $18, $0, 24           # r15 = 0
-addi $19, $0, 23           # r16 = 0
+addi $20, $20, 25           # r14 = 0
+addi $21, $21, 24           # r15 = 0
+addi $22, $22, 23           # r16 = 0
 
 
 

@@ -1,4 +1,27 @@
 
+# Register conventions:
+# $1-16 are dedicated FFT/IFFT registers
+# $17 PRESET_ADDR
+# $18 ADC_READY (ready for processing new sample, ~44kHz)
+
+
+MAIN:
+
+addi $20, $20, 5
+nop
+bne $18, $0, AUDIO
+nop
+
+j MAIN
+
+
+
+
+
+
+
+AUDIO:
+
 # initiate low pass modulation factors into registers 1 through 16
 addi $1, $0, 32767        # r1 = 0
 addi $2, $0, 32767        # r2 = 0
@@ -44,6 +67,14 @@ mod $0, $16, 0
 
 # after modulation, continue processing through IFFT
 ifft 1
+nop
+nop
+
+# reset r18 to 0 and r19 to 1
+addi $18, $0, 0           # r18 = 0
+
+
+j MAIN
 
 
 

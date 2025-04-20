@@ -6,6 +6,7 @@
 .\processor\divider.v
 .\processor\full_adder.v
 .\processor\gen_prop.v
+.\processor\ifft_pwm.v
 .\processor\multdiv.v
 .\processor\multiplier.v
 .\processor\mux_2.v

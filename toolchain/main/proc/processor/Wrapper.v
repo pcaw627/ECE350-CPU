@@ -24,9 +24,33 @@
  *
  **/
 
-module Wrapper (clock, reset);
-	input clock, reset;
-
+module Wrapper (
+    input clock, 
+    input reset, 
+    input BTNU, 
+    input BTND,
+    input BTNL,
+    input BTNR,
+    input BTNC,
+    //input XA_N,
+    //input XA_P,
+    output reg [4:0] LED);
+    
+    
+    assign clock = clk_40mhz;
+    
+    wire locked, clk_40mhz; 
+    clk_wiz_0 pll (
+      // Clock out ports
+      .clk_out1(clk_40mhz),
+      // Status and control signals
+      .reset(1'b0),
+      .locked(locked),
+     // Clock in ports
+      .clk_in1(clk_100mhz)
+     );
+     
+     
 	wire rwe, mwe;
 	wire[4:0] rd, rs1, rs2;
 	wire[31:0] instAddr, instData, 
@@ -50,7 +74,17 @@ module Wrapper (clock, reset);
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut)); 
+		.data(memDataIn), .q_dmem(memDataOut),
+		
+		// fpga input/output
+        .BTNU(BTNU),
+        .BTNR(BTNR),
+        .BTNL(BTNL),
+        .BTND(BTND),
+        .BTNC(BTNC),
+        .LED(LED[4:0])
+		
+		); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))

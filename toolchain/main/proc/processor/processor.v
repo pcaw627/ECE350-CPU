@@ -41,60 +41,10 @@ module processor(
     data_readRegA,                  // I: Data from port A of RegFile
     data_readRegB,                  // I: Data from port B of RegFile
 
-    // Buttons
-    BTNU,                           // I: Button Up from fpga
-    BTND,                           // I: Button Down from fpga
-    BTNL,                           // I: Button Left from fpga
-    BTNR,                           // I: Button Right from fpga
-    BTNC,                            // I: Button Right from fpga
-
-    LED
-
 );
 
     // Control signals
-    input clock, reset, BTNU, BTND, BTNL, BTNR, BTNC;
-    output [4:0] LED;
-
-    // BTN & LED fpga testing
-    reg btnu_d, btnd_d, btnl_d, btnr_d, btnc_d;  // 1‑cycle delayed copies
-    always @(posedge clock) begin
-        btnu_d <= BTNU;
-        btnd_d <= BTND;
-        btnl_d <= BTNL;
-        btnr_d <= BTNR;
-        btnc_d <= BTNC;
-    end
-
-    wire p_edge_u = BTNU & ~btnu_d;   // BTNU rising edge
-    wire p_edge_d = BTND & ~btnd_d;   // BTND rising edge
-    wire p_edge_l = BTNL & ~btnl_d;   // BTNL rising edge
-    wire p_edge_r = BTNR & ~btnr_d;   // BTNR rising edge
-    wire p_edge_c = BTNC & ~btnc_d;   // BTNC rising edge
-
-    // ----------- one‑hot latch -----------
-    reg [4:0] btn_latch;
-    always @(posedge clock or posedge reset) begin
-        if (reset)
-            btn_latch <= 5'b0;              // all LEDs off after reset
-        else if (p_edge_u)
-            btn_latch <= 5'b00001;          // U → LED0
-        else if (p_edge_d)
-            btn_latch <= 5'b00010;          // D → LED1
-        else if (p_edge_l)
-            btn_latch <= 5'b00100;          // L → LED2
-        else if (p_edge_r)
-            btn_latch <= 5'b01000;          // R → LED3
-        else if (p_edge_c)
-            btn_latch <= 5'b10000;          // C → LED4
-        // else keep previous value
-    end
-
-    // ----------- drive the LEDs -----------
-    assign LED = {btn_latch};   // LED[4:0]=latch
-
-
-
+    input clock, reset;
     
     // Imem
     output [31:0] address_imem;

@@ -70,6 +70,8 @@ proc create_report { reportName command } {
   }
 }
 OPTRACE "synth_1" START { ROLLUP_AUTO }
+set_param chipscope.maxJobs 1
+set_param xicom.use_bs_reader 1
 OPTRACE "Creating in-memory project" START { }
 create_project -in_memory -part xc7a100tcsg324-1
 
@@ -149,6 +151,8 @@ read_xdc C:/DUKE/ECE350/ECE350-CPU/adc/adc.srcs/constrs_1/imports/vivado/Nexys-A
 set_property used_in_implementation false [get_files C:/DUKE/ECE350/ECE350-CPU/adc/adc.srcs/constrs_1/imports/vivado/Nexys-A7-100T-Master.xdc]
 
 set_param ips.enableIPCacheLiteLoad 1
+
+read_checkpoint -auto_incremental -incremental C:/DUKE/ECE350/ECE350-CPU/adc/adc.srcs/utils_1/imports/synth_1/Wrapper.dcp
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }

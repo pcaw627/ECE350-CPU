@@ -1,0 +1,76 @@
+
+*** Running vivado
+    with args -log Wrapper.vdi -applog -m64 -product Vivado -messageDb vivado.pb -mode batch -source Wrapper.tcl -notrace
+
+
+
+****** Vivado v2021.1 (64-bit)
+  **** SW Build 3247384 on Thu Jun 10 19:36:33 MDT 2021
+  **** IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+    ** Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
+
+source Wrapper.tcl -notrace
+Command: link_design -top Wrapper -part xc7a100tcsg324-1
+Design is defaulting to srcset: sources_1
+Design is defaulting to constrset: constrs_1
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+INFO: [Project 1-454] Reading design checkpoint 'c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.dcp' for cell 'pll'
+INFO: [Project 1-454] Reading design checkpoint 'c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0.dcp' for cell 'data_capture/xadc_inst'
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.190 . Memory (MB): peak = 1329.055 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 536 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-479] Netlist was created with Vivado 2021.1
+INFO: [Project 1-570] Preparing netlist for logic optimization
+Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_board.xdc] for cell 'pll/inst'
+Finished Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_board.xdc] for cell 'pll/inst'
+Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.xdc] for cell 'pll/inst'
+INFO: [Timing 38-35] Done setting XDC timing constraints. [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.xdc:57]
+INFO: [Timing 38-2] Deriving generated clocks [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.xdc:57]
+get_clocks: Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 1751.320 ; gain = 422.266
+Finished Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.xdc] for cell 'pll/inst'
+Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0.xdc] for cell 'data_capture/xadc_inst/inst'
+Finished Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/Low_Pass_real_time/Low_Pass_real_time.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0.xdc] for cell 'data_capture/xadc_inst/inst'
+Parsing XDC File [C:/Users/af314/Documents/ECE350-CPU/vivado/Nexys-A7-100T-Master.xdc]
+Finished Parsing XDC File [C:/Users/af314/Documents/ECE350-CPU/vivado/Nexys-A7-100T-Master.xdc]
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.029 . Memory (MB): peak = 1751.320 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+11 Infos, 0 Warnings, 0 Critical Warnings and 0 Errors encountered.
+link_design completed successfully
+link_design: Time (s): cpu = 00:00:13 ; elapsed = 00:00:15 . Memory (MB): peak = 1751.320 ; gain = 422.266
+Command: opt_design
+Attempting to get a license for feature 'Implementation' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Implementation' and/or device 'xc7a100t'
+Running DRC as a precondition to command opt_design
+
+Starting DRC Task
+INFO: [DRC 23-27] Running DRC with 2 threads
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[0] has multiple drivers: data_capture/adc_out_reg[0]/Q, CPU/fft_regs_reg[0][0]/Q, CPU/fft_regs_reg[0][0]__0/Q, CPU/fft_regs_reg[0][0]__1/Q, CPU/fft_regs_reg[10][0]__0/Q, CPU/fft_regs_reg[10][0]/Q, CPU/fft_regs_reg[10][0]__1/Q, CPU/fft_regs_reg[11][0]__1/Q, CPU/fft_regs_reg[11][0]/Q, CPU/fft_regs_reg[11][0]__0/Q, CPU/fft_regs_reg[12][0]/Q, CPU/fft_regs_reg[12][0]__1/Q, CPU/fft_regs_reg[12][0]__0/Q, CPU/fft_regs_reg[13][0]/Q, CPU/fft_regs_reg[13][0]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[10] has multiple drivers: data_capture/adc_out_reg[10]/Q, CPU/fft_regs_reg[0][10]__1/Q, CPU/fft_regs_reg[0][10]/Q, CPU/fft_regs_reg[0][10]__0/Q, CPU/fft_regs_reg[10][10]__0/Q, CPU/fft_regs_reg[10][10]/Q, CPU/fft_regs_reg[10][10]__1/Q, CPU/fft_regs_reg[11][10]/Q, CPU/fft_regs_reg[11][10]__0/Q, CPU/fft_regs_reg[11][10]__1/Q, CPU/fft_regs_reg[12][10]__0/Q, CPU/fft_regs_reg[12][10]__1/Q, CPU/fft_regs_reg[12][10]/Q, CPU/fft_regs_reg[13][10]/Q, CPU/fft_regs_reg[13][10]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[11] has multiple drivers: data_capture/adc_out_reg[11]/Q, CPU/fft_regs_reg[0][11]__0/Q, CPU/fft_regs_reg[0][11]/Q, CPU/fft_regs_reg[0][11]__1/Q, CPU/fft_regs_reg[10][11]/Q, CPU/fft_regs_reg[10][11]__0/Q, CPU/fft_regs_reg[10][11]__1/Q, CPU/fft_regs_reg[11][11]/Q, CPU/fft_regs_reg[11][11]__1/Q, CPU/fft_regs_reg[11][11]__0/Q, CPU/fft_regs_reg[12][11]/Q, CPU/fft_regs_reg[12][11]__1/Q, CPU/fft_regs_reg[12][11]__0/Q, CPU/fft_regs_reg[13][11]/Q, CPU/fft_regs_reg[13][11]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[12] has multiple drivers: data_capture/adc_out_reg[12]/Q, CPU/fft_regs_reg[0][12]__0/Q, CPU/fft_regs_reg[0][12]__1/Q, CPU/fft_regs_reg[0][12]/Q, CPU/fft_regs_reg[10][12]/Q, CPU/fft_regs_reg[10][12]__0/Q, CPU/fft_regs_reg[10][12]__1/Q, CPU/fft_regs_reg[11][12]__1/Q, CPU/fft_regs_reg[11][12]/Q, CPU/fft_regs_reg[11][12]__0/Q, CPU/fft_regs_reg[12][12]/Q, CPU/fft_regs_reg[12][12]__1/Q, CPU/fft_regs_reg[12][12]__0/Q, CPU/fft_regs_reg[13][12]__0/Q, CPU/fft_regs_reg[13][12]/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[13] has multiple drivers: data_capture/adc_out_reg[13]/Q, CPU/fft_regs_reg[0][13]/Q, CPU/fft_regs_reg[0][13]__1/Q, CPU/fft_regs_reg[0][13]__0/Q, CPU/fft_regs_reg[10][13]/Q, CPU/fft_regs_reg[10][13]__0/Q, CPU/fft_regs_reg[10][13]__1/Q, CPU/fft_regs_reg[11][13]__0/Q, CPU/fft_regs_reg[11][13]__1/Q, CPU/fft_regs_reg[11][13]/Q, CPU/fft_regs_reg[12][13]__0/Q, CPU/fft_regs_reg[12][13]/Q, CPU/fft_regs_reg[12][13]__1/Q, CPU/fft_regs_reg[13][13]/Q, CPU/fft_regs_reg[13][13]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[14] has multiple drivers: data_capture/adc_out_reg[14]/Q, CPU/fft_regs_reg[0][14]__0/Q, CPU/fft_regs_reg[0][14]__1/Q, CPU/fft_regs_reg[0][14]/Q, CPU/fft_regs_reg[10][14]/Q, CPU/fft_regs_reg[10][14]__1/Q, CPU/fft_regs_reg[10][14]__0/Q, CPU/fft_regs_reg[11][14]__0/Q, CPU/fft_regs_reg[11][14]/Q, CPU/fft_regs_reg[11][14]__1/Q, CPU/fft_regs_reg[12][14]__0/Q, CPU/fft_regs_reg[12][14]/Q, CPU/fft_regs_reg[12][14]__1/Q, CPU/fft_regs_reg[13][14]/Q, CPU/fft_regs_reg[13][14]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[15] has multiple drivers: data_capture/adc_out_reg[15]/Q, CPU/fft_regs_reg[0][15]/Q, CPU/fft_regs_reg[0][15]__1/Q, CPU/fft_regs_reg[0][15]__0/Q, CPU/fft_regs_reg[10][15]__1/Q, CPU/fft_regs_reg[10][15]/Q, CPU/fft_regs_reg[10][15]__0/Q, CPU/fft_regs_reg[11][15]/Q, CPU/fft_regs_reg[11][15]__1/Q, CPU/fft_regs_reg[11][15]__0/Q, CPU/fft_regs_reg[12][15]/Q, CPU/fft_regs_reg[12][15]__1/Q, CPU/fft_regs_reg[12][15]__0/Q, CPU/fft_regs_reg[13][15]/Q, CPU/fft_regs_reg[13][15]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[1] has multiple drivers: data_capture/adc_out_reg[1]/Q, CPU/fft_regs_reg[0][1]__0/Q, CPU/fft_regs_reg[0][1]/Q, CPU/fft_regs_reg[0][1]__1/Q, CPU/fft_regs_reg[10][1]__0/Q, CPU/fft_regs_reg[10][1]__1/Q, CPU/fft_regs_reg[10][1]/Q, CPU/fft_regs_reg[11][1]/Q, CPU/fft_regs_reg[11][1]__0/Q, CPU/fft_regs_reg[11][1]__1/Q, CPU/fft_regs_reg[12][1]/Q, CPU/fft_regs_reg[12][1]__0/Q, CPU/fft_regs_reg[12][1]__1/Q, CPU/fft_regs_reg[13][1]/Q, CPU/fft_regs_reg[13][1]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[2] has multiple drivers: data_capture/adc_out_reg[2]/Q, CPU/fft_regs_reg[0][2]__1/Q, CPU/fft_regs_reg[0][2]/Q, CPU/fft_regs_reg[0][2]__0/Q, CPU/fft_regs_reg[10][2]/Q, CPU/fft_regs_reg[10][2]__1/Q, CPU/fft_regs_reg[10][2]__0/Q, CPU/fft_regs_reg[11][2]/Q, CPU/fft_regs_reg[11][2]__1/Q, CPU/fft_regs_reg[11][2]__0/Q, CPU/fft_regs_reg[12][2]/Q, CPU/fft_regs_reg[12][2]__1/Q, CPU/fft_regs_reg[12][2]__0/Q, CPU/fft_regs_reg[13][2]__1/Q, CPU/fft_regs_reg[13][2]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[3] has multiple drivers: data_capture/adc_out_reg[3]/Q, CPU/fft_regs_reg[0][3]/Q, CPU/fft_regs_reg[0][3]__1/Q, CPU/fft_regs_reg[0][3]__0/Q, CPU/fft_regs_reg[10][3]/Q, CPU/fft_regs_reg[10][3]__0/Q, CPU/fft_regs_reg[10][3]__1/Q, CPU/fft_regs_reg[11][3]__1/Q, CPU/fft_regs_reg[11][3]__0/Q, CPU/fft_regs_reg[11][3]/Q, CPU/fft_regs_reg[12][3]/Q, CPU/fft_regs_reg[12][3]__0/Q, CPU/fft_regs_reg[12][3]__1/Q, CPU/fft_regs_reg[13][3]__0/Q, CPU/fft_regs_reg[13][3]/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[4] has multiple drivers: data_capture/adc_out_reg[4]/Q, CPU/fft_regs_reg[0][4]__0/Q, CPU/fft_regs_reg[0][4]__1/Q, CPU/fft_regs_reg[0][4]/Q, CPU/fft_regs_reg[10][4]/Q, CPU/fft_regs_reg[10][4]__0/Q, CPU/fft_regs_reg[10][4]__1/Q, CPU/fft_regs_reg[11][4]__1/Q, CPU/fft_regs_reg[11][4]/Q, CPU/fft_regs_reg[11][4]__0/Q, CPU/fft_regs_reg[12][4]/Q, CPU/fft_regs_reg[12][4]__1/Q, CPU/fft_regs_reg[12][4]__0/Q, CPU/fft_regs_reg[13][4]/Q, CPU/fft_regs_reg[13][4]__1/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[5] has multiple drivers: data_capture/adc_out_reg[5]/Q, CPU/fft_regs_reg[0][5]/Q, CPU/fft_regs_reg[0][5]__0/Q, CPU/fft_regs_reg[0][5]__1/Q, CPU/fft_regs_reg[10][5]/Q, CPU/fft_regs_reg[10][5]__0/Q, CPU/fft_regs_reg[10][5]__1/Q, CPU/fft_regs_reg[11][5]/Q, CPU/fft_regs_reg[11][5]__1/Q, CPU/fft_regs_reg[11][5]__0/Q, CPU/fft_regs_reg[12][5]__0/Q, CPU/fft_regs_reg[12][5]/Q, CPU/fft_regs_reg[12][5]__1/Q, CPU/fft_regs_reg[13][5]__0/Q, CPU/fft_regs_reg[13][5]/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[6] has multiple drivers: data_capture/adc_out_reg[6]/Q, CPU/fft_regs_reg[0][6]/Q, CPU/fft_regs_reg[0][6]__0/Q, CPU/fft_regs_reg[0][6]__1/Q, CPU/fft_regs_reg[10][6]/Q, CPU/fft_regs_reg[10][6]__1/Q, CPU/fft_regs_reg[10][6]__0/Q, CPU/fft_regs_reg[11][6]__0/Q, CPU/fft_regs_reg[11][6]/Q, CPU/fft_regs_reg[11][6]__1/Q, CPU/fft_regs_reg[12][6]__0/Q, CPU/fft_regs_reg[12][6]__1/Q, CPU/fft_regs_reg[12][6]/Q, CPU/fft_regs_reg[13][6]__1/Q, CPU/fft_regs_reg[13][6]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[7] has multiple drivers: data_capture/adc_out_reg[7]/Q, CPU/fft_regs_reg[0][7]__0/Q, CPU/fft_regs_reg[0][7]/Q, CPU/fft_regs_reg[0][7]__1/Q, CPU/fft_regs_reg[10][7]__1/Q, CPU/fft_regs_reg[10][7]__0/Q, CPU/fft_regs_reg[10][7]/Q, CPU/fft_regs_reg[11][7]/Q, CPU/fft_regs_reg[11][7]__0/Q, CPU/fft_regs_reg[11][7]__1/Q, CPU/fft_regs_reg[12][7]__1/Q, CPU/fft_regs_reg[12][7]__0/Q, CPU/fft_regs_reg[12][7]/Q, CPU/fft_regs_reg[13][7]/Q, CPU/fft_regs_reg[13][7]__0/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[8] has multiple drivers: data_capture/adc_out_reg[8]/Q, CPU/fft_regs_reg[0][8]__0/Q, CPU/fft_regs_reg[0][8]__1/Q, CPU/fft_regs_reg[0][8]/Q, CPU/fft_regs_reg[10][8]__0/Q, CPU/fft_regs_reg[10][8]/Q, CPU/fft_regs_reg[10][8]__1/Q, CPU/fft_regs_reg[11][8]/Q, CPU/fft_regs_reg[11][8]__0/Q, CPU/fft_regs_reg[11][8]__1/Q, CPU/fft_regs_reg[12][8]__0/Q, CPU/fft_regs_reg[12][8]__1/Q, CPU/fft_regs_reg[12][8]/Q, CPU/fft_regs_reg[13][8]/Q, CPU/fft_regs_reg[13][8]__1/Q... and (the first 15 of 193 listed).
+ERROR: [DRC MDRV-1] Multiple Driver Nets: Net data_capture/Q[9] has multiple drivers: data_capture/adc_out_reg[9]/Q, CPU/fft_regs_reg[0][9]__1/Q, CPU/fft_regs_reg[0][9]/Q, CPU/fft_regs_reg[0][9]__0/Q, CPU/fft_regs_reg[10][9]/Q, CPU/fft_regs_reg[10][9]__0/Q, CPU/fft_regs_reg[10][9]__1/Q, CPU/fft_regs_reg[11][9]__1/Q, CPU/fft_regs_reg[11][9]/Q, CPU/fft_regs_reg[11][9]__0/Q, CPU/fft_regs_reg[12][9]/Q, CPU/fft_regs_reg[12][9]__0/Q, CPU/fft_regs_reg[12][9]__1/Q, CPU/fft_regs_reg[13][9]__0/Q, CPU/fft_regs_reg[13][9]/Q... and (the first 15 of 193 listed).
+INFO: [Project 1-461] DRC finished with 16 Errors
+INFO: [Project 1-462] Please refer to the DRC report (report_drc) for more information.
+ERROR: [Vivado_Tcl 4-78] Error(s) found during DRC. Opt_design not run.
+
+Time (s): cpu = 00:00:02 ; elapsed = 00:00:00.842 . Memory (MB): peak = 1751.320 ; gain = 0.000
+INFO: [Common 17-83] Releasing license: Implementation
+16 Infos, 0 Warnings, 0 Critical Warnings and 17 Errors encountered.
+opt_design failed
+ERROR: [Common 17-39] 'opt_design' failed due to earlier errors.
+
+INFO: [Common 17-206] Exiting Vivado at Sun Apr 20 19:50:26 2025...

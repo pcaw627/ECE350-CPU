@@ -238,7 +238,7 @@ module processor(
     wire [31:0] branch_cmp_result;
     wire branch_cmp_notEqual, branch_is_less;
     alu branch_cmp(
-        .data_operandA(data_readRegA), // for branch, we set regA = $rd
+        .data_operandA((adc_ready & (ifid_instr_out[26:22] == 5'd18)) ? 32'd1 : data_readRegA), // for branch, we set regA = $rd
         .data_operandB(data_readRegB), // and regB = $rs
         .ctrl_ALUopcode(5'b00001),      // subtraction
         .data_result(branch_cmp_result),
@@ -531,14 +531,14 @@ module processor(
         // assign adc_data_out [63] = 16'hF375;
 
 
-    assign fft_in_re = adc_data_out[fft_count-1];
+    //assign fft_in_re = adc_data_out[fft_count-1];
 
 
     sdf_fft  #(.WIDTH(16)) U_FFT  (
       .clock        (clock),
       .reset        (fft_reset),
       .data_in_en   (fft_in_en),
-      .data_in_real (fft_in_re),
+      .data_in_real (fft_regs[63]),
       .data_in_imag (16'd0),
       .data_out_en  (fft_out_en),
       .data_out_real(fft_out_re),
@@ -698,13 +698,14 @@ module processor(
       .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
     );
 
-    
-    
+
+
     reg [5:0] ifft_data_out_count;
-    always @(posedge clock or posedge fft_reset) begin
+    always @(posedge clock) begin
         if (fft_reset) begin
             ifft_data_out_count <= 5'd0;
-        end else if (ifft_out_en) begin
+        end
+        if (ifft_out_en) begin
             ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
             fft_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
         end  
@@ -761,7 +762,7 @@ module processor(
 
      
 
-    assign stall = stall_multdiv | stall_fft | stall_ifft | stall_adc_ready;
+    assign stall = stall_multdiv | stall_fft | stall_ifft;
 
 
     wire we_exmem = ~stall;
@@ -808,7 +809,7 @@ module processor(
         .clock(~clock),
         .reset(reset),
         .we(we_exmem),
-        .d((adc_ready) ? 32'd1: branchOrJump ? 32'd0 : ex_result),
+        .d(branchOrJump ? 32'd0 : ex_result),
         .q(exmem_result_out)
     );
     
@@ -817,7 +818,7 @@ module processor(
         .clock(~clock),
         .reset(reset),
         .we(we_exmem),
-        .d( (adc_ready) ? 32'b00101100100000000000000000000001: branchOrJump ? 32'd0 : idex_instr_out),
+        .d(branchOrJump ? 32'd0 : idex_instr_out),
         .q(exmem_instr_out)
     );
     

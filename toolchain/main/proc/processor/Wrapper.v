@@ -52,12 +52,11 @@ module Wrapper (
       .clk_in1(clk_100mhz)
      );
      
-    reg [26:0] paddr;
+    //reg [26:0] paddr;
 
     reg led_latch;
     initial begin
         led_latch <= 1'b0;
-        pval <= 3'b0;
     end
 
      wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
@@ -67,13 +66,13 @@ module Wrapper (
 //        LED[2] <= BTNR_out;     
 //        LED[3] <= BTNL_out;   
 //        LED[15:4] <= adc_out[15:4]
-          LED[9:0] <= duty_cycle_total;
+          LED[15:0] <= audio_latch_out;
           //LED[0] <= led_latch;
 //        LED[4] <= BTNC_out;    
           if (adc_stb) begin
             led_latch <= 1'b1;
           end
-        paddr <= BTNL ? 4 : BTND ? 3 : BTNR ? 2 : BTNU ? 1 : BTNC ? 0: pval;
+        //paddr <= BTNL ? 4 : BTND ? 3 : BTNR ? 2 : BTNU ? 1 : BTNC ? 0: pval;
      end
      
      
@@ -117,7 +116,7 @@ module Wrapper (
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "fft";
+	localparam INSTR_FILE = "low_pass";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -148,7 +147,7 @@ module Wrapper (
         .BTNC_out(BTNC_out),
 
         // paddr
-        .paddr(paddr),
+        //.paddr(paddr),
 
         // ADC sample
         .adc_sample(adc_out),

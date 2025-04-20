@@ -26,3 +26,55 @@ FFT/*
 *.html
 *.pyc
 *.vvp
+
+
+# Source files
+!*.vhd
+!*.v
+!*.sv
+!*.bd
+!*.edif
+
+# IP files
+!*.xci
+!*.xcix
+!*.dcp
+!*.vds
+!*.pb
+
+# System Generator
+!*.mdl
+!*.slx
+!*.bxml
+
+# Simulation logic analyzer
+!*.wcfg
+!*.coe
+
+# MIG
+!*.prj
+!*.mem
+
+# Project files
+!*.xpr
+!*.xml
+
+# Constraint files
+!*.xdc
+
+# TCL files
+!*.tcl
+
+# Journal files
+!*.jou
+
+# Reports
+!*.rpt
+!*.txt
+!*.vdi
+
+# C-files
+!*.c
+!*.h
+!*.elf
+

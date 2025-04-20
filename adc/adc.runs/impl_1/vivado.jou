@@ -1,0 +1,14 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Sat Apr 19 22:11:28 2025
+# Process ID: 16908
+# Current directory: C:/DUKE/ECE350/ECE350-CPU/adc/adc.runs/impl_1
+# Command line: vivado.exe -log Wrapper.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source Wrapper.tcl -notrace
+# Log file: C:/DUKE/ECE350/ECE350-CPU/adc/adc.runs/impl_1/Wrapper.vdi
+# Journal file: C:/DUKE/ECE350/ECE350-CPU/adc/adc.runs/impl_1\vivado.jou
+# Running On: Liam-Laptop, OS: Windows, CPU Frequency: 2688 MHz, CPU Physical cores: 12, Host memory: 16573 MB
+#-----------------------------------------------------------
+source Wrapper.tcl -notrace

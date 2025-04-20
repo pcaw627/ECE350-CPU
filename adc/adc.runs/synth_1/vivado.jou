@@ -1,0 +1,14 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Sat Apr 19 22:03:43 2025
+# Process ID: 28480
+# Current directory: C:/DUKE/ECE350/ECE350-CPU/adc/adc.runs/synth_1
+# Command line: vivado.exe -log Wrapper.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source Wrapper.tcl
+# Log file: C:/DUKE/ECE350/ECE350-CPU/adc/adc.runs/synth_1/Wrapper.vds
+# Journal file: C:/DUKE/ECE350/ECE350-CPU/adc/adc.runs/synth_1\vivado.jou
+# Running On: Liam-Laptop, OS: Windows, CPU Frequency: 2688 MHz, CPU Physical cores: 12, Host memory: 16573 MB
+#-----------------------------------------------------------
+source Wrapper.tcl -notrace

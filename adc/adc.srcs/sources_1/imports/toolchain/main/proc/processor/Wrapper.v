@@ -32,9 +32,11 @@ module Wrapper (
     input BTNL,
     input BTNR,
     input BTNC,
+    input vauxp3,
+    input vauxn3,
     //input XA_N,
     //input XA_P,
-    output reg [4:0] LED);
+    output reg [15:0] LED);
     
     
     assign clock = clk_40mhz;
@@ -49,14 +51,28 @@ module Wrapper (
      // Clock in ports
       .clk_in1(clk_100mhz)
      );
+     
+     
      wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
      always @(posedge clock) begin
-        LED[0] <= BTNU_out;     
-        LED[1] <= BTND_out;
-        LED[2] <= BTNR_out;     
-        LED[3] <= BTNL_out;     
-        LED[4] <= BTNC_out;     
+//        LED[0] <= BTNU_out;     
+//        LED[1] <= BTND_out;
+//        LED[2] <= BTNR_out;     
+//        LED[3] <= BTNL_out;   
+//        LED[15:4] <= adc_out[15:4]
+          LED <= adc_out;
+//        LED[4] <= BTNC_out;     
      end
+     
+     wire [15:0] adc_out;
+     adc_data_capture data_capture(
+        .clk(clock),
+        .reset(1'b0),
+        .vauxn3(vauxn3), .vauxp3(vauxp3),
+        .adc_out(adc_out)
+    );
+    
+    
 
      
 

@@ -25,7 +25,7 @@
  **/
 
 module Wrapper (
-    input clock, 
+    input clk_100mhz, 
     input reset, 
     input BTNU, 
     input BTND,
@@ -49,7 +49,17 @@ module Wrapper (
      // Clock in ports
       .clk_in1(clk_100mhz)
      );
+     wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
+     always @(posedge clock) begin
+        LED[0] <= BTNU_out;     
+        LED[1] <= BTND_out;
+        LED[2] <= BTNR_out;     
+        LED[3] <= BTNL_out;     
+        LED[4] <= BTNC_out;     
+     end
+
      
+
      
 	wire rwe, mwe;
 	wire[4:0] rd, rs1, rs2;
@@ -59,7 +69,7 @@ module Wrapper (
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "";
+	localparam INSTR_FILE = "fft";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -82,8 +92,12 @@ module Wrapper (
         .BTNL(BTNL),
         .BTND(BTND),
         .BTNC(BTNC),
-        .LED(LED[4:0])
-		
+        
+        .BTNU_out(BTNU_out),
+        .BTND_out(BTND_out),
+        .BTNL_out(BTNL_out),
+        .BTNR_out(BTNR_out),
+        .BTNC_out(BTNC_out)		
 		); 
 	
 	// Instruction Memory (ROM)

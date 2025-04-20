@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Webtalk v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:33 MDT 2021
+# IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+# Start of session at: Sat Apr 19 23:39:23 2025
+# Process ID: 21496
+# Current directory: C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.sim/sim_1/impl/func/xsim
+# Command line: wbtcv.exe -mode batch -source C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.sim/sim_1/impl/func/xsim/xsim.dir/Wrapper_func_impl/webtalk/xsim_webtalk.tcl -notrace
+# Log file: C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.sim/sim_1/impl/func/xsim/webtalk.log
+# Journal file: C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.sim/sim_1/impl/func/xsim\webtalk.jou
+#-----------------------------------------------------------
+source C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.sim/sim_1/impl/func/xsim/xsim.dir/Wrapper_func_impl/webtalk/xsim_webtalk.tcl -notrace
+INFO: [Common 17-206] Exiting Webtalk at Sat Apr 19 23:39:24 2025...

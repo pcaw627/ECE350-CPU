@@ -1,0 +1,65 @@
+Vivado Simulator v2021.1
+Copyright 1986-1999, 2001-2021 Xilinx, Inc. All Rights Reserved.
+Running: C:/Xilinx/Vivado/2021.1/bin/unwrapped/win64.o/xelab.exe -wto cb8a4ea7d40b47218650116004d408d9 --incr --debug typical --relax --mt 2 -L xil_defaultlib -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot Wrapper_behav xil_defaultlib.Wrapper xil_defaultlib.glbl -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling module unisims_ver.IBUF
+Compiling module unisims_ver.PLLE2_ADV(CLKFBOUT_MULT=42,CLKIN...
+Compiling module unisims_ver.BUFG
+Compiling module xil_defaultlib.clk_wiz_0_clk_wiz
+Compiling module xil_defaultlib.clk_wiz_0
+Compiling module unisims_ver.XADC(INIT_40=16'b010011,INIT_41=...
+Compiling module xil_defaultlib.xadc_wiz_0
+Compiling module xil_defaultlib.adc_data_capture
+Compiling module xil_defaultlib.dffe_ref
+Compiling module xil_defaultlib.registerDFFE_default
+Compiling module xil_defaultlib.gen_prop
+Compiling module xil_defaultlib.cla_8
+Compiling module xil_defaultlib.cla_32
+Compiling module xil_defaultlib.not_equal
+Compiling module xil_defaultlib.my_sub
+Compiling module xil_defaultlib.my_and
+Compiling module xil_defaultlib.my_or
+Compiling module xil_defaultlib.my_sll
+Compiling module xil_defaultlib.my_sra
+Compiling module xil_defaultlib.my_mux_8
+Compiling module xil_defaultlib.alu
+Compiling module xil_defaultlib.registerDFFE(WIDTH=1)
+Compiling module xil_defaultlib.tff
+Compiling module xil_defaultlib.counter6
+Compiling module xil_defaultlib.multiplier
+Compiling module xil_defaultlib.divider
+Compiling module xil_defaultlib.multdiv
+Compiling module xil_defaultlib.Butterfly
+Compiling module xil_defaultlib.single_clock_delay(WIDTH=16)
+Compiling module xil_defaultlib.multi_clock_delay(WIDTH=16,CYCLE...
+Compiling module xil_defaultlib.multi_clock_delay(WIDTH=16,CYCLE...
+Compiling module xil_defaultlib.Twiddle64
+Compiling module xil_defaultlib.mult
+Compiling module xil_defaultlib.sdf_default
+Compiling module xil_defaultlib.multi_clock_delay(WIDTH=16,CYCLE...
+Compiling module xil_defaultlib.multi_clock_delay(WIDTH=16,CYCLE...
+Compiling module xil_defaultlib.sdf(M=16)
+Compiling module xil_defaultlib.multi_clock_delay(WIDTH=16,CYCLE...
+Compiling module xil_defaultlib.multi_clock_delay(WIDTH=16)
+Compiling module xil_defaultlib.sdf(M=4)
+Compiling module xil_defaultlib.sdf_fft
+Compiling module xil_defaultlib.full_adder
+Compiling module xil_defaultlib.wallace_16_default
+Compiling module xil_defaultlib.sdf_ifft_default
+Compiling module xil_defaultlib.processor
+Compiling module xil_defaultlib.ROM(MEMFILE="fft.mem")
+Compiling module xil_defaultlib.mux_8
+Compiling module xil_defaultlib.mux_2
+Compiling module xil_defaultlib.mux_4
+Compiling module xil_defaultlib.mux_32
+Compiling module xil_defaultlib.regfile_default
+Compiling module xil_defaultlib.RAM
+Compiling module xil_defaultlib.Wrapper
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot Wrapper_behav

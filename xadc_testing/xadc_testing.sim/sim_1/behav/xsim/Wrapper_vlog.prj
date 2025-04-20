@@ -1,0 +1,49 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "../../../../xadc_testing.gen/sources_1/ip/clk_wiz_0" \
+"../../../../xadc_testing.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0.v" \
+"../../../../xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_clk_wiz.v" \
+"../../../../xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/Butterfly.v" \
+"../../../../../toolchain/main/proc/processor/RAM.v" \
+"../../../../../toolchain/main/proc/processor/ROM.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/Twiddle64.v" \
+"../../../../../toolchain/main/proc/vivado/adc_data_capture.v" \
+"../../../../../toolchain/main/proc/processor/alu.v" \
+"../../../../../toolchain/main/proc/processor/cla_32.v" \
+"../../../../../toolchain/main/proc/processor/cla_8.v" \
+"../../../../../toolchain/main/proc/processor/counter6.v" \
+"../../../../../toolchain/main/proc/processor/dffe_ref.v" \
+"../../../../../toolchain/main/proc/processor/divider.v" \
+"../../../../../toolchain/main/proc/processor/full_adder.v" \
+"../../../../../toolchain/main/proc/processor/gen_prop.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/mult.v" \
+"../../../../../toolchain/main/proc/processor/multdiv.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/multi_clock_delay.v" \
+"../../../../../toolchain/main/proc/processor/multiplier.v" \
+"../../../../../toolchain/main/proc/processor/mux_2.v" \
+"../../../../../toolchain/main/proc/processor/mux_32.v" \
+"../../../../../toolchain/main/proc/processor/mux_4.v" \
+"../../../../../toolchain/main/proc/processor/mux_8.v" \
+"../../../../../toolchain/main/proc/processor/my_and.v" \
+"../../../../../toolchain/main/proc/processor/my_mux_8.v" \
+"../../../../../toolchain/main/proc/processor/my_or.v" \
+"../../../../../toolchain/main/proc/processor/my_sll.v" \
+"../../../../../toolchain/main/proc/processor/my_sra.v" \
+"../../../../../toolchain/main/proc/processor/my_sub.v" \
+"../../../../../toolchain/main/proc/processor/not_equal.v" \
+"../../../../../toolchain/main/proc/processor/processor.v" \
+"../../../../../toolchain/main/proc/processor/regfile.v" \
+"../../../../../toolchain/main/proc/processor/registerDFFE.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/sdf.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/sdf_fft.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/sdf_ifft.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/single_clock_delay.v" \
+"../../../../../toolchain/main/proc/processor/tff.v" \
+"../../../../../toolchain/main/proc/SDF-FFT/wallace_16.v" \
+"../../../../../toolchain/main/proc/vivado/Wrapper.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

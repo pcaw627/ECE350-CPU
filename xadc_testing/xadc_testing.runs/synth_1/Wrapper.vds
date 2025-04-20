@@ -1,0 +1,541 @@
+#-----------------------------------------------------------
+# Vivado v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:33 MDT 2021
+# IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+# Start of session at: Sat Apr 19 22:28:27 2025
+# Process ID: 3904
+# Current directory: C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1
+# Command line: vivado.exe -log Wrapper.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source Wrapper.tcl
+# Log file: C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1/Wrapper.vds
+# Journal file: C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source Wrapper.tcl -notrace
+Command: synth_design -top Wrapper -part xc7a100tcsg324-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 528
+WARNING: [Synth 8-6901] identifier 'stall' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:94]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:121]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:122]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:123]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:127]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:130]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:135]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:136]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:137]
+WARNING: [Synth 8-6901] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:137]
+WARNING: [Synth 8-6901] identifier 'branchTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:149]
+WARNING: [Synth 8-6901] identifier 'bexTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:152]
+WARNING: [Synth 8-6901] identifier 'bex_address' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:152]
+WARNING: [Synth 8-6901] identifier 'branchTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:153]
+WARNING: [Synth 8-6901] identifier 'branchTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:165]
+WARNING: [Synth 8-6901] identifier 'bexTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:165]
+WARNING: [Synth 8-6901] identifier 'stall' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:167]
+WARNING: [Synth 8-6901] identifier 'stall' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:248]
+WARNING: [Synth 8-6901] identifier 'db2_data_out_real' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:170]
+WARNING: [Synth 8-6901] identifier 'db2_data_out_imag' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:171]
+WARNING: [Synth 8-6901] identifier 'clk_40mhz' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v:42]
+WARNING: [Synth 8-6901] identifier 'adc_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v:63]
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 1328.930 ; gain = 0.000
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'Wrapper' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v:27]
+INFO: [Synth 8-6157] synthesizing module 'clk_wiz_0' [C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1/.Xil/Vivado-3904-P2-07/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'clk_wiz_0' (1#1) [C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1/.Xil/Vivado-3904-P2-07/realtime/clk_wiz_0_stub.v:5]
+INFO: [Synth 8-6157] synthesizing module 'adc_data_capture' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:2]
+INFO: [Synth 8-6157] synthesizing module 'xadc_wiz_0' [C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1/.Xil/Vivado-3904-P2-07/realtime/xadc_wiz_0_stub.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'xadc_wiz_0' (2#1) [C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1/.Xil/Vivado-3904-P2-07/realtime/xadc_wiz_0_stub.v:5]
+WARNING: [Synth 8-7071] port 'busy_out' of module 'xadc_wiz_0' is unconnected for instance 'xadc_inst' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:14]
+WARNING: [Synth 8-7071] port 'channel_out' of module 'xadc_wiz_0' is unconnected for instance 'xadc_inst' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:14]
+WARNING: [Synth 8-7071] port 'eoc_out' of module 'xadc_wiz_0' is unconnected for instance 'xadc_inst' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:14]
+WARNING: [Synth 8-7071] port 'eos_out' of module 'xadc_wiz_0' is unconnected for instance 'xadc_inst' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:14]
+WARNING: [Synth 8-7071] port 'alarm_out' of module 'xadc_wiz_0' is unconnected for instance 'xadc_inst' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:14]
+WARNING: [Synth 8-7023] instance 'xadc_inst' of module 'xadc_wiz_0' has 17 connections declared, but only 12 given [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:14]
+INFO: [Synth 8-6155] done synthesizing module 'adc_data_capture' (3#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v:2]
+INFO: [Synth 8-6157] synthesizing module 'processor' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:20]
+INFO: [Synth 8-6157] synthesizing module 'registerDFFE' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/registerDFFE.v:1]
+	Parameter WIDTH bound to: 32 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'dffe_ref' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/dffe_ref.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'dffe_ref' (4#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/dffe_ref.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'registerDFFE' (5#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/registerDFFE.v:1]
+INFO: [Synth 8-6157] synthesizing module 'alu' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/alu.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cla_32' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/cla_32.v:1]
+INFO: [Synth 8-6157] synthesizing module 'cla_8' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/cla_8.v:1]
+INFO: [Synth 8-6157] synthesizing module 'gen_prop' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/gen_prop.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'gen_prop' (6#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/gen_prop.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'cla_8' (7#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/cla_8.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'cla_32' (8#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/cla_32.v:1]
+INFO: [Synth 8-6157] synthesizing module 'my_sub' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sub.v:1]
+INFO: [Synth 8-6157] synthesizing module 'not_equal' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/not_equal.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'not_equal' (9#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/not_equal.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'my_sub' (10#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sub.v:1]
+INFO: [Synth 8-6157] synthesizing module 'my_and' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_and.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'my_and' (11#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_and.v:1]
+INFO: [Synth 8-6157] synthesizing module 'my_or' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_or.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'my_or' (12#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_or.v:1]
+INFO: [Synth 8-6157] synthesizing module 'my_sll' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sll.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'my_sll' (13#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sll.v:5]
+INFO: [Synth 8-6157] synthesizing module 'my_sra' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sra.v:7]
+INFO: [Synth 8-6155] done synthesizing module 'my_sra' (14#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sra.v:7]
+INFO: [Synth 8-6157] synthesizing module 'my_mux_8' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_mux_8.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'my_mux_8' (15#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_mux_8.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'alu' (16#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/alu.v:1]
+INFO: [Synth 8-6157] synthesizing module 'registerDFFE__parameterized0' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/registerDFFE.v:1]
+	Parameter WIDTH bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'registerDFFE__parameterized0' (16#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/registerDFFE.v:1]
+INFO: [Synth 8-6157] synthesizing module 'counter6' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/counter6.v:1]
+INFO: [Synth 8-6157] synthesizing module 'tff' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/tff.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'tff' (17#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/tff.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'counter6' (18#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/counter6.v:1]
+INFO: [Synth 8-6157] synthesizing module 'multdiv' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/multdiv.v:1]
+INFO: [Synth 8-6157] synthesizing module 'multiplier' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/multiplier.v:1]
+WARNING: [Synth 8-6090] variable 'P' is written by both blocking and non-blocking assignments, entire logic could be removed [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/multiplier.v:52]
+INFO: [Synth 8-6155] done synthesizing module 'multiplier' (19#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/multiplier.v:1]
+INFO: [Synth 8-6157] synthesizing module 'divider' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/divider.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'divider' (20#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/divider.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'multdiv' (21#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/multdiv.v:1]
+INFO: [Synth 8-6157] synthesizing module 'sdf_fft' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_fft.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'sdf' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:1]
+	Parameter N bound to: 64 - type: integer 
+	Parameter M bound to: 64 - type: integer 
+	Parameter WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'Butterfly' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Butterfly.v:4]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter RH bound to: 0 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'Butterfly' (22#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Butterfly.v:4]
+INFO: [Synth 8-6157] synthesizing module 'multi_clock_delay' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter CYCLES bound to: 32 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'single_clock_delay' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/single_clock_delay.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'single_clock_delay' (23#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/single_clock_delay.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'multi_clock_delay' (24#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+INFO: [Synth 8-6157] synthesizing module 'Butterfly__parameterized0' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Butterfly.v:4]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter RH bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'Butterfly__parameterized0' (24#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Butterfly.v:4]
+INFO: [Synth 8-6157] synthesizing module 'multi_clock_delay__parameterized0' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter CYCLES bound to: 16 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'multi_clock_delay__parameterized0' (24#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+INFO: [Synth 8-6157] synthesizing module 'Twiddle64' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Twiddle64.v:4]
+INFO: [Synth 8-6155] done synthesizing module 'Twiddle64' (25#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Twiddle64.v:4]
+INFO: [Synth 8-6157] synthesizing module 'mult' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/mult.v:4]
+	Parameter WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mult' (26#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/mult.v:4]
+INFO: [Synth 8-6155] done synthesizing module 'sdf' (27#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:1]
+INFO: [Synth 8-6157] synthesizing module 'sdf__parameterized0' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:1]
+	Parameter N bound to: 64 - type: integer 
+	Parameter M bound to: 16 - type: integer 
+	Parameter WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'multi_clock_delay__parameterized1' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter CYCLES bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'multi_clock_delay__parameterized1' (27#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+INFO: [Synth 8-6157] synthesizing module 'multi_clock_delay__parameterized2' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter CYCLES bound to: 4 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'multi_clock_delay__parameterized2' (27#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'sdf__parameterized0' (27#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:1]
+INFO: [Synth 8-6157] synthesizing module 'sdf__parameterized1' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:1]
+	Parameter N bound to: 64 - type: integer 
+	Parameter M bound to: 4 - type: integer 
+	Parameter WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'multi_clock_delay__parameterized3' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter CYCLES bound to: 2 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'multi_clock_delay__parameterized3' (27#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+INFO: [Synth 8-6157] synthesizing module 'multi_clock_delay__parameterized4' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+	Parameter CYCLES bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'multi_clock_delay__parameterized4' (27#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'sdf__parameterized1' (27#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'sdf_fft' (28#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_fft.v:1]
+INFO: [Synth 8-6157] synthesizing module 'wallace_16' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/wallace_16.v:1]
+INFO: [Synth 8-6157] synthesizing module 'full_adder' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/full_adder.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'full_adder' (29#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/full_adder.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'wallace_16' (30#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/wallace_16.v:1]
+INFO: [Synth 8-6157] synthesizing module 'sdf_ifft' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_ifft.v:1]
+	Parameter WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'sdf_ifft' (31#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_ifft.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'processor' (32#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:20]
+INFO: [Synth 8-6157] synthesizing module 'ROM' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/ROM.v:2]
+	Parameter MEMFILE bound to: 56'b01100110011001100111010000101110011011010110010101101101 
+INFO: [Synth 8-3876] $readmem data file 'fft.mem' is read successfully [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/ROM.v:11]
+INFO: [Synth 8-6155] done synthesizing module 'ROM' (33#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/ROM.v:2]
+INFO: [Synth 8-6157] synthesizing module 'regfile' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/regfile.v:4]
+INFO: [Synth 8-6157] synthesizing module 'mux_32' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_32.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mux_8' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_8.v:5]
+INFO: [Synth 8-6155] done synthesizing module 'mux_8' (34#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_8.v:5]
+INFO: [Synth 8-6157] synthesizing module 'mux_4' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_4.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mux_2' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_2.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'mux_2' (35#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_2.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'mux_4' (36#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_4.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'mux_32' (37#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_32.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'regfile' (38#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/regfile.v:4]
+INFO: [Synth 8-6157] synthesizing module 'RAM' [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/RAM.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'RAM' (39#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/RAM.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'Wrapper' (40#1) [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v:27]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1342.141 ; gain = 13.211
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:06 ; elapsed = 00:00:07 . Memory (MB): peak = 1342.141 ; gain = 13.211
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:06 ; elapsed = 00:00:07 . Memory (MB): peak = 1342.141 ; gain = 13.211
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.405 . Memory (MB): peak = 1342.141 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc] for cell 'pll'
+Finished Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc] for cell 'pll'
+Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0/xadc_wiz_0_in_context.xdc] for cell 'data_capture/xadc_inst'
+Finished Parsing XDC File [c:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0/xadc_wiz_0_in_context.xdc] for cell 'data_capture/xadc_inst'
+Parsing XDC File [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Nexys-A7-100T-Master.xdc]
+Finished Parsing XDC File [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Nexys-A7-100T-Master.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Nexys-A7-100T-Master.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/Wrapper_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/Wrapper_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.057 . Memory (MB): peak = 1571.555 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.167 . Memory (MB): peak = 1571.555 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 1571.555 ; gain = 242.625
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a100tcsg324-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 1571.555 ; gain = 242.625
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+Applied set_property IO_BUFFER_TYPE = NONE for clk_100mhz. (constraint file  c:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc, line 3).
+Applied set_property CLOCK_BUFFER_TYPE = NONE for clk_100mhz. (constraint file  c:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0/clk_wiz_0_in_context.xdc, line 4).
+Applied set_property KEEP_HIERARCHY = SOFT for pll. (constraint file  auto generated constraint).
+Applied set_property KEEP_HIERARCHY = SOFT for data_capture/xadc_inst. (constraint file  auto generated constraint).
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 1571.555 ; gain = 242.625
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:19 ; elapsed = 00:00:20 . Memory (MB): peak = 1571.555 ; gain = 242.625
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input   65 Bit       Adders := 2     
+	   3 Input   64 Bit       Adders := 1     
+	   2 Input   32 Bit       Adders := 1     
+	   2 Input   17 Bit       Adders := 24    
+	   3 Input   17 Bit       Adders := 24    
+	   3 Input   16 Bit       Adders := 6     
+	   2 Input   16 Bit       Adders := 12    
+	   2 Input    8 Bit       Adders := 2     
+	   2 Input    6 Bit       Adders := 25    
++---XORs : 
+	   3 Input      1 Bit         XORs := 3968  
+	   2 Input      1 Bit         XORs := 531   
++---Registers : 
+	               65 Bit    Registers := 3     
+	               64 Bit    Registers := 3     
+	               32 Bit    Registers := 3     
+	               16 Bit    Registers := 47    
+	                8 Bit    Registers := 2     
+	                6 Bit    Registers := 22    
+	                1 Bit    Registers := 9660  
++---Multipliers : 
+	              32x32  Multipliers := 1     
++---RAMs : 
+	             128K Bit	(4096 X 32 bit)          RAMs := 1     
++---ROMs : 
+	                    ROMs := 13    
++---Muxes : 
+	   2 Input   65 Bit        Muxes := 4     
+	   3 Input   65 Bit        Muxes := 1     
+	   2 Input   64 Bit        Muxes := 2     
+	   2 Input   32 Bit        Muxes := 149   
+	   4 Input   16 Bit        Muxes := 128   
+	   3 Input   16 Bit        Muxes := 32    
+	   2 Input   16 Bit        Muxes := 120   
+	   2 Input    6 Bit        Muxes := 20    
+	   3 Input    6 Bit        Muxes := 1     
+	   2 Input    5 Bit        Muxes := 6     
+	   5 Input    5 Bit        Muxes := 1     
+	   7 Input    3 Bit        Muxes := 1     
+	   2 Input    1 Bit        Muxes := 28    
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 240 (col length:80)
+BRAMs: 270 (col length: RAMB18 80 RAMB36 40)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU1/MU/arbi, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU1/TW/ff_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/arbi.
+DSP Report: register U_IFFT/fwd_fft/SU1/bf2_data_out_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/arbi.
+DSP Report: operator U_IFFT/fwd_fft/SU1/MU/arbi is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/arbi.
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU1/MU/aibr, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU1/TW/ff_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/aibr.
+DSP Report: register U_IFFT/fwd_fft/SU1/bf2_data_out_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/aibr.
+DSP Report: operator U_IFFT/fwd_fft/SU1/MU/aibr is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/aibr.
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU1/MU/arbr, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU1/TW/ff_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/arbr.
+DSP Report: register U_IFFT/fwd_fft/SU1/bf2_data_out_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/arbr.
+DSP Report: operator U_IFFT/fwd_fft/SU1/MU/arbr is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/arbr.
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU1/MU/aibi, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU1/TW/ff_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/aibi.
+DSP Report: register U_IFFT/fwd_fft/SU1/bf2_data_out_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/aibi.
+DSP Report: operator U_IFFT/fwd_fft/SU1/MU/aibi is absorbed into DSP U_IFFT/fwd_fft/SU1/MU/aibi.
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU2/MU/arbi, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU2/TW/ff_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/arbi.
+DSP Report: register U_IFFT/fwd_fft/SU2/bf2_data_out_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/arbi.
+DSP Report: operator U_IFFT/fwd_fft/SU2/MU/arbi is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/arbi.
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU2/MU/aibr, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU2/TW/ff_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/aibr.
+DSP Report: register U_IFFT/fwd_fft/SU2/bf2_data_out_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/aibr.
+DSP Report: operator U_IFFT/fwd_fft/SU2/MU/aibr is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/aibr.
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU2/MU/arbr, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU2/TW/ff_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/arbr.
+DSP Report: register U_IFFT/fwd_fft/SU2/bf2_data_out_real_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/arbr.
+DSP Report: operator U_IFFT/fwd_fft/SU2/MU/arbr is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/arbr.
+DSP Report: Generating DSP U_IFFT/fwd_fft/SU2/MU/aibi, operation Mode is: A2*B2.
+DSP Report: register U_IFFT/fwd_fft/SU2/TW/ff_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/aibi.
+DSP Report: register U_IFFT/fwd_fft/SU2/bf2_data_out_imag_reg is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/aibi.
+DSP Report: operator U_IFFT/fwd_fft/SU2/MU/aibi is absorbed into DSP U_IFFT/fwd_fft/SU2/MU/aibi.
+DSP Report: Generating DSP SU1/MU/arbr, operation Mode is: A2*B2.
+DSP Report: register SU1/TW/ff_real_reg is absorbed into DSP SU1/MU/arbr.
+DSP Report: register SU1/bf2_data_out_real_reg is absorbed into DSP SU1/MU/arbr.
+DSP Report: operator SU1/MU/arbr is absorbed into DSP SU1/MU/arbr.
+DSP Report: Generating DSP SU1/MU/aibi, operation Mode is: A2*B2.
+DSP Report: register SU1/TW/ff_imag_reg is absorbed into DSP SU1/MU/aibi.
+DSP Report: register SU1/bf2_data_out_imag_reg is absorbed into DSP SU1/MU/aibi.
+DSP Report: operator SU1/MU/aibi is absorbed into DSP SU1/MU/aibi.
+DSP Report: Generating DSP SU1/MU/arbi, operation Mode is: A2*B2.
+DSP Report: register SU1/TW/ff_imag_reg is absorbed into DSP SU1/MU/arbi.
+DSP Report: register SU1/bf2_data_out_real_reg is absorbed into DSP SU1/MU/arbi.
+DSP Report: operator SU1/MU/arbi is absorbed into DSP SU1/MU/arbi.
+DSP Report: Generating DSP SU1/MU/aibr, operation Mode is: A2*B2.
+DSP Report: register SU1/TW/ff_real_reg is absorbed into DSP SU1/MU/aibr.
+DSP Report: register SU1/bf2_data_out_imag_reg is absorbed into DSP SU1/MU/aibr.
+DSP Report: operator SU1/MU/aibr is absorbed into DSP SU1/MU/aibr.
+DSP Report: Generating DSP SU2/MU/arbr, operation Mode is: A2*B2.
+DSP Report: register SU2/TW/ff_real_reg is absorbed into DSP SU2/MU/arbr.
+DSP Report: register SU2/bf2_data_out_real_reg is absorbed into DSP SU2/MU/arbr.
+DSP Report: operator SU2/MU/arbr is absorbed into DSP SU2/MU/arbr.
+DSP Report: Generating DSP SU2/MU/aibi, operation Mode is: A2*B2.
+DSP Report: register SU2/TW/ff_imag_reg is absorbed into DSP SU2/MU/aibi.
+DSP Report: register SU2/bf2_data_out_imag_reg is absorbed into DSP SU2/MU/aibi.
+DSP Report: operator SU2/MU/aibi is absorbed into DSP SU2/MU/aibi.
+DSP Report: Generating DSP SU2/MU/arbi, operation Mode is: A2*B2.
+DSP Report: register SU2/TW/ff_imag_reg is absorbed into DSP SU2/MU/arbi.
+DSP Report: register SU2/bf2_data_out_real_reg is absorbed into DSP SU2/MU/arbi.
+DSP Report: operator SU2/MU/arbi is absorbed into DSP SU2/MU/arbi.
+DSP Report: Generating DSP SU2/MU/aibr, operation Mode is: A2*B2.
+DSP Report: register SU2/TW/ff_real_reg is absorbed into DSP SU2/MU/aibr.
+DSP Report: register SU2/bf2_data_out_imag_reg is absorbed into DSP SU2/MU/aibr.
+DSP Report: operator SU2/MU/aibr is absorbed into DSP SU2/MU/aibr.
+DSP Report: Generating DSP mult/real_prod0, operation Mode is: A*B.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod0.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod0.
+DSP Report: Generating DSP mult/real_prod_reg, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: register mult/real_prod_reg is absorbed into DSP mult/real_prod_reg.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod_reg.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod_reg.
+DSP Report: Generating DSP mult/real_prod0, operation Mode is: A*B.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod0.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod0.
+DSP Report: Generating DSP mult/real_prod_reg, operation Mode is: (PCIN>>17)+A*B.
+DSP Report: register mult/real_prod_reg is absorbed into DSP mult/real_prod_reg.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod_reg.
+DSP Report: operator mult/real_prod0 is absorbed into DSP mult/real_prod_reg.
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:02:03 ; elapsed = 00:02:04 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+ROM: Preliminary Mapping Report
++------------+-------------------------------+---------------+----------------+
+|Module Name | RTL Object                    | Depth x Width | Implemented As | 
++------------+-------------------------------+---------------+----------------+
+|processor   | adc_data_out                  | 64x16         | LUT            | 
+|Wrapper     | U_IFFT/fwd_fft/SU1/TW/tw_imag | 64x16         | LUT            | 
+|Wrapper     | U_IFFT/fwd_fft/SU1/TW/tw_real | 64x16         | LUT            | 
+|Wrapper     | U_IFFT/fwd_fft/SU2/TW/tw_imag | 64x16         | LUT            | 
+|Wrapper     | U_IFFT/fwd_fft/SU2/TW/tw_real | 64x16         | LUT            | 
+|sdf_fft     | SU1/TW/tw_real                | 64x16         | LUT            | 
+|sdf_fft     | SU1/TW/tw_imag                | 64x16         | LUT            | 
+|sdf_fft     | SU2/TW/tw_real                | 64x16         | LUT            | 
+|sdf_fft     | SU2/TW/tw_imag                | 64x16         | LUT            | 
+|Wrapper     | adc_data_out                  | 64x16         | LUT            | 
+|Wrapper     | InstMem/dataOut_reg           | 4096x1        | Block RAM      | 
++------------+-------------------------------+---------------+----------------+
+
+
+DSP: Preliminary Mapping Report (see note below)
++------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|Module Name | DSP Mapping    | A Size | B Size | C Size | D Size | P Size | AREG | BREG | CREG | DREG | ADREG | MREG | PREG | 
++------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|Wrapper     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|sdf_fft     | A2*B2          | 16     | 16     | -      | -      | 32     | 1    | 1    | -    | -    | -     | 0    | 0    | 
+|multdiv     | A*B            | 18     | 15     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|multdiv     | (PCIN>>17)+A*B | 15     | 15     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 1    | 
+|multdiv     | A*B            | 18     | 18     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 0    | 
+|multdiv     | (PCIN>>17)+A*B | 18     | 15     | -      | -      | 48     | 0    | 0    | -    | -    | -     | 0    | 1    | 
++------------+----------------+--------+--------+--------+--------+--------+------+------+------+------+-------+------+------+
+
+Note: The table above is a preliminary report that shows the DSPs inferred at the current stage of the synthesis flow. Some DSP may be reimplemented as non DSP primitives later in the synthesis flow. Multiple instantiated DSPs are reported only once.
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:02:07 ; elapsed = 00:02:08 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:02:07 ; elapsed = 00:02:08 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:02:07 ; elapsed = 00:02:09 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+--------------+----------+
+|      |BlackBox name |Instances |
++------+--------------+----------+
+|1     |clk_wiz_0     |         1|
+|2     |xadc_wiz_0    |         1|
++------+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |clk_wiz  |     1|
+|2     |xadc_wiz |     1|
+|3     |FDRE     |    32|
+|4     |IBUF     |     2|
+|5     |OBUF     |    16|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:56 ; elapsed = 00:02:04 . Memory (MB): peak = 1789.281 ; gain = 230.938
+Synthesis Optimization Complete : Time (s): cpu = 00:02:09 ; elapsed = 00:02:11 . Memory (MB): peak = 1789.281 ; gain = 460.352
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.001 . Memory (MB): peak = 1789.281 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1789.281 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Synth Design complete, checksum: df053435
+INFO: [Common 17-83] Releasing license: Synthesis
+112 Infos, 29 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:02:13 ; elapsed = 00:02:15 . Memory (MB): peak = 1789.281 ; gain = 460.352
+INFO: [Common 17-1381] The checkpoint 'C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.runs/synth_1/Wrapper.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file Wrapper_utilization_synth.rpt -pb Wrapper_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Sat Apr 19 22:30:47 2025...

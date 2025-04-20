@@ -1,0 +1,7 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.sim/sim_1/impl/func/xsim/Wrapper_func_impl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Wrapper
+INFO: [VRFC 10-311] analyzing module adc_data_capture
+INFO: [VRFC 10-311] analyzing module clk_wiz_0
+INFO: [VRFC 10-311] analyzing module clk_wiz_0_clk_wiz
+INFO: [VRFC 10-311] analyzing module xadc_wiz_0
+INFO: [VRFC 10-311] analyzing module glbl

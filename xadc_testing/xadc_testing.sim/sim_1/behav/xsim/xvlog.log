@@ -1,0 +1,104 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module xadc_wiz_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0_clk_wiz.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module clk_wiz_0_clk_wiz
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.gen/sources_1/ip/clk_wiz_0/clk_wiz_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module clk_wiz_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Butterfly.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Butterfly
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/RAM.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module RAM
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/ROM.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ROM
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/Twiddle64.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Twiddle64
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/adc_data_capture.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module adc_data_capture
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/alu.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module alu
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/cla_32.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cla_32
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/cla_8.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cla_8
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/counter6.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module counter6
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/dffe_ref.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module dffe_ref
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/divider.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module divider
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/full_adder.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module full_adder
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/gen_prop.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module gen_prop
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/mult.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mult
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/multdiv.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module multdiv
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/multi_clock_delay.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module multi_clock_delay
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/multiplier.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module multiplier
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_2.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mux_2
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_32.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mux_32
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_4.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mux_4
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/mux_8.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mux_8
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_and.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module my_and
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_mux_8.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module my_mux_8
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_or.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module my_or
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sll.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module my_sll
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sra.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module my_sra
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/my_sub.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module my_sub
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/not_equal.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module not_equal
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module processor
+WARNING: [VRFC 10-3380] identifier 'stall' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:94]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:121]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:122]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:123]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:127]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:130]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:135]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:136]
+WARNING: [VRFC 10-3380] identifier 'ifid_instr_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:137]
+WARNING: [VRFC 10-3380] identifier 'branchTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:149]
+WARNING: [VRFC 10-3380] identifier 'bexTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:152]
+WARNING: [VRFC 10-3380] identifier 'branchTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:153]
+WARNING: [VRFC 10-3380] identifier 'branchTaken' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:165]
+WARNING: [VRFC 10-3380] identifier 'stall' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:167]
+WARNING: [VRFC 10-3380] identifier 'stall' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/processor.v:248]
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/regfile.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module regfile
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/registerDFFE.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module registerDFFE
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sdf
+WARNING: [VRFC 10-3380] identifier 'db2_data_out_real' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:170]
+WARNING: [VRFC 10-3380] identifier 'db2_data_out_imag' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf.v:171]
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_fft.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sdf_fft
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/sdf_ifft.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sdf_ifft
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/single_clock_delay.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module single_clock_delay
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/processor/tff.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tff
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/SDF-FFT/wallace_16.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module wallace_16
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Wrapper
+INFO: [VRFC 10-2458] undeclared symbol clock, assumed default net type wire [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v:42]
+WARNING: [VRFC 10-3380] identifier 'clk_40mhz' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v:42]
+WARNING: [VRFC 10-3380] identifier 'adc_out' is used before its declaration [C:/Users/af314/Documents/ECE350-CPU/toolchain/main/proc/vivado/Wrapper.v:63]
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/af314/Documents/ECE350-CPU/xadc_testing/xadc_testing.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl

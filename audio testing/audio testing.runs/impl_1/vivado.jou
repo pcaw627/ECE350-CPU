@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:33 MDT 2021
+# IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+# Start of session at: Sun Apr 20 11:43:28 2025
+# Process ID: 12760
+# Current directory: C:/Users/af314/Documents/ECE350-CPU/audio testing/audio testing.runs/impl_1
+# Command line: vivado.exe -log AudioController.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source AudioController.tcl -notrace
+# Log file: C:/Users/af314/Documents/ECE350-CPU/audio testing/audio testing.runs/impl_1/AudioController.vdi
+# Journal file: C:/Users/af314/Documents/ECE350-CPU/audio testing/audio testing.runs/impl_1\vivado.jou
+#-----------------------------------------------------------
+source AudioController.tcl -notrace

@@ -32,46 +32,81 @@ module Wrapper (
     input BTNL,
     input BTNR,
     input BTNC,
-    //input XA_N,
-    //input XA_P,
-    output reg [4:0] LED);
+    input vauxp3,
+    input vauxn3,
+    output AUD_PWM,
+    output AUD_SD,
+    output reg [15:0] LED);
     
     wire clock;
     assign clock = clk_40mhz;
     
     wire locked, clk_40mhz; 
     clk_wiz_0 pll (
-        // Clock out ports
-        .clk_out1(clk_40mhz),
-        // Status and control signals
+      // Clock out ports
+      .clk_out1(clk_40mhz),
+      // Status and control signals
+      .reset(1'b0),
+      .locked(locked),
+     // Clock in ports
+      .clk_in1(clk_100mhz)
+     );
+     
+    reg [26:0] paddr;
+
+    reg led_latch;
+    initial begin
+        led_latch <= 1'b0;
+        pval <= 3'b0;
+    end
+
+     wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
+     always @(posedge clock) begin
+//        LED[0] <= BTNU_out;     
+//        LED[1] <= BTND_out;
+//        LED[2] <= BTNR_out;     
+//        LED[3] <= BTNL_out;   
+//        LED[15:4] <= adc_out[15:4]
+          LED[9:0] <= duty_cycle_total;
+          //LED[0] <= led_latch;
+//        LED[4] <= BTNC_out;    
+          if (adc_stb) begin
+            led_latch <= 1'b1;
+          end
+        paddr <= BTNL ? 4 : BTND ? 3 : BTNR ? 2 : BTNU ? 1 : BTNC ? 0: pval;
+     end
+     
+     
+     
+     wire [15:0] adc_out;
+     wire adc_stb, adc_ready;
+     adc_data_capture data_capture(
+        .clk(clock),
         .reset(1'b0),
-        .locked(locked),
-        // Clock in ports
-        .clk_in1(clk_100mhz)
+        .vauxn3(vauxn3), .vauxp3(vauxp3),
+        .adc_out(adc_out),
+        .adc_stb(adc_stb),
+        .data_ready(adc_ready)
+    );
+    
+    assign AUD_SD = 1'b1;
+    wire [9:0] duty_cycle_total = 1023 * audio_latch_out / 16383;
+	PWMSerializer serializer1(
+		.clk(clock),              // System Clock
+		.reset(1'b0),            // Reset the counter
+		.duty_cycle(duty_cycle_total), // Duty Cycle of the Wave, between 0 and 1023 - scaled to 0 and 100
+		.signal(AUD_PWM)   // Output PWM signal
+    );
+    
+
+    dffe_ref audio_out_reg [15:0] (
+        .q(audio_latch_out),
+        .d(audio_out),
+        .clk(clock),
+        .clr(1'b0),
+        .en(sample_ready)
     );
 
-    reg [15:0] clk_audio_44kHz;
-    initial begin
-        clk_audio_44kHz <= 16'd0;
-    end
-    wire [15:0] clk_audio_44kHz_out = clk_audio_44kHz;
-
-    wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
-    always @(posedge clock) begin
-        if (clk_audio_44kHz == 16'd44000) begin
-            clk_audio_44kHz <= 16'd0;
-        end else begin
-            clk_audio_44kHz <= clk_audio_44kHz + 16'd1;
-        end
-
-        LED[0] <= BTNU_out;     
-        LED[1] <= BTND_out;
-        LED[2] <= BTNR_out;     
-        LED[3] <= BTNL_out;     
-        LED[4] <= BTNC_out;     
-    end
-
-     
 
      
 	wire rwe, mwe;
@@ -110,7 +145,20 @@ module Wrapper (
         .BTND_out(BTND_out),
         .BTNL_out(BTNL_out),
         .BTNR_out(BTNR_out),
-        .BTNC_out(BTNC_out)		
+        .BTNC_out(BTNC_out),
+
+        // paddr
+        .paddr(paddr),
+
+        // ADC sample
+        .adc_sample(adc_out),
+        .adc_ready(adc_ready),
+
+        // Audio Out Signals
+        .audio_out(audio_out),
+        .sample_ready(sample_ready)
+
+
 		); 
 	
 	// Instruction Memory (ROM)

@@ -53,15 +53,27 @@ module processor(
     BTND_out,
     BTNL_out,
     BTNR_out,
-    BTNC_out
+    BTNC_out,
+
+    // ADC In
+    adc_sample,
+    adc_ready,
+
+    // Audio controls
+    sample_ready,
+    audio_out
     
 
 );
 
     // Control signals
-    input clock, reset, BTNU, BTND, BTNL, BTNR, BTNC;
+    input clock, reset, BTNU, BTND, BTNL, BTNR, BTNC, adc_ready;
+    input [15:0] adc_sample;
+
     output BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
-    
+    output reg [15:0] audio_out;
+    output reg sample_ready;
+
     assign BTNU_out = BTNU;
     assign BTND_out = BTND;
     assign BTNL_out = BTNL;
@@ -444,72 +456,79 @@ module processor(
 
     // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
     // assign fft_in_re = {adc_data_out, 4'd0};
+    integer i;
+    always @(adc_ready) begin
+        for (i=0; i<63; i=i+1) begin
+            fft_regs[i] <= fft_regs[i+1];
+        end
+        fft_regs[63] <= adc_sample;
+    end
 
-    wire [15:0] adc_data_out [0:63];
-    assign adc_data_out [0] = 16'h0000;
-    assign adc_data_out [1] = 16'h0C8B;
-    assign adc_data_out [2] = 16'h18F8;
-    assign adc_data_out [3] = 16'h2527;
-    assign adc_data_out [4] = 16'h30FB;
-    assign adc_data_out [5] = 16'h3C56;
-    assign adc_data_out [6] = 16'h471C;
-    assign adc_data_out [7] = 16'h5133;
-    assign adc_data_out [8] = 16'h5A81;
-    assign adc_data_out [9] = 16'h62F1;
-    assign adc_data_out [10] = 16'h6A6C;
-    assign adc_data_out [11] = 16'h70E1;
-    assign adc_data_out [12] = 16'h7640;
-    assign adc_data_out [13] = 16'h7A7C;
-    assign adc_data_out [14] = 16'h7D89;
-    assign adc_data_out [15] = 16'h7F61;
-    assign adc_data_out [16] = 16'h7FFF;
-    assign adc_data_out [17] = 16'h7F61;
-    assign adc_data_out [18] = 16'h7D89;
-    assign adc_data_out [19] = 16'h7A7C;
-    assign adc_data_out [20] = 16'h7640;
-    assign adc_data_out [21] = 16'h70E1;
-    assign adc_data_out [22] = 16'h6A6C;
-    assign adc_data_out [23] = 16'h62F1;
-    assign adc_data_out [24] = 16'h5A81;
-    assign adc_data_out [25] = 16'h5133;
-    assign adc_data_out [26] = 16'h471C;
-    assign adc_data_out [27] = 16'h3C56;
-    assign adc_data_out [28] = 16'h30FB;
-    assign adc_data_out [29] = 16'h2527;
-    assign adc_data_out [30] = 16'h18F8;
-    assign adc_data_out [31] = 16'h0C8B;
-    assign adc_data_out [32] = 16'h0000;
-    assign adc_data_out [33] = 16'hF375;
-    assign adc_data_out [34] = 16'hE708;
-    assign adc_data_out [35] = 16'hDAD9;
-    assign adc_data_out [36] = 16'hCF05;
-    assign adc_data_out [37] = 16'hC3AA;
-    assign adc_data_out [38] = 16'hB8E4;
-    assign adc_data_out [39] = 16'hAECD;
-    assign adc_data_out [40] = 16'hA57F;
-    assign adc_data_out [41] = 16'h9D0F;
-    assign adc_data_out [42] = 16'h9594;
-    assign adc_data_out [43] = 16'h8F1F;
-    assign adc_data_out [44] = 16'h89C0;
-    assign adc_data_out [45] = 16'h8584;
-    assign adc_data_out [46] = 16'h8277;
-    assign adc_data_out [47] = 16'h809F;
-    assign adc_data_out [48] = 16'h8001;
-    assign adc_data_out [49] = 16'h809F;
-    assign adc_data_out [50] = 16'h8277;
-    assign adc_data_out [51] = 16'h8584;
-    assign adc_data_out [52] = 16'h89C0;
-    assign adc_data_out [53] = 16'h8F1F;
-    assign adc_data_out [54] = 16'h9594;
-    assign adc_data_out [55] = 16'h9D0F;
-    assign adc_data_out [56] = 16'hA57F;
-    assign adc_data_out [57] = 16'hAECD;
-    assign adc_data_out [58] = 16'hB8E4;
-    assign adc_data_out [59] = 16'hC3AA;
-    assign adc_data_out [60] = 16'hCF05;
-    assign adc_data_out [61] = 16'hDAD9;
-    assign adc_data_out [62] = 16'hE708;
-    assign adc_data_out [63] = 16'hF375;
+    // wire [15:0] adc_data_out [0:63];
+        // assign adc_data_out [0] = 16'h0000;
+        // assign adc_data_out [1] = 16'h0C8B;
+        // assign adc_data_out [2] = 16'h18F8;
+        // assign adc_data_out [3] = 16'h2527;
+        // assign adc_data_out [4] = 16'h30FB;
+        // assign adc_data_out [5] = 16'h3C56;
+        // assign adc_data_out [6] = 16'h471C;
+        // assign adc_data_out [7] = 16'h5133;
+        // assign adc_data_out [8] = 16'h5A81;
+        // assign adc_data_out [9] = 16'h62F1;
+        // assign adc_data_out [10] = 16'h6A6C;
+        // assign adc_data_out [11] = 16'h70E1;
+        // assign adc_data_out [12] = 16'h7640;
+        // assign adc_data_out [13] = 16'h7A7C;
+        // assign adc_data_out [14] = 16'h7D89;
+        // assign adc_data_out [15] = 16'h7F61;
+        // assign adc_data_out [16] = 16'h7FFF;
+        // assign adc_data_out [17] = 16'h7F61;
+        // assign adc_data_out [18] = 16'h7D89;
+        // assign adc_data_out [19] = 16'h7A7C;
+        // assign adc_data_out [20] = 16'h7640;
+        // assign adc_data_out [21] = 16'h70E1;
+        // assign adc_data_out [22] = 16'h6A6C;
+        // assign adc_data_out [23] = 16'h62F1;
+        // assign adc_data_out [24] = 16'h5A81;
+        // assign adc_data_out [25] = 16'h5133;
+        // assign adc_data_out [26] = 16'h471C;
+        // assign adc_data_out [27] = 16'h3C56;
+        // assign adc_data_out [28] = 16'h30FB;
+        // assign adc_data_out [29] = 16'h2527;
+        // assign adc_data_out [30] = 16'h18F8;
+        // assign adc_data_out [31] = 16'h0C8B;
+        // assign adc_data_out [32] = 16'h0000;
+        // assign adc_data_out [33] = 16'hF375;
+        // assign adc_data_out [34] = 16'hE708;
+        // assign adc_data_out [35] = 16'hDAD9;
+        // assign adc_data_out [36] = 16'hCF05;
+        // assign adc_data_out [37] = 16'hC3AA;
+        // assign adc_data_out [38] = 16'hB8E4;
+        // assign adc_data_out [39] = 16'hAECD;
+        // assign adc_data_out [40] = 16'hA57F;
+        // assign adc_data_out [41] = 16'h9D0F;
+        // assign adc_data_out [42] = 16'h9594;
+        // assign adc_data_out [43] = 16'h8F1F;
+        // assign adc_data_out [44] = 16'h89C0;
+        // assign adc_data_out [45] = 16'h8584;
+        // assign adc_data_out [46] = 16'h8277;
+        // assign adc_data_out [47] = 16'h809F;
+        // assign adc_data_out [48] = 16'h8001;
+        // assign adc_data_out [49] = 16'h809F;
+        // assign adc_data_out [50] = 16'h8277;
+        // assign adc_data_out [51] = 16'h8584;
+        // assign adc_data_out [52] = 16'h89C0;
+        // assign adc_data_out [53] = 16'h8F1F;
+        // assign adc_data_out [54] = 16'h9594;
+        // assign adc_data_out [55] = 16'h9D0F;
+        // assign adc_data_out [56] = 16'hA57F;
+        // assign adc_data_out [57] = 16'hAECD;
+        // assign adc_data_out [58] = 16'hB8E4;
+        // assign adc_data_out [59] = 16'hC3AA;
+        // assign adc_data_out [60] = 16'hCF05;
+        // assign adc_data_out [61] = 16'hDAD9;
+        // assign adc_data_out [62] = 16'hE708;
+        // assign adc_data_out [63] = 16'hF375;
 
 
     assign fft_in_re = adc_data_out[fft_count-1];
@@ -680,7 +699,7 @@ module processor(
     );
 
     
-
+    
     reg [5:0] ifft_data_out_count;
     always @(posedge clock or posedge fft_reset) begin
         if (fft_reset) begin
@@ -688,10 +707,15 @@ module processor(
         end else if (ifft_out_en) begin
             ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
             fft_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
+        end  
+        // audio signals for output / take in sample       
+        if (idex_instr_out[26:22] == 5'b10011) begin
+            sample_ready <= 1'b1;  
+            audio_out <= fft_regs[63];
+        end else begin
+            sample_ready <= 1'b0;  
         end
     end
-
-
 
 
     
@@ -735,8 +759,9 @@ module processor(
 
     assign stall_ifft = ex_is_ifft & (ifft_count != 8'd138);
 
+     
 
-    assign stall = stall_multdiv | stall_fft | stall_ifft;
+    assign stall = stall_multdiv | stall_fft | stall_ifft | stall_adc_ready;
 
 
     wire we_exmem = ~stall;
@@ -783,7 +808,7 @@ module processor(
         .clock(~clock),
         .reset(reset),
         .we(we_exmem),
-        .d(branchOrJump ? 32'd0 : ex_result),
+        .d((adc_ready) ? 32'd1: branchOrJump ? 32'd0 : ex_result),
         .q(exmem_result_out)
     );
     
@@ -792,7 +817,7 @@ module processor(
         .clock(~clock),
         .reset(reset),
         .we(we_exmem),
-        .d(branchOrJump ? 32'd0 : idex_instr_out),
+        .d( (adc_ready) ? 32'b00101100100000000000000000000001: branchOrJump ? 32'd0 : idex_instr_out),
         .q(exmem_instr_out)
     );
     

@@ -3,7 +3,9 @@ module adc_data_capture(
     input clk,
     input reset,
     input vauxn3, input vauxp3,        // EMG input (VAUX3)
-    output reg [15:0] adc_out         // Output for EMG
+    output reg [15:0] adc_out,         // Output for EMG
+    output reg adc_stb,
+    output data_ready
 );
 
 reg [6:0] daddr_in = 7'h13;            // Start with VAUX3
@@ -23,16 +25,17 @@ xadc_wiz_0 xadc_inst (
     .vn_in(1'b0),
     .vauxp3(vauxp3),
     .vauxn3(vauxn3),
-    .reset_in(reset) // âœ… no comma here!
-);                   // âœ… good
+    .reset_in(reset)
+);                   
+
+assign data_ready = drdy;
 
 // Read and route ADC values to EMG or ECG outputs
 always @(posedge clk) begin 
+    adc_stb <= 1'b0;
     if (drdy) begin
-        
-        // convert 12-bit to 32-bit
-        adc_out <= adc_data; //{21'h0, adc_data[15:4]};  // 32-bit EMG data
-        
+        adc_stb <= 1'b1;
+        adc_out <= adc_data;
     end
 end
 

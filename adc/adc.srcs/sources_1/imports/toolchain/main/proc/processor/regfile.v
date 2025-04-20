@@ -15,7 +15,7 @@ module regfile (
 
 
 	// add your code here
-	wire not_writeReg0;
+    wire not_writeReg0;
 	wire [31:0] write_enable, en_signal;
     wire [31:0] reg_out [31:0];
     wire [31:0] read_enableA, read_enableB;

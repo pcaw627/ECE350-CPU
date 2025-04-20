@@ -25,50 +25,51 @@
  **/
 
 module Wrapper (
-    input clk_100mhz,
+    input clk_100mhz, 
+    input reset, 
     input BTNU, 
-    input [15:0] SW,
-    output reg [15:0] LED);
-    wire clock, reset;
-    assign reset = BTNU; 
-	wire rwe, mwe;
-	wire[4:0] rd, rs1, rs2;
-	wire[31:0] instAddr, instData, 
-		rData, regA, regB,
-		memAddr, memDataIn, memDataOut, q_dmem, data;
-    reg [15:0] SW_Q, SW_M; 
+    input BTND,
+    input BTNL,
+    input BTNR,
+    input BTNC,
+    //input XA_N,
+    //input XA_P,
+    output reg [4:0] LED);
     
-    wire clk_47mhz, locked;
-    assign clock = clk_47mhz;
+    
+    assign clock = clk_40mhz;
+    
+    wire locked, clk_40mhz; 
     clk_wiz_0 pll (
-      // Clock out ports    
-      .clk_out1(clk_47mhz),
+      // Clock out ports
+      .clk_out1(clk_40mhz),
       // Status and control signals
       .reset(1'b0),
       .locked(locked),
      // Clock in ports
       .clk_in1(clk_100mhz)
-     ); 
-    
-    wire io_read, io_write;
-    
-    assign io_read = (memAddr == 32'd4096) ? 1'b1: 1'b0;
-    assign io_write = (memAddr == 32'd4097) ? 1'b1: 1'b0;
-     always @(negedge clock) begin
-           SW_M <= SW;
-           SW_Q <= SW_M; 
-       end
-       
-       always @(posedge clock) begin
-           if (io_write == 1'b1) begin
-               LED <= memDataIn[15:0];
-           end else begin
-               LED <= LED;
-           end
-       end
-    assign q_dmem = (io_read == 1'b1) ? SW_Q : memDataOut;
+     );
+     wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
+     always @(posedge clock) begin
+        LED[0] <= BTNU_out;     
+        LED[1] <= BTND_out;
+        LED[2] <= BTNR_out;     
+        LED[3] <= BTNL_out;     
+        LED[4] <= BTNC_out;     
+     end
+
+     
+
+     
+	wire rwe, mwe;
+	wire[4:0] rd, rs1, rs2;
+	wire[31:0] instAddr, instData, 
+		rData, regA, regB,
+		memAddr, memDataIn, memDataOut;
+
+
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "timing";
+	localparam INSTR_FILE = "fft";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -83,7 +84,21 @@ module Wrapper (
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(q_dmem)); 
+		.data(memDataIn), .q_dmem(memDataOut),
+		
+		// fpga input/output
+        .BTNU(BTNU),
+        .BTNR(BTNR),
+        .BTNL(BTNL),
+        .BTND(BTND),
+        .BTNC(BTNC),
+        
+        .BTNU_out(BTNU_out),
+        .BTND_out(BTND_out),
+        .BTNL_out(BTNL_out),
+        .BTNR_out(BTNR_out),
+        .BTNC_out(BTNC_out)		
+		); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
@@ -104,7 +119,5 @@ module Wrapper (
 		.addr(memAddr[11:0]), 
 		.dataIn(memDataIn), 
 		.dataOut(memDataOut));
-		
-	
 
 endmodule

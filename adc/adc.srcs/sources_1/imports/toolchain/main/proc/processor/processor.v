@@ -39,11 +39,35 @@ module processor(
     ctrl_readRegB,                  // O: Register to read from port B of RegFile
     data_writeReg,                  // O: Data to write to for RegFile
     data_readRegA,                  // I: Data from port A of RegFile
-    data_readRegB                   // I: Data from port B of RegFile
+    data_readRegB,                  // I: Data from port B of RegFile
+
+
+    // FPGA IN/OUT
+    BTNU,
+    BTND,
+    BTNL,
+    BTNR,
+    BTNC,
+    
+    BTNU_out,
+    BTND_out,
+    BTNL_out,
+    BTNR_out,
+    BTNC_out
+    
+
 );
 
     // Control signals
-    input clock, reset;
+    input clock, reset, BTNU, BTND, BTNL, BTNR, BTNC;
+    output BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
+    
+    assign BTNU_out = BTNU;
+    assign BTND_out = BTND;
+    assign BTNL_out = BTNL;
+    assign BTNR_out = BTNR;
+    assign BTNC_out = BTNC;
+    
     
     // Imem
     output [31:0] address_imem;

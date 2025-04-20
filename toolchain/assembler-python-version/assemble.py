@@ -305,6 +305,7 @@ with open(input_file, 'r', encoding="utf8") as f:
 		line_counter += 1
 		# find instruction from correct part of partition depending on presence of colon
 		instr = (instr_parts[2] if instr_parts[1] else instr_parts[0])
+		# print(instr)
 		# isolate mnemonic and make sure mnemonic is in list of instructions
 		split_instr = instr.split(None, 1)
 		mnemonic = split_instr[0]

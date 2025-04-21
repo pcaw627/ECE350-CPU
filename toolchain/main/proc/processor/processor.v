@@ -456,17 +456,50 @@ module processor(
     assign fft_in_en = (fft_count < 65) & (fft_count>0);
     assign ifft_in_en = (ifft_count < 67) & (ifft_count>2);
 
+    function integer bitrev6;       // 6‑bit bit‑reverse
+      input integer idx;
+      integer j;
+      begin
+         bitrev6 = 0;
+         for (j = 0; j < 6; j = j + 1)
+            bitrev6 = bitrev6 | (((idx >> j) & 1) << (5 - j));
+      end
+   endfunction
+
     // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
     // assign fft_in_re = {adc_data_out, 4'd0};
     integer i;
     // 16‑bit signed sample, one‑clock pulse on adc_ready_sync
+    reg [5:0] fft_data_out_count;
+    reg [5:0] ifft_data_out_count;
     always @(posedge clock) begin
-        if (pulse_adc) begin
+        if (pulse_adc & (~ex_is_fft) & (~ex_is_ifft) & (~ex_is_mod)) begin
             fft_regs[0] <= adc_data_signed;          // newest at index 0
             for (i = 1; i < 64; i = i + 1)
                 fft_regs[i] <= fft_regs[i-1];   // shift the window right
         end
+
+        if (fft_reset) begin
+            fft_data_out_count <= 5'd0;
+            ifft_data_out_count <= 5'd0;
+        end else if (fft_out_en & (ex_is_fft)) begin
+            fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
+            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
+        end
+
+        if (ifft_out_en & (ex_is_ifft)) begin
+            ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
+            fft_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
+        end  
+        // audio signals for output / take in sample       
+        if (idex_instr_out[26:22] == 5'b10011) begin
+            sample_ready <= 1'b1;  
+            audio_out <= fft_regs[0];
+        end else begin
+            sample_ready <= 1'b0;  
+        end
     end
+
 
 
     // wire [15:0] adc_data_out [0:63];
@@ -535,49 +568,37 @@ module processor(
         // assign adc_data_out [62] = 16'hE708;
         // assign adc_data_out [63] = 16'hF375;
 
-
-    //assign fft_in_re = adc_data_out[fft_count-1];
+    wire [15:0] fft_in_re;
+    assign fft_in_re = adc_data_out[0];
 
 
     sdf_fft  #(.WIDTH(16)) U_FFT  (
       .clock        (clock),
       .reset        (fft_reset),
       .data_in_en   (fft_in_en),
-      .data_in_real (fft_regs[63]),
+      .data_in_real (fft_in_re),
       .data_in_imag (16'd0),
       .data_out_en  (fft_out_en),
       .data_out_real(fft_out_re),
       .data_out_imag(fft_out_im) // 16'd0 will always be 0 bc imag is always 0
     );
 
-   function integer bitrev6;       // 6‑bit bit‑reverse
-      input integer idx;
-      integer j;
-      begin
-         bitrev6 = 0;
-         for (j = 0; j < 6; j = j + 1)
-            bitrev6 = bitrev6 | (((idx >> j) & 1) << (5 - j));
-      end
-   endfunction
+   
 
-    reg [5:0] fft_data_out_count;
-    always @(posedge clock or posedge fft_reset) begin
-        if (fft_reset) begin
-            fft_data_out_count <= 5'd0;
-        end else if (fft_out_en) begin
-            fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
-        end
-    end
 
 
     wire ex_is_mod = (idex_instr_out[31:27] == 5'b11000);
     wire [5:0] ex_mod_index = (idex_instr_out[21:17]-1)<<2;
     wire [15:0] ex_mod_operandA = ex_operandA[15:0];
     wire [15:0] mod_out1, mod_out2, mod_out3, mod_out4;
+    wire [15:0] ex_mod_operandB1 = fft_regs[ex_mod_index];
+    wire [15:0] ex_mod_operandB2 = fft_regs[ex_mod_index+1];
+    wire [15:0] ex_mod_operandB3 = fft_regs[ex_mod_index+2];
+    wire [15:0] ex_mod_operandB4 = fft_regs[ex_mod_index+3];
+
     wallace_16 mod_mult1(
         .a(ex_mod_operandA),
-        .b(fft_regs[ex_mod_index]),
+        .b(ex_mod_operandB1),
         .product(),
         .product_hi(mod_out1),
         .product_lo(),
@@ -585,7 +606,7 @@ module processor(
     );  
     wallace_16 mod_mult2(
         .a(ex_mod_operandA),
-        .b(fft_regs[ex_mod_index+1]),
+        .b(ex_mod_operandB2),
         .product(),
         .product_hi(mod_out2),
         .product_lo(),
@@ -593,7 +614,7 @@ module processor(
     );      
     wallace_16 mod_mult3(
         .a(ex_mod_operandA),
-        .b(fft_regs[ex_mod_index+2]),
+        .b(ex_mod_operandB3),
         .product(),
         .product_hi(mod_out3),
         .product_lo(),
@@ -601,7 +622,7 @@ module processor(
     );      
     wallace_16 mod_mult4(
         .a(ex_mod_operandA),
-        .b(fft_regs[ex_mod_index+3]),
+        .b(ex_mod_operandB4),
         .product(),
         .product_hi(mod_out4),
         .product_lo(),
@@ -703,25 +724,6 @@ module processor(
       .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
     );
 
-
-
-    reg [5:0] ifft_data_out_count;
-    always @(posedge clock) begin
-        if (fft_reset) begin
-            ifft_data_out_count <= 5'd0;
-        end
-        if (ifft_out_en) begin
-            ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
-            fft_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
-        end  
-        // audio signals for output / take in sample       
-        if (idex_instr_out[26:22] == 5'b10011) begin
-            sample_ready <= 1'b1;  
-            audio_out <= fft_regs[63];
-        end else begin
-            sample_ready <= 1'b0;  
-        end
-    end
 
 
     

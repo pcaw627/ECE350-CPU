@@ -21,7 +21,6 @@ j MAIN
 
 
 AUDIO:
-
 # initiate low pass modulation factors into registers 1 through 16
 addi $1, $0, 32767        # r1 = 0
 addi $2, $0, 32767        # r2 = 0
@@ -72,7 +71,7 @@ nop
 
 # reset r18 to 0 and r19 to 1
 addi $18, $0, 0           # r18 = 0
-
+addi $19, $0, 1
 
 j MAIN
 

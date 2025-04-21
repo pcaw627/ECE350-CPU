@@ -151,7 +151,7 @@ module Wrapper (
 
         // ADC sample
         .adc_sample(adc_out),
-        .adc_ready(adc_ready),
+        .adc_ready(adc_stb),
 
         // Audio Out Signals
         .audio_out(audio_out),

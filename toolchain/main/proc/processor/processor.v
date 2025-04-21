@@ -916,6 +916,11 @@ module processor(
     wire memwb_is_mod = memwb_instr_out[31:27] == 5'b11000;
 
 
+    // WB stage – inject write when adc_ready goes high
+    reg adc_ready_d;
+    always @(posedge clock) adc_ready_d <= adc_ready;
+
+    wire pulse_adc =  adc_ready & ~adc_ready_d;  // 1‑cycle pulse
 
 
     wire [4:0] normal_rd = memwb_instr_out[26:22];
@@ -924,12 +929,12 @@ module processor(
                     (is_jalWB ? 5'd31 : 
                     is_setxWB ? 5'd30 : normal_rd);
                     
-    assign ctrl_writeReg = (failed_jump) ? 5'b00000 : wb_rd;
+    assign ctrl_writeReg = (pulse_adc) ?  5'd18 : (failed_jump) ? 5'b00000 : wb_rd;
     
     wire [31:0] wb_data;
     assign wb_data = memwb_exception ? memwb_excode : 
                     (is_jalWB ? memwb_link_out : memwb_result_out);
-    assign data_writeReg = (failed_jump) ? 32'd0 : wb_data;
+    assign data_writeReg = pulse_adc ? 32'd1 : (failed_jump) ? 32'd0 : wb_data;
     
     assign ctrl_writeEnable = (is_storeWB | memwb_is_fft | memwb_is_ifft | memwb_is_mod) ? 1'b0 : 1'b1;
     

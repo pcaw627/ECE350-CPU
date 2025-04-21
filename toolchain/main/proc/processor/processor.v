@@ -69,6 +69,8 @@ module processor(
     // Control signals
     input clock, reset, BTNU, BTND, BTNL, BTNR, BTNC, adc_ready;
     input [15:0] adc_sample;
+    wire signed [15:0] adc_data_signed = {adc_sample[16] , adc_sample[16:2]} - 16'h8000; // centre at 0
+
 
     output BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
     output reg [15:0] audio_out;
@@ -457,12 +459,15 @@ module processor(
     // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
     // assign fft_in_re = {adc_data_out, 4'd0};
     integer i;
-    always @(adc_ready) begin
-        for (i=0; i<63; i=i+1) begin
-            fft_regs[i] <= fft_regs[i+1];
+    // 16‑bit signed sample, one‑clock pulse on adc_ready_sync
+    always @(posedge clock) begin
+        if (pulse_adc) begin
+            fft_regs[0] <= adc_data_signed;          // newest at index 0
+            for (i = 1; i < 64; i = i + 1)
+                fft_regs[i] <= fft_regs[i-1];   // shift the window right
         end
-        fft_regs[63] <= adc_sample;
     end
+
 
     // wire [15:0] adc_data_out [0:63];
         // assign adc_data_out [0] = 16'h0000;

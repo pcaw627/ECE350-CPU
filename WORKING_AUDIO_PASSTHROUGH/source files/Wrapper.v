@@ -58,26 +58,33 @@ module Wrapper (
     initial begin
         led_latch <= 1'b0;
     end
+    
+    
 
      wire BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
      always @(posedge clock) begin
 //        LED[0] <= BTNU_out;     
 //        LED[1] <= BTND_out;
 //        LED[2] <= BTNR_out;     
-//        LED[3] <= BTNL_out;   
+          LED[13] <= BTNL;
+   
 //        LED[15:4] <= adc_out[15:4]
           LED[9:0] <= duty_cycle_total;
-          //LED[0] <= led_latch;
-//        LED[4] <= BTNC_out;    
-          if (adc_stb) begin
+          LED[14] <= led_latch;
+          LED[15] <= audio_ready;   
+          
+          
+           
+          if (audio_ready) begin
             led_latch <= 1'b1;
+            audio_out_latch <= audio_out;
           end
-        paddr <= BTNL ? 4 : BTND ? 3 : BTNR ? 2 : BTNU ? 1 : BTNC ? 0: paddr;
+//        paddr <= BTNL ? 4 : BTND ? 3 : BTNR ? 2 : BTNU ? 1 : BTNC ? 0: paddr;
      end
      
      
      
-     wire [15:0] adc_out;
+     wire [15:0] adc_out, audio_out;
      wire adc_stb, adc_ready;
      adc_data_capture data_capture(
         .clk(clock),
@@ -89,7 +96,8 @@ module Wrapper (
     );
     
     assign AUD_SD = 1'b1;
-    wire [9:0] duty_cycle_total = 1023 * adc_out / 16383;
+    reg [15:0] audio_out_latch;
+    wire [9:0] duty_cycle_total = 1023 * audio_out_latch / 16383;
 	PWMSerializer serializer1(
 		.clk(clock),              // System Clock
 		.reset(1'b0),            // Reset the counter
@@ -97,14 +105,6 @@ module Wrapper (
 		.signal(AUD_PWM)   // Output PWM signal
     );
     
-
-    dffe_ref audio_out_reg [15:0] (
-        .q(audio_latch_out),
-        .d(audio_out),
-        .clk(clock),
-        .clr(1'b0),
-        .en(sample_ready)
-    );
 
 
      
@@ -114,9 +114,10 @@ module Wrapper (
 		rData, regA, regB,
 		memAddr, memDataIn, memDataOut;
 
+    wire audio_ready;
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "fft";
+	localparam INSTR_FILE = "low_pass";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -140,22 +141,22 @@ module Wrapper (
         .BTND(BTND),
         .BTNC(BTNC),
         
-        .BTNU_out(BTNU_out),
-        .BTND_out(BTND_out),
-        .BTNL_out(BTNL_out),
-        .BTNR_out(BTNR_out),
-        .BTNC_out(BTNC_out)
+//        .BTNU_out(BTNU_out),
+//        .BTND_out(BTND_out),
+//        .BTNL_out(BTNL_out),
+//        .BTNR_out(BTNR_out),
+//        .BTNC_out(BTNC_out),
 
         // paddr
         //.paddr(paddr),
 
         // ADC sample
-        //.adc_sample(adc_out),
-        //.adc_ready(adc_ready),
+        .adc_in(adc_out),
+        .adc_ready(adc_ready),
 
         // Audio Out Signals
-        //.audio_out(audio_out),
-        //.sample_ready(sample_ready)
+        .audio_out(audio_out),
+        .audio_ready(audio_ready)
 
 
 		); 

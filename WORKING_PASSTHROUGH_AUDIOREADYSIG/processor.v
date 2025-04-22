@@ -81,7 +81,7 @@ module processor(
     input [15:0] adc_in;
     input adc_ready;
     output reg [15:0] audio_out;
-    output reg audio_ready;
+    output audio_ready;
     
     wire signed [15:0] adc_in_signed = adc_in[15:0] - 16'h8000; 
     
@@ -424,7 +424,7 @@ module processor(
         if (fft_reset) begin
             fft_count <= 7'd0;
         end else begin
-            fft_count <= ex_is_fft ? (fft_count + 1'b1) : fft_count;
+            fft_count <= ex_is_fft ? (fft_count + 8'd1) : fft_count;
         end
     end
     
@@ -435,9 +435,9 @@ module processor(
         end else if (ifft_in_en) begin
             ifft_in_im <= mod_ifft_regs[ifft_count-2];
             // ifft_in_im <= fft_regs[bitrev6(ifft_count-2)];
-            ifft_count <= ex_is_ifft ? (ifft_count + 1'b1) : ifft_count;
+            ifft_count <= ex_is_ifft ? (ifft_count + 8'd1) : ifft_count;
         end else begin
-            ifft_count <= ex_is_ifft ? (ifft_count + 1'b1) : ifft_count;
+            ifft_count <= ex_is_ifft ? (ifft_count + 8'd1) : ifft_count;
         end
     end
 
@@ -811,11 +811,11 @@ module processor(
    endfunction
 
     reg [5:0] fft_data_out_count;
-    always @(posedge clock or posedge fft_reset) begin
+    always @(posedge clock) begin
         if (fft_reset) begin
             fft_data_out_count <= 5'd0;
         end else if (fft_out_en) begin
-            fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
+            fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 6'd1) : fft_data_out_count;
             fft_mod_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
         end
     end
@@ -1293,18 +1293,18 @@ assign mod_out_flat63 = mod_ifft_regs[63];
 
     reg [5:0] ifft_data_out_count;
     
+    assign audio_ready = (idex_instr_out[26:22] == 5'd19) ? 1'b1 : 1'b0;
+    
     always @(posedge clock) begin
         if (fft_reset) begin
             ifft_data_out_count <= 5'd0;
-            audio_ready <= 1'b0;
         end else if (ifft_out_en) begin
-            ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
+            ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 5'd1) : ifft_data_out_count;
             ifft_out_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
         end 
         
         if (idex_instr_out[26:22] == 5'd19) begin
             audio_out <= ifft_out_regs[0];
-            audio_ready <= 1'b1;
         end
     end
 

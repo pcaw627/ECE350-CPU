@@ -3,16 +3,17 @@
 # $1-16 are dedicated FFT/IFFT registers
 # $17 PRESET_ADDR
 # $18 ADC_READY (ready for processing new sample, ~44kHz)
+# $19 ifft done
 
 
-MAIN:
+#MAIN:
 
 addi $20, $20, 5
 nop
 bne $18, $0, AUDIO
 nop
 
-j MAIN
+#j MAIN
 
 
 
@@ -73,7 +74,7 @@ nop
 addi $18, $0, 0           # r18 = 0
 addi $19, $0, 1
 
-j MAIN
+#j MAIN
 
 
 

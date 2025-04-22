@@ -47,41 +47,14 @@ module processor(
     BTND,
     BTNL,
     BTNR,
-    BTNC,
-    
-    BTNU_out,
-    BTND_out,
-    BTNL_out,
-    BTNR_out,
-    BTNC_out,
-
-    // ADC In
-    adc_sample,
-    adc_ready,
-
-    // Audio controls
-    sample_ready,
-    audio_out
-    
+    BTNC
 
 );
 
     // Control signals
-    input clock, reset, BTNU, BTND, BTNL, BTNR, BTNC, adc_ready;
-    input [15:0] adc_sample;
-    wire signed [15:0] adc_data_signed = {adc_sample[16] , adc_sample[16:2]} - 16'h8000; // centre at 0
-
-
+    input clock, reset, BTNU, BTND, BTNL, BTNR, BTNC;
     output BTNU_out, BTND_out, BTNL_out, BTNR_out, BTNC_out;
-    output reg [15:0] audio_out;
-    output reg sample_ready;
-
-    assign BTNU_out = BTNU;
-    assign BTND_out = BTND;
-    assign BTNL_out = BTNL;
-    assign BTNR_out = BTNR;
-    assign BTNC_out = BTNC;
-    
+  
     
     // Imem
     output [31:0] address_imem;
@@ -240,7 +213,7 @@ module processor(
     wire [31:0] branch_cmp_result;
     wire branch_cmp_notEqual, branch_is_less;
     alu branch_cmp(
-        .data_operandA((adc_ready & (ifid_instr_out[26:22] == 5'd18)) ? 32'd1 : data_readRegA), // for branch, we set regA = $rd
+        .data_operandA(data_readRegA), // for branch, we set regA = $rd
         .data_operandB(data_readRegB), // and regB = $rs
         .ctrl_ALUopcode(5'b00001),      // subtraction
         .data_result(branch_cmp_result),
@@ -410,7 +383,20 @@ module processor(
 
     // FFT opcode = 01000
 
-    reg [15:0] fft_regs [0:63]; // holding values in between fft, modulation, and ifft
+    reg [15:0] adc_fft_regs [0:63];
+    reg [15:0] fft_mod_regs [0:63]; 
+    reg [15:0] mod_ifft_regs [0:63];
+    reg [15:0] ifft_out_regs [0:63];
+
+    integer reg_idx;
+    initial begin
+        for (reg_idx=0; reg_idx<64; reg_idx+=1) begin
+            //adc_fft_regs[reg_idx] = 16'd0;
+            fft_mod_regs[reg_idx] = 16'd0;
+            mod_ifft_regs[reg_idx] = 16'd0;
+            ifft_out_regs[reg_idx] = 16'd0;
+        end
+    end 
 
     wire  fft_in_en, fft_reset, fft_reset_unsynced;
     wire [WIDTH-1:0] fft_in_re,  fft_in_im;
@@ -429,7 +415,7 @@ module processor(
 
 
     reg [7:0] fft_count;
-    always @(posedge clock or posedge fft_reset) begin
+    always @(posedge clock) begin
         if (fft_reset) begin
             fft_count <= 7'd0;
         end else begin
@@ -438,11 +424,11 @@ module processor(
     end
     
     reg [7:0] ifft_count;
-    always @(posedge clock or posedge fft_reset) begin
+    always @(posedge clock) begin
         if (fft_reset) begin
             ifft_count <= 7'd0;
         end else if (ifft_in_en) begin
-            ifft_in_im <= fft_regs[ifft_count-2];
+            ifft_in_im <= mod_ifft_regs[ifft_count-2];
             // ifft_in_im <= fft_regs[bitrev6(ifft_count-2)];
             ifft_count <= ex_is_ifft ? (ifft_count + 1'b1) : ifft_count;
         end else begin
@@ -456,120 +442,148 @@ module processor(
     assign fft_in_en = (fft_count < 65) & (fft_count>0);
     assign ifft_in_en = (ifft_count < 67) & (ifft_count>2);
 
-    function integer bitrev6;       // 6‑bit bit‑reverse
-      input integer idx;
-      integer j;
-      begin
-         bitrev6 = 0;
-         for (j = 0; j < 6; j = j + 1)
-            bitrev6 = bitrev6 | (((idx >> j) & 1) << (5 - j));
-      end
-   endfunction
-
     // // take adc output and shift it so the 12 bit input matches the 16 bits needed for fft
     // assign fft_in_re = {adc_data_out, 4'd0};
-    integer i;
-    // 16‑bit signed sample, one‑clock pulse on adc_ready_sync
-    reg [5:0] fft_data_out_count;
-    reg [5:0] ifft_data_out_count;
-    always @(posedge clock) begin
-        if (pulse_adc & (~ex_is_fft) & (~ex_is_ifft) & (~ex_is_mod)) begin
-            fft_regs[0] <= adc_data_signed;          // newest at index 0
-            for (i = 1; i < 64; i = i + 1)
-                fft_regs[i] <= fft_regs[i-1];   // shift the window right
-        end
 
-        if (fft_reset) begin
-            fft_data_out_count <= 5'd0;
-            ifft_data_out_count <= 5'd0;
-        end else if (fft_out_en & (ex_is_fft)) begin
-            fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
-            fft_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
-        end
+    wire [15:0] adc_data_out [0:63]; 
 
-        if (ifft_out_en & (ex_is_ifft)) begin
-            ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
-            fft_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
-        end  
-        // audio signals for output / take in sample       
-        if (idex_instr_out[26:22] == 5'b10011) begin
-            sample_ready <= 1'b1;  
-            audio_out <= fft_regs[0];
-        end else begin
-            sample_ready <= 1'b0;  
-        end
+    wire [15:0] adc_data_out_test;
+
+    initial begin
+        adc_fft_regs[0] <= 16'h0000;
+        adc_fft_regs[1] <= 16'h0C8B;
+        adc_fft_regs[2] <= 16'h18F8;
+        adc_fft_regs[3] <= 16'h2527;
+        adc_fft_regs[4] <= 16'h30FB;
+        adc_fft_regs[5] <= 16'h3C56;
+        adc_fft_regs[6] <= 16'h471C;
+        adc_fft_regs[7] <= 16'h5133;
+        adc_fft_regs[8] <= 16'h5A81;
+        adc_fft_regs[9] <= 16'h62F1;
+        adc_fft_regs[10] <= 16'h6A6C;
+        adc_fft_regs[11] <= 16'h70E1;
+        adc_fft_regs[12] <= 16'h7640;
+        adc_fft_regs[13] <= 16'h7A7C;
+        adc_fft_regs[14] <= 16'h7D89;
+        adc_fft_regs[15] <= 16'h7F61;
+        adc_fft_regs[16] <= 16'h7FFF;
+        adc_fft_regs[17] <= 16'h7F61;
+        adc_fft_regs[18] <= 16'h7D89;
+        adc_fft_regs[19] <= 16'h7A7C;
+        adc_fft_regs[20] <= 16'h7640;
+        adc_fft_regs[21] <= 16'h70E1;
+        adc_fft_regs[22] <= 16'h6A6C;
+        adc_fft_regs[23] <= 16'h62F1;
+        adc_fft_regs[24] <= 16'h5A81;
+        adc_fft_regs[25] <= 16'h5133;
+        adc_fft_regs[26] <= 16'h471C;
+        adc_fft_regs[27] <= 16'h3C56;
+        adc_fft_regs[28] <= 16'h30FB;
+        adc_fft_regs[29] <= 16'h2527;
+        adc_fft_regs[30] <= 16'h18F8;
+        adc_fft_regs[31] <= 16'h0C8B;
+        adc_fft_regs[32] <= 16'h0000;
+        adc_fft_regs[33] <= 16'hF375;
+        adc_fft_regs[34] <= 16'hE708;
+        adc_fft_regs[35] <= 16'hDAD9;
+        adc_fft_regs[36] <= 16'hCF05;
+        adc_fft_regs[37] <= 16'hC3AA;
+        adc_fft_regs[38] <= 16'hB8E4;
+        adc_fft_regs[39] <= 16'hAECD;
+        adc_fft_regs[40] <= 16'hA57F;
+        adc_fft_regs[41] <= 16'h9D0F;
+        adc_fft_regs[42] <= 16'h9594;
+        adc_fft_regs[43] <= 16'h8F1F;
+        adc_fft_regs[44] <= 16'h89C0;
+        adc_fft_regs[45] <= 16'h8584;
+        adc_fft_regs[46] <= 16'h8277;
+        adc_fft_regs[47] <= 16'h809F;
+        adc_fft_regs[48] <= 16'h8001;
+        adc_fft_regs[49] <= 16'h809F;
+        adc_fft_regs[50] <= 16'h8277;
+        adc_fft_regs[51] <= 16'h8584;
+        adc_fft_regs[52] <= 16'h89C0;
+        adc_fft_regs[53] <= 16'h8F1F;
+        adc_fft_regs[54] <= 16'h9594;
+        adc_fft_regs[55] <= 16'h9D0F;
+        adc_fft_regs[56] <= 16'hA57F;
+        adc_fft_regs[57] <= 16'hAECD;
+        adc_fft_regs[58] <= 16'hB8E4;
+        adc_fft_regs[59] <= 16'hC3AA;
+        adc_fft_regs[60] <= 16'hCF05;
+        adc_fft_regs[61] <= 16'hDAD9;
+        adc_fft_regs[62] <= 16'hE708;
+        adc_fft_regs[63] <= 16'hF375;
     end
 
+    assign adc_data_out [0] = 16'h0000;
+    assign adc_data_out [1] = 16'h0C8B;
+    assign adc_data_out [2] = 16'h18F8;
+    assign adc_data_out [3] = 16'h2527;
+    assign adc_data_out [4] = 16'h30FB;
+    assign adc_data_out [5] = 16'h3C56;
+    assign adc_data_out [6] = 16'h471C;
+    assign adc_data_out [7] = 16'h5133;
+    assign adc_data_out [8] = 16'h5A81;
+    assign adc_data_out [9] = 16'h62F1;
+    assign adc_data_out [10] = 16'h6A6C;
+    assign adc_data_out [11] = 16'h70E1;
+    assign adc_data_out [12] = 16'h7640;
+    assign adc_data_out [13] = 16'h7A7C;
+    assign adc_data_out [14] = 16'h7D89;
+    assign adc_data_out [15] = 16'h7F61;
+    assign adc_data_out [16] = 16'h7FFF;
+    assign adc_data_out [17] = 16'h7F61;
+    assign adc_data_out [18] = 16'h7D89;
+    assign adc_data_out [19] = 16'h7A7C;
+    assign adc_data_out [20] = 16'h7640;
+    assign adc_data_out [21] = 16'h70E1;
+    assign adc_data_out [22] = 16'h6A6C;
+    assign adc_data_out [23] = 16'h62F1;
+    assign adc_data_out [24] = 16'h5A81;
+    assign adc_data_out [25] = 16'h5133;
+    assign adc_data_out [26] = 16'h471C;
+    assign adc_data_out [27] = 16'h3C56;
+    assign adc_data_out [28] = 16'h30FB;
+    assign adc_data_out [29] = 16'h2527;
+    assign adc_data_out [30] = 16'h18F8;
+    assign adc_data_out [31] = 16'h0C8B;
+    assign adc_data_out [32] = 16'h0000;
+    assign adc_data_out [33] = 16'hF375;
+    assign adc_data_out [34] = 16'hE708;
+    assign adc_data_out [35] = 16'hDAD9;
+    assign adc_data_out [36] = 16'hCF05;
+    assign adc_data_out [37] = 16'hC3AA;
+    assign adc_data_out [38] = 16'hB8E4;
+    assign adc_data_out [39] = 16'hAECD;
+    assign adc_data_out [40] = 16'hA57F;
+    assign adc_data_out [41] = 16'h9D0F;
+    assign adc_data_out [42] = 16'h9594;
+    assign adc_data_out [43] = 16'h8F1F;
+    assign adc_data_out [44] = 16'h89C0;
+    assign adc_data_out [45] = 16'h8584;
+    assign adc_data_out [46] = 16'h8277;
+    assign adc_data_out [47] = 16'h809F;
+    assign adc_data_out [48] = 16'h8001;
+    assign adc_data_out [49] = 16'h809F;
+    assign adc_data_out [50] = 16'h8277;
+    assign adc_data_out [51] = 16'h8584;
+    assign adc_data_out [52] = 16'h89C0;
+    assign adc_data_out [53] = 16'h8F1F;
+    assign adc_data_out [54] = 16'h9594;
+    assign adc_data_out [55] = 16'h9D0F;
+    assign adc_data_out [56] = 16'hA57F;
+    assign adc_data_out [57] = 16'hAECD;
+    assign adc_data_out [58] = 16'hB8E4;
+    assign adc_data_out [59] = 16'hC3AA;
+    assign adc_data_out [60] = 16'hCF05;
+    assign adc_data_out [61] = 16'hDAD9;
+    assign adc_data_out [62] = 16'hE708;
+    assign adc_data_out [63] = 16'hF375;
+    
 
 
-    // wire [15:0] adc_data_out [0:63];
-        // assign adc_data_out [0] = 16'h0000;
-        // assign adc_data_out [1] = 16'h0C8B;
-        // assign adc_data_out [2] = 16'h18F8;
-        // assign adc_data_out [3] = 16'h2527;
-        // assign adc_data_out [4] = 16'h30FB;
-        // assign adc_data_out [5] = 16'h3C56;
-        // assign adc_data_out [6] = 16'h471C;
-        // assign adc_data_out [7] = 16'h5133;
-        // assign adc_data_out [8] = 16'h5A81;
-        // assign adc_data_out [9] = 16'h62F1;
-        // assign adc_data_out [10] = 16'h6A6C;
-        // assign adc_data_out [11] = 16'h70E1;
-        // assign adc_data_out [12] = 16'h7640;
-        // assign adc_data_out [13] = 16'h7A7C;
-        // assign adc_data_out [14] = 16'h7D89;
-        // assign adc_data_out [15] = 16'h7F61;
-        // assign adc_data_out [16] = 16'h7FFF;
-        // assign adc_data_out [17] = 16'h7F61;
-        // assign adc_data_out [18] = 16'h7D89;
-        // assign adc_data_out [19] = 16'h7A7C;
-        // assign adc_data_out [20] = 16'h7640;
-        // assign adc_data_out [21] = 16'h70E1;
-        // assign adc_data_out [22] = 16'h6A6C;
-        // assign adc_data_out [23] = 16'h62F1;
-        // assign adc_data_out [24] = 16'h5A81;
-        // assign adc_data_out [25] = 16'h5133;
-        // assign adc_data_out [26] = 16'h471C;
-        // assign adc_data_out [27] = 16'h3C56;
-        // assign adc_data_out [28] = 16'h30FB;
-        // assign adc_data_out [29] = 16'h2527;
-        // assign adc_data_out [30] = 16'h18F8;
-        // assign adc_data_out [31] = 16'h0C8B;
-        // assign adc_data_out [32] = 16'h0000;
-        // assign adc_data_out [33] = 16'hF375;
-        // assign adc_data_out [34] = 16'hE708;
-        // assign adc_data_out [35] = 16'hDAD9;
-        // assign adc_data_out [36] = 16'hCF05;
-        // assign adc_data_out [37] = 16'hC3AA;
-        // assign adc_data_out [38] = 16'hB8E4;
-        // assign adc_data_out [39] = 16'hAECD;
-        // assign adc_data_out [40] = 16'hA57F;
-        // assign adc_data_out [41] = 16'h9D0F;
-        // assign adc_data_out [42] = 16'h9594;
-        // assign adc_data_out [43] = 16'h8F1F;
-        // assign adc_data_out [44] = 16'h89C0;
-        // assign adc_data_out [45] = 16'h8584;
-        // assign adc_data_out [46] = 16'h8277;
-        // assign adc_data_out [47] = 16'h809F;
-        // assign adc_data_out [48] = 16'h8001;
-        // assign adc_data_out [49] = 16'h809F;
-        // assign adc_data_out [50] = 16'h8277;
-        // assign adc_data_out [51] = 16'h8584;
-        // assign adc_data_out [52] = 16'h89C0;
-        // assign adc_data_out [53] = 16'h8F1F;
-        // assign adc_data_out [54] = 16'h9594;
-        // assign adc_data_out [55] = 16'h9D0F;
-        // assign adc_data_out [56] = 16'hA57F;
-        // assign adc_data_out [57] = 16'hAECD;
-        // assign adc_data_out [58] = 16'hB8E4;
-        // assign adc_data_out [59] = 16'hC3AA;
-        // assign adc_data_out [60] = 16'hCF05;
-        // assign adc_data_out [61] = 16'hDAD9;
-        // assign adc_data_out [62] = 16'hE708;
-        // assign adc_data_out [63] = 16'hF375;
-
-    wire [15:0] fft_in_re;
-    assign fft_in_re = adc_data_out[0];
+    assign fft_in_re = adc_fft_regs[fft_count-1];
 
 
     sdf_fft  #(.WIDTH(16)) U_FFT  (
@@ -583,22 +597,34 @@ module processor(
       .data_out_imag(fft_out_im) // 16'd0 will always be 0 bc imag is always 0
     );
 
-   
+   function integer bitrev6;       // 6-bit bit-reverse
+      input integer idx;
+      integer j;
+      begin
+         bitrev6 = 0;
+         for (j = 0; j < 6; j = j + 1)
+            bitrev6 = bitrev6 | (((idx >> j) & 1) << (5 - j));
+      end
+   endfunction
 
+    reg [5:0] fft_data_out_count;
+    always @(posedge clock or posedge fft_reset) begin
+        if (fft_reset) begin
+            fft_data_out_count <= 5'd0;
+        end else if (fft_out_en) begin
+            fft_data_out_count <= ex_is_fft ? (fft_data_out_count + 1'b1) : fft_data_out_count;
+            fft_mod_regs [bitrev6(fft_data_out_count)] <= fft_out_im; // inverse bit order for output
+        end
+    end
 
 
     wire ex_is_mod = (idex_instr_out[31:27] == 5'b11000);
     wire [5:0] ex_mod_index = (idex_instr_out[21:17]-1)<<2;
     wire [15:0] ex_mod_operandA = ex_operandA[15:0];
     wire [15:0] mod_out1, mod_out2, mod_out3, mod_out4;
-    wire [15:0] ex_mod_operandB1 = fft_regs[ex_mod_index];
-    wire [15:0] ex_mod_operandB2 = fft_regs[ex_mod_index+1];
-    wire [15:0] ex_mod_operandB3 = fft_regs[ex_mod_index+2];
-    wire [15:0] ex_mod_operandB4 = fft_regs[ex_mod_index+3];
-
     wallace_16 mod_mult1(
         .a(ex_mod_operandA),
-        .b(ex_mod_operandB1),
+        .b(fft_mod_regs[ex_mod_index]),
         .product(),
         .product_hi(mod_out1),
         .product_lo(),
@@ -606,7 +632,7 @@ module processor(
     );  
     wallace_16 mod_mult2(
         .a(ex_mod_operandA),
-        .b(ex_mod_operandB2),
+        .b(fft_mod_regs[ex_mod_index+1]),
         .product(),
         .product_hi(mod_out2),
         .product_lo(),
@@ -614,7 +640,7 @@ module processor(
     );      
     wallace_16 mod_mult3(
         .a(ex_mod_operandA),
-        .b(ex_mod_operandB3),
+        .b(fft_mod_regs[ex_mod_index+2]),
         .product(),
         .product_hi(mod_out3),
         .product_lo(),
@@ -622,94 +648,417 @@ module processor(
     );      
     wallace_16 mod_mult4(
         .a(ex_mod_operandA),
-        .b(ex_mod_operandB4),
+        .b(fft_mod_regs[ex_mod_index+3]),
         .product(),
         .product_hi(mod_out4),
         .product_lo(),
         .ovf()
     );  
 
-    always @(negedge clock) begin
+    always @(posedge clock) begin
         if (ex_is_mod) begin
-            fft_regs[ex_mod_index] <= mod_out1 <<< 1;
-            fft_regs[ex_mod_index+1] <= mod_out2 <<< 1;
-            fft_regs[ex_mod_index+2] <= mod_out3 <<< 1;
-            fft_regs[ex_mod_index+3] <= mod_out4 <<< 1;
+            mod_ifft_regs[ex_mod_index] <= mod_out1 <<< 1;
+            mod_ifft_regs[ex_mod_index+1] <= mod_out2 <<< 1;
+            mod_ifft_regs[ex_mod_index+2] <= mod_out3 <<< 1;
+            mod_ifft_regs[ex_mod_index+3] <= mod_out4 <<< 1;
         end 
     end
     
     
+// FFT output flat wires
+wire [15:0] fft_out_flat0;
+wire [15:0] fft_out_flat1;
+wire [15:0] fft_out_flat2;
+wire [15:0] fft_out_flat3;
+wire [15:0] fft_out_flat4;
+wire [15:0] fft_out_flat5;
+wire [15:0] fft_out_flat6;
+wire [15:0] fft_out_flat7;
+wire [15:0] fft_out_flat8;
+wire [15:0] fft_out_flat9;
+wire [15:0] fft_out_flat10;
+wire [15:0] fft_out_flat11;
+wire [15:0] fft_out_flat12;
+wire [15:0] fft_out_flat13;
+wire [15:0] fft_out_flat14;
+wire [15:0] fft_out_flat15;
+wire [15:0] fft_out_flat16;
+wire [15:0] fft_out_flat17;
+wire [15:0] fft_out_flat18;
+wire [15:0] fft_out_flat19;
+wire [15:0] fft_out_flat20;
+wire [15:0] fft_out_flat21;
+wire [15:0] fft_out_flat22;
+wire [15:0] fft_out_flat23;
+wire [15:0] fft_out_flat24;
+wire [15:0] fft_out_flat25;
+wire [15:0] fft_out_flat26;
+wire [15:0] fft_out_flat27;
+wire [15:0] fft_out_flat28;
+wire [15:0] fft_out_flat29;
+wire [15:0] fft_out_flat30;
+wire [15:0] fft_out_flat31;
+wire [15:0] fft_out_flat32;
+wire [15:0] fft_out_flat33;
+wire [15:0] fft_out_flat34;
+wire [15:0] fft_out_flat35;
+wire [15:0] fft_out_flat36;
+wire [15:0] fft_out_flat37;
+wire [15:0] fft_out_flat38;
+wire [15:0] fft_out_flat39;
+wire [15:0] fft_out_flat40;
+wire [15:0] fft_out_flat41;
+wire [15:0] fft_out_flat42;
+wire [15:0] fft_out_flat43;
+wire [15:0] fft_out_flat44;
+wire [15:0] fft_out_flat45;
+wire [15:0] fft_out_flat46;
+wire [15:0] fft_out_flat47;
+wire [15:0] fft_out_flat48;
+wire [15:0] fft_out_flat49;
+wire [15:0] fft_out_flat50;
+wire [15:0] fft_out_flat51;
+wire [15:0] fft_out_flat52;
+wire [15:0] fft_out_flat53;
+wire [15:0] fft_out_flat54;
+wire [15:0] fft_out_flat55;
+wire [15:0] fft_out_flat56;
+wire [15:0] fft_out_flat57;
+wire [15:0] fft_out_flat58;
+wire [15:0] fft_out_flat59;
+wire [15:0] fft_out_flat60;
+wire [15:0] fft_out_flat61;
+wire [15:0] fft_out_flat62;
+wire [15:0] fft_out_flat63;
+
+// IFFT output flat wires
+wire [15:0] ifft_out_flat0;
+wire [15:0] ifft_out_flat1;
+wire [15:0] ifft_out_flat2;
+wire [15:0] ifft_out_flat3;
+wire [15:0] ifft_out_flat4;
+wire [15:0] ifft_out_flat5;
+wire [15:0] ifft_out_flat6;
+wire [15:0] ifft_out_flat7;
+wire [15:0] ifft_out_flat8;
+wire [15:0] ifft_out_flat9;
+wire [15:0] ifft_out_flat10;
+wire [15:0] ifft_out_flat11;
+wire [15:0] ifft_out_flat12;
+wire [15:0] ifft_out_flat13;
+wire [15:0] ifft_out_flat14;
+wire [15:0] ifft_out_flat15;
+wire [15:0] ifft_out_flat16;
+wire [15:0] ifft_out_flat17;
+wire [15:0] ifft_out_flat18;
+wire [15:0] ifft_out_flat19;
+wire [15:0] ifft_out_flat20;
+wire [15:0] ifft_out_flat21;
+wire [15:0] ifft_out_flat22;
+wire [15:0] ifft_out_flat23;
+wire [15:0] ifft_out_flat24;
+wire [15:0] ifft_out_flat25;
+wire [15:0] ifft_out_flat26;
+wire [15:0] ifft_out_flat27;
+wire [15:0] ifft_out_flat28;
+wire [15:0] ifft_out_flat29;
+wire [15:0] ifft_out_flat30;
+wire [15:0] ifft_out_flat31;
+wire [15:0] ifft_out_flat32;
+wire [15:0] ifft_out_flat33;
+wire [15:0] ifft_out_flat34;
+wire [15:0] ifft_out_flat35;
+wire [15:0] ifft_out_flat36;
+wire [15:0] ifft_out_flat37;
+wire [15:0] ifft_out_flat38;
+wire [15:0] ifft_out_flat39;
+wire [15:0] ifft_out_flat40;
+wire [15:0] ifft_out_flat41;
+wire [15:0] ifft_out_flat42;
+wire [15:0] ifft_out_flat43;
+wire [15:0] ifft_out_flat44;
+wire [15:0] ifft_out_flat45;
+wire [15:0] ifft_out_flat46;
+wire [15:0] ifft_out_flat47;
+wire [15:0] ifft_out_flat48;
+wire [15:0] ifft_out_flat49;
+wire [15:0] ifft_out_flat50;
+wire [15:0] ifft_out_flat51;
+wire [15:0] ifft_out_flat52;
+wire [15:0] ifft_out_flat53;
+wire [15:0] ifft_out_flat54;
+wire [15:0] ifft_out_flat55;
+wire [15:0] ifft_out_flat56;
+wire [15:0] ifft_out_flat57;
+wire [15:0] ifft_out_flat58;
+wire [15:0] ifft_out_flat59;
+wire [15:0] ifft_out_flat60;
+wire [15:0] ifft_out_flat61;
+wire [15:0] ifft_out_flat62;
+wire [15:0] ifft_out_flat63;
+
+// IFFT output flat wires
+wire [15:0] mod_out_flat0;
+wire [15:0] mod_out_flat1;
+wire [15:0] mod_out_flat2;
+wire [15:0] mod_out_flat3;
+wire [15:0] mod_out_flat4;
+wire [15:0] mod_out_flat5;
+wire [15:0] mod_out_flat6;
+wire [15:0] mod_out_flat7;
+wire [15:0] mod_out_flat8;
+wire [15:0] mod_out_flat9;
+wire [15:0] mod_out_flat10;
+wire [15:0] mod_out_flat11;
+wire [15:0] mod_out_flat12;
+wire [15:0] mod_out_flat13;
+wire [15:0] mod_out_flat14;
+wire [15:0] mod_out_flat15;
+wire [15:0] mod_out_flat16;
+wire [15:0] mod_out_flat17;
+wire [15:0] mod_out_flat18;
+wire [15:0] mod_out_flat19;
+wire [15:0] mod_out_flat20;
+wire [15:0] mod_out_flat21;
+wire [15:0] mod_out_flat22;
+wire [15:0] mod_out_flat23;
+wire [15:0] mod_out_flat24;
+wire [15:0] mod_out_flat25;
+wire [15:0] mod_out_flat26;
+wire [15:0] mod_out_flat27;
+wire [15:0] mod_out_flat28;
+wire [15:0] mod_out_flat29;
+wire [15:0] mod_out_flat30;
+wire [15:0] mod_out_flat31;
+wire [15:0] mod_out_flat32;
+wire [15:0] mod_out_flat33;
+wire [15:0] mod_out_flat34;
+wire [15:0] mod_out_flat35;
+wire [15:0] mod_out_flat36;
+wire [15:0] mod_out_flat37;
+wire [15:0] mod_out_flat38;
+wire [15:0] mod_out_flat39;
+wire [15:0] mod_out_flat40;
+wire [15:0] mod_out_flat41;
+wire [15:0] mod_out_flat42;
+wire [15:0] mod_out_flat43;
+wire [15:0] mod_out_flat44;
+wire [15:0] mod_out_flat45;
+wire [15:0] mod_out_flat46;
+wire [15:0] mod_out_flat47;
+wire [15:0] mod_out_flat48;
+wire [15:0] mod_out_flat49;
+wire [15:0] mod_out_flat50;
+wire [15:0] mod_out_flat51;
+wire [15:0] mod_out_flat52;
+wire [15:0] mod_out_flat53;
+wire [15:0] mod_out_flat54;
+wire [15:0] mod_out_flat55;
+wire [15:0] mod_out_flat56;
+wire [15:0] mod_out_flat57;
+wire [15:0] mod_out_flat58;
+wire [15:0] mod_out_flat59;
+wire [15:0] mod_out_flat60;
+wire [15:0] mod_out_flat61;
+wire [15:0] mod_out_flat62;
+wire [15:0] mod_out_flat63;
 
 
+assign fft_out_flat0 = fft_mod_regs[0];
+assign fft_out_flat1 = fft_mod_regs[1];
+assign fft_out_flat2 = fft_mod_regs[2];
+assign fft_out_flat3 = fft_mod_regs[3];
+assign fft_out_flat4 = fft_mod_regs[4];
+assign fft_out_flat5 = fft_mod_regs[5];
+assign fft_out_flat6 = fft_mod_regs[6];
+assign fft_out_flat7 = fft_mod_regs[7];
+assign fft_out_flat8 = fft_mod_regs[8];
+assign fft_out_flat9 = fft_mod_regs[9];
+assign fft_out_flat10 = fft_mod_regs[10];
+assign fft_out_flat11 = fft_mod_regs[11];
+assign fft_out_flat12 = fft_mod_regs[12];
+assign fft_out_flat13 = fft_mod_regs[13];
+assign fft_out_flat14 = fft_mod_regs[14];
+assign fft_out_flat15 = fft_mod_regs[15];
+assign fft_out_flat16 = fft_mod_regs[16];
+assign fft_out_flat17 = fft_mod_regs[17];
+assign fft_out_flat18 = fft_mod_regs[18];
+assign fft_out_flat19 = fft_mod_regs[19];
+assign fft_out_flat20 = fft_mod_regs[20];
+assign fft_out_flat21 = fft_mod_regs[21];
+assign fft_out_flat22 = fft_mod_regs[22];
+assign fft_out_flat23 = fft_mod_regs[23];
+assign fft_out_flat24 = fft_mod_regs[24];
+assign fft_out_flat25 = fft_mod_regs[25];
+assign fft_out_flat26 = fft_mod_regs[26];
+assign fft_out_flat27 = fft_mod_regs[27];
+assign fft_out_flat28 = fft_mod_regs[28];
+assign fft_out_flat29 = fft_mod_regs[29];
+assign fft_out_flat30 = fft_mod_regs[30];
+assign fft_out_flat31 = fft_mod_regs[31];
+assign fft_out_flat32 = fft_mod_regs[32];
+assign fft_out_flat33 = fft_mod_regs[33];
+assign fft_out_flat34 = fft_mod_regs[34];
+assign fft_out_flat35 = fft_mod_regs[35];
+assign fft_out_flat36 = fft_mod_regs[36];
+assign fft_out_flat37 = fft_mod_regs[37];
+assign fft_out_flat38 = fft_mod_regs[38];
+assign fft_out_flat39 = fft_mod_regs[39];
+assign fft_out_flat40 = fft_mod_regs[40];
+assign fft_out_flat41 = fft_mod_regs[41];
+assign fft_out_flat42 = fft_mod_regs[42];
+assign fft_out_flat43 = fft_mod_regs[43];
+assign fft_out_flat44 = fft_mod_regs[44];
+assign fft_out_flat45 = fft_mod_regs[45];
+assign fft_out_flat46 = fft_mod_regs[46];
+assign fft_out_flat47 = fft_mod_regs[47];
+assign fft_out_flat48 = fft_mod_regs[48];
+assign fft_out_flat49 = fft_mod_regs[49];
+assign fft_out_flat50 = fft_mod_regs[50];
+assign fft_out_flat51 = fft_mod_regs[51];
+assign fft_out_flat52 = fft_mod_regs[52];
+assign fft_out_flat53 = fft_mod_regs[53];
+assign fft_out_flat54 = fft_mod_regs[54];
+assign fft_out_flat55 = fft_mod_regs[55];
+assign fft_out_flat56 = fft_mod_regs[56];
+assign fft_out_flat57 = fft_mod_regs[57];
+assign fft_out_flat58 = fft_mod_regs[58];
+assign fft_out_flat59 = fft_mod_regs[59];
+assign fft_out_flat60 = fft_mod_regs[60];
+assign fft_out_flat61 = fft_mod_regs[61];
+assign fft_out_flat62 = fft_mod_regs[62];
+assign fft_out_flat63 = fft_mod_regs[63];
+
+assign ifft_out_flat0 = ifft_out_regs[0];
+assign ifft_out_flat1 = ifft_out_regs[1];
+assign ifft_out_flat2 = ifft_out_regs[2];
+assign ifft_out_flat3 = ifft_out_regs[3];
+assign ifft_out_flat4 = ifft_out_regs[4];
+assign ifft_out_flat5 = ifft_out_regs[5];
+assign ifft_out_flat6 = ifft_out_regs[6];
+assign ifft_out_flat7 = ifft_out_regs[7];
+assign ifft_out_flat8 = ifft_out_regs[8];
+assign ifft_out_flat9 = ifft_out_regs[9];
+assign ifft_out_flat10 = ifft_out_regs[10];
+assign ifft_out_flat11 = ifft_out_regs[11];
+assign ifft_out_flat12 = ifft_out_regs[12];
+assign ifft_out_flat13 = ifft_out_regs[13];
+assign ifft_out_flat14 = ifft_out_regs[14];
+assign ifft_out_flat15 = ifft_out_regs[15];
+assign ifft_out_flat16 = ifft_out_regs[16];
+assign ifft_out_flat17 = ifft_out_regs[17];
+assign ifft_out_flat18 = ifft_out_regs[18];
+assign ifft_out_flat19 = ifft_out_regs[19];
+assign ifft_out_flat20 = ifft_out_regs[20];
+assign ifft_out_flat21 = ifft_out_regs[21];
+assign ifft_out_flat22 = ifft_out_regs[22];
+assign ifft_out_flat23 = ifft_out_regs[23];
+assign ifft_out_flat24 = ifft_out_regs[24];
+assign ifft_out_flat25 = ifft_out_regs[25];
+assign ifft_out_flat26 = ifft_out_regs[26];
+assign ifft_out_flat27 = ifft_out_regs[27];
+assign ifft_out_flat28 = ifft_out_regs[28];
+assign ifft_out_flat29 = ifft_out_regs[29];
+assign ifft_out_flat30 = ifft_out_regs[30];
+assign ifft_out_flat31 = ifft_out_regs[31];
+assign ifft_out_flat32 = ifft_out_regs[32];
+assign ifft_out_flat33 = ifft_out_regs[33];
+assign ifft_out_flat34 = ifft_out_regs[34];
+assign ifft_out_flat35 = ifft_out_regs[35];
+assign ifft_out_flat36 = ifft_out_regs[36];
+assign ifft_out_flat37 = ifft_out_regs[37];
+assign ifft_out_flat38 = ifft_out_regs[38];
+assign ifft_out_flat39 = ifft_out_regs[39];
+assign ifft_out_flat40 = ifft_out_regs[40];
+assign ifft_out_flat41 = ifft_out_regs[41];
+assign ifft_out_flat42 = ifft_out_regs[42];
+assign ifft_out_flat43 = ifft_out_regs[43];
+assign ifft_out_flat44 = ifft_out_regs[44];
+assign ifft_out_flat45 = ifft_out_regs[45];
+assign ifft_out_flat46 = ifft_out_regs[46];
+assign ifft_out_flat47 = ifft_out_regs[47];
+assign ifft_out_flat48 = ifft_out_regs[48];
+assign ifft_out_flat49 = ifft_out_regs[49];
+assign ifft_out_flat50 = ifft_out_regs[50];
+assign ifft_out_flat51 = ifft_out_regs[51];
+assign ifft_out_flat52 = ifft_out_regs[52];
+assign ifft_out_flat53 = ifft_out_regs[53];
+assign ifft_out_flat54 = ifft_out_regs[54];
+assign ifft_out_flat55 = ifft_out_regs[55];
+assign ifft_out_flat56 = ifft_out_regs[56];
+assign ifft_out_flat57 = ifft_out_regs[57];
+assign ifft_out_flat58 = ifft_out_regs[58];
+assign ifft_out_flat59 = ifft_out_regs[59];
+assign ifft_out_flat60 = ifft_out_regs[60];
+assign ifft_out_flat61 = ifft_out_regs[61];
+assign ifft_out_flat62 = ifft_out_regs[62];
+assign ifft_out_flat63 = ifft_out_regs[63];
 
 
-
-
-    wire [15:0] fft_out_0 = fft_regs[0];
-    wire [15:0] fft_out_1 = fft_regs[1];
-    wire [15:0] fft_out_2 = fft_regs[2];
-    wire [15:0] fft_out_3 = fft_regs[3];
-    wire [15:0] fft_out_4 = fft_regs[4];
-    wire [15:0] fft_out_5 = fft_regs[5];
-    wire [15:0] fft_out_6 = fft_regs[6];
-    wire [15:0] fft_out_7 = fft_regs[7];
-    wire [15:0] fft_out_8 = fft_regs[8];
-    wire [15:0] fft_out_9 = fft_regs[9];
-    wire [15:0] fft_out_10 = fft_regs[10];
-    wire [15:0] fft_out_11 = fft_regs[11];
-    wire [15:0] fft_out_12 = fft_regs[12];
-    wire [15:0] fft_out_13 = fft_regs[13];
-    wire [15:0] fft_out_14 = fft_regs[14];
-    wire [15:0] fft_out_15 = fft_regs[15];
-    wire [15:0] fft_out_16 = fft_regs[16];
-    wire [15:0] fft_out_17 = fft_regs[17];
-    wire [15:0] fft_out_18 = fft_regs[18];
-    wire [15:0] fft_out_19 = fft_regs[19];
-    wire [15:0] fft_out_20 = fft_regs[20];
-    wire [15:0] fft_out_21 = fft_regs[21];
-    wire [15:0] fft_out_22 = fft_regs[22];
-    wire [15:0] fft_out_23 = fft_regs[23];
-    wire [15:0] fft_out_24 = fft_regs[24];
-    wire [15:0] fft_out_25 = fft_regs[25];
-    wire [15:0] fft_out_26 = fft_regs[26];
-    wire [15:0] fft_out_27 = fft_regs[27];
-    wire [15:0] fft_out_28 = fft_regs[28];
-    wire [15:0] fft_out_29 = fft_regs[29];
-    wire [15:0] fft_out_30 = fft_regs[30];
-    wire [15:0] fft_out_31 = fft_regs[31];
-    wire [15:0] fft_out_32 = fft_regs[32];
-    wire [15:0] fft_out_33 = fft_regs[33];
-    wire [15:0] fft_out_34 = fft_regs[34];
-    wire [15:0] fft_out_35 = fft_regs[35];
-    wire [15:0] fft_out_36 = fft_regs[36];
-    wire [15:0] fft_out_37 = fft_regs[37];
-    wire [15:0] fft_out_38 = fft_regs[38];
-    wire [15:0] fft_out_39 = fft_regs[39];
-    wire [15:0] fft_out_40 = fft_regs[40];
-    wire [15:0] fft_out_41 = fft_regs[41];
-    wire [15:0] fft_out_42 = fft_regs[42];
-    wire [15:0] fft_out_43 = fft_regs[43];
-    wire [15:0] fft_out_44 = fft_regs[44];
-    wire [15:0] fft_out_45 = fft_regs[45];
-    wire [15:0] fft_out_46 = fft_regs[46];
-    wire [15:0] fft_out_47 = fft_regs[47];
-    wire [15:0] fft_out_48 = fft_regs[48];
-    wire [15:0] fft_out_49 = fft_regs[49];
-    wire [15:0] fft_out_50 = fft_regs[50];
-    wire [15:0] fft_out_51 = fft_regs[51];
-    wire [15:0] fft_out_52 = fft_regs[52];
-    wire [15:0] fft_out_53 = fft_regs[53];
-    wire [15:0] fft_out_54 = fft_regs[54];
-    wire [15:0] fft_out_55 = fft_regs[55];
-    wire [15:0] fft_out_56 = fft_regs[56];
-    wire [15:0] fft_out_57 = fft_regs[57];
-    wire [15:0] fft_out_58 = fft_regs[58];
-    wire [15:0] fft_out_59 = fft_regs[59];
-    wire [15:0] fft_out_60 = fft_regs[60];
-    wire [15:0] fft_out_61 = fft_regs[61];
-    wire [15:0] fft_out_62 = fft_regs[62];
-    wire [15:0] fft_out_63 = fft_regs[63];
-
+assign mod_out_flat0 = mod_ifft_regs[0];
+assign mod_out_flat1 = mod_ifft_regs[1];
+assign mod_out_flat2 = mod_ifft_regs[2];
+assign mod_out_flat3 = mod_ifft_regs[3];
+assign mod_out_flat4 = mod_ifft_regs[4];
+assign mod_out_flat5 = mod_ifft_regs[5];
+assign mod_out_flat6 = mod_ifft_regs[6];
+assign mod_out_flat7 = mod_ifft_regs[7];
+assign mod_out_flat8 = mod_ifft_regs[8];
+assign mod_out_flat9 = mod_ifft_regs[9];
+assign mod_out_flat10 = mod_ifft_regs[10];
+assign mod_out_flat11 = mod_ifft_regs[11];
+assign mod_out_flat12 = mod_ifft_regs[12];
+assign mod_out_flat13 = mod_ifft_regs[13];
+assign mod_out_flat14 = mod_ifft_regs[14];
+assign mod_out_flat15 = mod_ifft_regs[15];
+assign mod_out_flat16 = mod_ifft_regs[16];
+assign mod_out_flat17 = mod_ifft_regs[17];
+assign mod_out_flat18 = mod_ifft_regs[18];
+assign mod_out_flat19 = mod_ifft_regs[19];
+assign mod_out_flat20 = mod_ifft_regs[20];
+assign mod_out_flat21 = mod_ifft_regs[21];
+assign mod_out_flat22 = mod_ifft_regs[22];
+assign mod_out_flat23 = mod_ifft_regs[23];
+assign mod_out_flat24 = mod_ifft_regs[24];
+assign mod_out_flat25 = mod_ifft_regs[25];
+assign mod_out_flat26 = mod_ifft_regs[26];
+assign mod_out_flat27 = mod_ifft_regs[27];
+assign mod_out_flat28 = mod_ifft_regs[28];
+assign mod_out_flat29 = mod_ifft_regs[29];
+assign mod_out_flat30 = mod_ifft_regs[30];
+assign mod_out_flat31 = mod_ifft_regs[31];
+assign mod_out_flat32 = mod_ifft_regs[32];
+assign mod_out_flat33 = mod_ifft_regs[33];
+assign mod_out_flat34 = mod_ifft_regs[34];
+assign mod_out_flat35 = mod_ifft_regs[35];
+assign mod_out_flat36 = mod_ifft_regs[36];
+assign mod_out_flat37 = mod_ifft_regs[37];
+assign mod_out_flat38 = mod_ifft_regs[38];
+assign mod_out_flat39 = mod_ifft_regs[39];
+assign mod_out_flat40 = mod_ifft_regs[40];
+assign mod_out_flat41 = mod_ifft_regs[41];
+assign mod_out_flat42 = mod_ifft_regs[42];
+assign mod_out_flat43 = mod_ifft_regs[43];
+assign mod_out_flat44 = mod_ifft_regs[44];
+assign mod_out_flat45 = mod_ifft_regs[45];
+assign mod_out_flat46 = mod_ifft_regs[46];
+assign mod_out_flat47 = mod_ifft_regs[47];
+assign mod_out_flat48 = mod_ifft_regs[48];
+assign mod_out_flat49 = mod_ifft_regs[49];
+assign mod_out_flat50 = mod_ifft_regs[50];
+assign mod_out_flat51 = mod_ifft_regs[51];
+assign mod_out_flat52 = mod_ifft_regs[52];
+assign mod_out_flat53 = mod_ifft_regs[53];
+assign mod_out_flat54 = mod_ifft_regs[54];
+assign mod_out_flat55 = mod_ifft_regs[55];
+assign mod_out_flat56 = mod_ifft_regs[56];
+assign mod_out_flat57 = mod_ifft_regs[57];
+assign mod_out_flat58 = mod_ifft_regs[58];
+assign mod_out_flat59 = mod_ifft_regs[59];
+assign mod_out_flat60 = mod_ifft_regs[60];
+assign mod_out_flat61 = mod_ifft_regs[61];
+assign mod_out_flat62 = mod_ifft_regs[62];
+assign mod_out_flat63 = mod_ifft_regs[63];
 
 
     // ifft opcode = 01001
@@ -723,6 +1072,19 @@ module processor(
       .data_out_real(ifft_out_re),
       .data_out_imag() // 16'd0 will always be 0 bc imag is always 0
     );
+
+    
+
+    reg [5:0] ifft_data_out_count;
+    always @(posedge clock or posedge fft_reset) begin
+        if (fft_reset) begin
+            ifft_data_out_count <= 5'd0;
+        end else if (ifft_out_en) begin
+            ifft_data_out_count <= ex_is_ifft ? (ifft_data_out_count + 1'b1) : ifft_data_out_count;
+            ifft_out_regs [bitrev6(ifft_data_out_count)] <= ifft_out_re; // inverse bit order for output
+        end
+    end
+
 
 
 
@@ -767,7 +1129,6 @@ module processor(
 
     assign stall_ifft = ex_is_ifft & (ifft_count != 8'd138);
 
-     
 
     assign stall = stall_multdiv | stall_fft | stall_ifft;
 
@@ -923,11 +1284,6 @@ module processor(
     wire memwb_is_mod = memwb_instr_out[31:27] == 5'b11000;
 
 
-    // WB stage – inject write when adc_ready goes high
-    reg adc_ready_d;
-    always @(posedge clock) adc_ready_d <= adc_ready;
-
-    wire pulse_adc =  adc_ready & ~adc_ready_d;  // 1‑cycle pulse
 
 
     wire [4:0] normal_rd = memwb_instr_out[26:22];
@@ -936,12 +1292,12 @@ module processor(
                     (is_jalWB ? 5'd31 : 
                     is_setxWB ? 5'd30 : normal_rd);
                     
-    assign ctrl_writeReg = (pulse_adc) ?  5'd18 : (failed_jump) ? 5'b00000 : wb_rd;
+    assign ctrl_writeReg = (failed_jump) ? 5'b00000 : wb_rd;
     
     wire [31:0] wb_data;
     assign wb_data = memwb_exception ? memwb_excode : 
                     (is_jalWB ? memwb_link_out : memwb_result_out);
-    assign data_writeReg = pulse_adc ? 32'd1 : (failed_jump) ? 32'd0 : wb_data;
+    assign data_writeReg = (failed_jump) ? 32'd0 : wb_data;
     
     assign ctrl_writeEnable = (is_storeWB | memwb_is_fft | memwb_is_ifft | memwb_is_mod) ? 1'b0 : 1'b1;
     
